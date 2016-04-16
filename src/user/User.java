@@ -30,4 +30,5 @@ public interface User
 	public void setCity(String city);
 	public void setState(String state);
 	public void setDateOfBirth(LocalDate birthDate);
+	public void setPassword(String password);
 }

@@ -3,11 +3,11 @@ package demo;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import user.Administrator;
-import user.User;
 import view.LoginView;
 
-public class Demo extends Application 
+public class Demo extends Application //Tester class(Temporary)
 {
+
 	@Override
 	public void start(Stage primaryStage)
 	{

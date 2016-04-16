@@ -39,26 +39,25 @@ public class Faculty implements User
 	@Override
 	public boolean isStudent() 
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public boolean isFacutly() 
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	@Override
 	public boolean isAdministrator() 
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public boolean correctPassword(String password)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		if(this.password.equals(password))
+			return true;
+		else
+			return false;
 	}
 	@Override
 	public Object getUser() 
