@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Scanner;
 public class GetCourseDescriptions {
 
-	public static void main(String[] args) throws FileNotFoundException 
+	public static void main(String[] args) throws IOException 
 	{
 		String courseCode = "";
 		String description = "";
@@ -18,15 +18,15 @@ public class GetCourseDescriptions {
 		String[] prerequisites = new String[5];
 		String[] attributes = new String[15];
 		int prereqCount = 0;
-		boolean ammerman;
-		boolean grant;
-		boolean eastern;
-		boolean loop = true;
+		boolean ammerman = false;
+		boolean grant = false;
+		boolean eastern = false;
 		int capIndex = 0;
 		int credits = 0;
 		int startingIndex = -1;
 		int atrIndex = 0;
-		String level;
+		String level = new String();
+		int atrCounter = 0;
 		while(fileIn.hasNextLine())
 		{
 			courseCode = fileIn.nextLine();
@@ -42,40 +42,38 @@ public class GetCourseDescriptions {
 		        {
 		            line += temp;
 		        }
-		        line = line.substring(line.indexOf("</a></td> </tr> <tr> <TD CLASS=\"ntdefault\">") + "</a></td> </tr> <tr> <TD CLASS=\"ntdefault\">".length());
+		        line = line.substring(line.indexOf("</a></td></tr><tr><TD CLASS=\"ntdefault\">") + "</a></td></tr><tr><TD CLASS=\"ntdefault\">".length());
 		        description = line.substring(0, line.indexOf("Offered on"));
 		        if(line.contains("Prerequisite: "))
 		        {
 		        	line = line.substring(line.indexOf("Prerequisite"));
-		        	while(loop)
-		        	{
-		        		for(int i = 0; i <= 50; i++)//50 is an arbitrarily long number which should encompass all prerequisistes
-		        		{
-		        			if(Character.isUpperCase(line.charAt(i)))
-		        				capIndex++;
-		        			else
-		        				capIndex = 0;
-		        			if(capIndex == 3)
-		        			{
-		        				capIndex = 0;
-		        				prerequisites[prereqCount] = line.substring(i - 2, i + 3);
-		        				i = i + 3;
-		        			}
-		        		}
-		        	}
+		        	for(int i = 0; i <= 50; i++)//50 is an arbitrarily long number which should encompass all prerequisistes
+	        		{
+	        			if(Character.isUpperCase(line.charAt(i)))
+	        				capIndex++;
+	        			else
+	        				capIndex = 0;
+	        			if(capIndex == 3)
+	        			{
+	        				capIndex = 0;
+	        				prerequisites[prereqCount] = line.substring(i - 2, i + 3);
+	        				i = i + 3;
+	        			}
+	        		} 	
 		        }
 		        line = line.substring(line.indexOf("Offered on: ") + "Offered on: ".length());
-		        if(line.substring(0, 4).contains("A"))
+		        if(line.substring(0, 5).contains("A"))
 		        	ammerman = true;
-		        if(line.substring(0, 4).contains("E"))
+		        if(line.substring(0, 5).contains("E"))
 		        	eastern = true;
-		        if(line.substring(0, 4).contains("G"))
+		        if(line.substring(0, 5).contains("G"))
 		        	grant = true;
 		        for(int i = 0; i <= 20; i++)
 		        {
 		        	if(Character.isDigit(line.charAt(i)))
 		        	{
 		        		credits = Character.getNumericValue(line.charAt(i));
+		        		break;
 		        	}
 		        }
 		        line = line.substring(line.indexOf("Levels: </SPAN>") + "Levels: </SPAN>".length());
@@ -85,27 +83,44 @@ public class GetCourseDescriptions {
 		        for(int i = 0; i < line.indexOf("<"); i++)
 		        {
 		        	if(Character.isUpperCase(line.charAt(i)))
-		        		if(startingIndex >= 0)
+		        		if(startingIndex >= 0 && atrCounter == 2)
 		        		{
-		        			attributes[atrIndex] = line.substring(startingIndex, i);
+		        			attributes[atrIndex] = line.substring(startingIndex, i + 1);
 		        			startingIndex = -1;
+		        			atrCounter = 0;
 		        			atrIndex++;
 		        		}
+		        		else if(startingIndex >= 0)
+		        			atrCounter++;
 		        		else
+		        		{
 		        			startingIndex = i;
+		        			atrCounter++;
+		        		}
+		        	else
+		        	{
+		        		atrCounter = 0;
+		        		startingIndex = -1;
+		        	}
+		        	
 		        }
 			}
 			catch(Exception e){}
-			System.out.println(courseCode + " " + description + " " + prerequisites.toString());
+			if(description != null && description != "")
+			{
+				File file = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Course Descriptions\\" + courseCode + ".bin");
+				FileOutputStream fileOut = new FileOutputStream(file);
+				ObjectOutputStream objOut = new ObjectOutputStream(fileOut);
+				objOut.writeObject(new CourseDownload(courseCode, description, ammerman, grant, eastern, prerequisites, attributes, credits, level));
+			}
+			System.out.println(courseCode + " " + description + " " + attributes[0]);
 			startingIndex = -1;
-			credits = prereqCount = capIndex = atrIndex = 0;
+			credits = prereqCount = capIndex = atrIndex = atrCounter = 0;
 			ammerman = eastern = grant = false;
-			loop = true;
 			prerequisites = new String[5];
 			attributes = new String[15];
 			line = level = "";
-			description = "";
-			
+			description = "";	
 		}
 	}
 
