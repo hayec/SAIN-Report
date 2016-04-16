@@ -2,18 +2,33 @@ package view;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import user.User;
+import eventHandlers.*;
 
 public class LoginView 
 {
-	public void start(Stage primaryStage)
+	SearchListener listenerSearch;
+	LogoutListener listenerLogout;
+	Stage primaryStage;
+	public LoginView(Stage primaryStage)
+	{
+		this.primaryStage = primaryStage;
+	}
+	public void start()
 	{
 		Label lblUsername = new Label("User Name : ");
 		TextField txtUsername = new TextField();
@@ -26,19 +41,22 @@ public class LoginView
 		lblLoginStatus.setVisible(false);
 		lblLoginStatus.setTextFill(Color.rgb(255, 50, 50));
 		//Create and populate containers to align GUI
-		HBox hbxUser = new HBox();
-		HBox hbxPassword = new HBox();
+		VBox hbxLabel = new VBox();
+		VBox hbxText = new VBox();
 		HBox hbxButton = new HBox();
-		hbxUser.getChildren().addAll(lblUsername, txtUsername);
-		hbxPassword.getChildren().addAll(lblPassword, txtPassword);
+		hbxLabel.getChildren().addAll(lblUsername, lblPassword);
+		hbxText.getChildren().addAll(txtUsername, txtPassword);
 		hbxButton.getChildren().addAll(btnExit, btnLogin);
 		//Set Spacings
-		hbxUser.setAlignment(Pos.CENTER);
-		hbxPassword.setAlignment(Pos.CENTER);
+		hbxLabel.setAlignment(Pos.CENTER);
+		hbxText.setAlignment(Pos.CENTER);
 		hbxButton.setAlignment(Pos.CENTER);
-		hbxUser.setSpacing(10);
-		hbxPassword.setSpacing(10);
+		hbxLabel.setSpacing(10);
+		hbxText.setSpacing(10);
 		hbxButton.setSpacing(30);
+		HBox hbxInput = new HBox();
+		hbxInput.getChildren().addAll(hbxLabel, hbxText);
+		hbxInput.setAlignment(Pos.CENTER);
 		VBox pane = new VBox();
 		//Set Action Events
 		btnLogin.setOnAction(e ->
@@ -54,7 +72,7 @@ public class LoginView
 					lblLoginStatus.setVisible(false);
 					try
 					{
-						Thread.sleep(500);
+						Thread.sleep(2000);
 					}
 					catch(InterruptedException ex)
 					{
@@ -68,13 +86,163 @@ public class LoginView
 			primaryStage.close();
 		});
 		//Add horizontal panes in descending order of username, password, error message, and buttons
-		pane.getChildren().addAll(hbxUser, hbxPassword, lblLoginStatus, hbxButton);
-		Scene scene = new Scene(pane, 400, 400);
+		pane.getChildren().addAll(hbxInput, lblLoginStatus, hbxButton);
+		pane.setAlignment(Pos.CENTER);
+		Scene scene = new Scene(pane, 500, 300);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
-	public void staffView(Stage stage, boolean admin)
+	@SuppressWarnings("unused")
+	public void staffView(boolean admin, User user)
 	{
-		
+		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
+		Hyperlink hplChangePass = new Hyperlink("Change Password");
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxAccount = new HBox();
+		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxAccount.setAlignment(Pos.TOP_RIGHT);
+		Label lblID = new Label("ID # : ");
+		TextField txtID = new TextField();
+		HBox hbxID = new HBox();
+		hbxID.getChildren().addAll(lblID, txtID);
+		hbxID.setAlignment(Pos.CENTER);
+		Label lblFirstName = new Label("First Name : ");
+		TextField txtFirstName = new TextField();
+		HBox hbxFirstName = new HBox();
+		hbxFirstName.getChildren().addAll(lblFirstName, txtFirstName);
+		hbxFirstName.setAlignment(Pos.CENTER);
+		Label lblLastName = new Label("Last Name : ");
+		TextField txtLastName = new TextField();
+		HBox hbxLastName = new HBox();
+		hbxLastName.getChildren().addAll(lblLastName, txtLastName);
+		hbxLastName.setAlignment(Pos.CENTER);
+		Label lblAddress = new Label("Address : ");
+		TextField txtAddress = new TextField();
+		HBox hbxAddress = new HBox();
+		hbxAddress.getChildren().addAll(lblAddress, txtAddress);
+		hbxAddress.setAlignment(Pos.CENTER);
+		Label lblCity = new Label("City : ");
+		TextField txtCity = new TextField();
+		HBox hbxCity = new HBox();
+		hbxCity.getChildren().addAll(lblCity, txtCity);
+		hbxCity.setAlignment(Pos.CENTER);
+		Label lblZipCode = new Label("Zip Code : ");
+		TextField txtZipCode = new TextField();
+		HBox hbxZipCode = new HBox();
+		hbxZipCode.getChildren().addAll(lblZipCode, txtZipCode);
+		hbxZipCode.setAlignment(Pos.CENTER);
+		Label lblState = new Label("State : ");
+		TextField txtState = new TextField();
+		HBox hbxState = new HBox();
+		hbxState.getChildren().addAll(lblState, txtState);
+		hbxState.setAlignment(Pos.CENTER);
+		Label lblGPA = new Label("GPA : ");
+		TextField txtGPA = new TextField();
+		HBox hbxGPA = new HBox();
+		hbxGPA.getChildren().addAll(lblGPA, txtGPA);
+		hbxGPA.setAlignment(Pos.CENTER);
+		Label lblSSN = new Label("Social Security # : ");
+		TextField txtSSN = new TextField();
+		HBox hbxSSN = new HBox();
+		hbxSSN.getChildren().addAll(lblSSN, txtSSN);
+		hbxSSN.setAlignment(Pos.CENTER);
+		Label lblYearEnrolled = new Label("Year Enrolled : ");
+		TextField txtYearEnrolled = new TextField();
+		HBox hbxYearEnrolled = new HBox();
+		hbxYearEnrolled.getChildren().addAll(lblYearEnrolled, txtYearEnrolled);
+		hbxYearEnrolled.setAlignment(Pos.CENTER);
+		Label lblBirthYear = new Label("Year of Birth : ");
+		TextField txtBirthYear = new TextField();
+		HBox hbxBirthYear = new HBox();
+		hbxBirthYear.getChildren().addAll(lblBirthYear, txtBirthYear);
+		hbxBirthYear.setAlignment(Pos.CENTER);
+		Label lblMajor = new Label("Major : ");
+		ComboBox<String> cmbMajor = new ComboBox<String>();
+		HBox hbxMajor = new HBox();
+		hbxMajor.getChildren().addAll(lblMajor, cmbMajor);
+		hbxMajor.setAlignment(Pos.CENTER);
+		Label lblStudents = new Label("Results : ");
+		ListView<String> lstStudents = new ListView<String>();
+		lstStudents.setMaxHeight(300);
+		lstStudents.setMaxWidth(600);
+		VBox vbxResults = new VBox();
+		vbxResults.getChildren().addAll(lblStudents, lstStudents);
+		vbxResults.setAlignment(Pos.CENTER);
+		Button btnSearch = new Button("Search");
+		Button btnClear = new Button("Clear");
+		Button btnEdit = new Button("Edit Student Data");
+		HBox hbxButtons = new HBox();
+		hbxButtons.getChildren().addAll(btnClear, btnSearch, btnEdit);
+		VBox vbxLabel = new VBox();
+		vbxLabel.getChildren().addAll(lblID, lblFirstName, lblLastName, lblAddress, lblCity, lblZipCode, lblState, lblGPA, lblSSN, lblYearEnrolled, lblBirthYear, lblMajor);
+		vbxLabel.setAlignment(Pos.CENTER);
+		vbxLabel.setSpacing(30);
+		VBox vbxText = new VBox();
+		vbxText.getChildren().addAll(txtID, txtFirstName, txtLastName, txtAddress, txtCity, txtZipCode, txtState, txtGPA, txtSSN, txtYearEnrolled, txtBirthYear, cmbMajor);
+		vbxText.setAlignment(Pos.CENTER);
+		vbxText.setSpacing(15);
+		HBox hbxInput = new HBox();
+		hbxInput.getChildren().addAll(vbxLabel, vbxText);
+		if(!admin)//Don't allow faculty to edit student data
+			btnEdit.setVisible(false);
+		btnSearch.setOnAction(e->{
+			SearchEventObject ev = new SearchEventObject(btnSearch, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), Integer.parseInt(txtZipCode.getText()), txtSSN.getText(), Integer.parseInt(txtYearEnrolled.getText()), Integer.parseInt(txtBirthYear.getText()), cmbMajor.getValue(), Double.parseDouble(txtGPA.getText()));
+			if(listenerSearch != null)
+			{
+				listenerSearch.search(ev);
+				if(ev.isInputValid())
+				{
+					if(ev.getStudentResults().length == 0)
+					{
+						Alert alert = new Alert(AlertType.INFORMATION, "No students were found with the specified search terms.", ButtonType.OK);
+						alert.showAndWait();
+					}
+					else
+					{
+						for(int i = 0; i < ev.getStudentResults().length; i++)
+							lstStudents.getItems().add(ev.getStudentResults()[i].getLastName() + ", " + ev.getStudentResults()[i].getFirstName() + " " + ev.getStudentResults()[i].getId());
+					}
+				}
+				else
+				{
+					Alert alert = new Alert(AlertType.ERROR, "Error!  Invalid input detected!  Please check input validity, then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+			}
+		});
+		btnClear.setOnAction(e->{
+			txtFirstName.clear();
+			txtLastName.clear();
+			txtAddress.clear();
+			txtCity.clear();
+			txtZipCode.clear();
+			txtState.clear();
+			txtGPA.clear();
+			txtSSN.clear();
+			txtYearEnrolled.clear();
+			txtBirthYear.clear();
+			cmbMajor.setValue(null);
+			lstStudents.getItems().removeAll();
+		});
+		VBox pane = new VBox();
+		pane.getChildren().addAll(hbxAccount, hbxInput, vbxResults);
+		pane.setAlignment(Pos.CENTER);
+		Scene scene = new Scene(pane, 800, 1100);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("SAIN Report");
+		primaryStage.show();
+	}
+	public void setListenerSearch(SearchListener listenerSearch) 
+	{
+		this.listenerSearch = listenerSearch;
+	}
+	public void setListenerLogout(LogoutListener logoutListener) 
+	{
+		this.listenerLogout = logoutListener;
 	}
 }

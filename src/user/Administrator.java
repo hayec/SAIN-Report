@@ -4,9 +4,9 @@ import java.time.LocalDate;
 
 public class Administrator implements User
 {
+	private String username;
 	private int id;
 	private String firstName;
-	
 	private String lastName;
 	private LocalDate dateOfBirth;
 	private String address;
@@ -16,6 +16,7 @@ public class Administrator implements User
 	private String title;
 	private String socialSecNum;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
+	public Administrator(String firstName, String lastName){this.firstName = firstName; this.lastName = lastName;}
 	public Administrator(int id, String firstName, String lastName, LocalDate dateOfBirth, String address, String city,
 			String state, int zipCode, String title, String socialSecNum, String password) 
 	{
@@ -34,7 +35,7 @@ public class Administrator implements User
 	@Override
 	public String getName() 
 	{
-		return firstName + lastName;
+		return firstName + " " + lastName;
 	}
 	@Override
 	public boolean isStudent() 
@@ -155,5 +156,14 @@ public class Administrator implements User
 	public void setPassword(String password) 
 	{
 		this.password = password;
+	}
+	@Override
+	public String getUsername() 
+	{
+		return username;
+	}
+	public void setUsername(String username) 
+	{
+		this.username = username;
 	}
 }

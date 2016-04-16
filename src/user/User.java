@@ -1,7 +1,10 @@
 package user;
 
+import java.time.LocalDate;
+
 public interface User 
 {
+	public String getUsername();
 	public String getName();	
 	public boolean isStudent();
 	public boolean isFacutly();
@@ -17,4 +20,14 @@ public interface User
 	public String getState();
 	public Object getUser();
 	public int getBirthYear();
+	public void setUsername(String username);
+	public void setId(int id);
+	public void setFirstName(String firstName);
+	public void setLastName(String lastName);
+	public void setZipCode(int zipCode);
+	public void setSocialSecNum(String socSecNum);
+	public void setAddress(String address);
+	public void setCity(String city);
+	public void setState(String state);
+	public void setDateOfBirth(LocalDate birthDate);
 }

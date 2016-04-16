@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class Faculty implements User 
 {
+	String username;
 	private int id;
 	private String firstName;
 	private String lastName;
@@ -18,7 +19,7 @@ public class Faculty implements User
 	@Override
 	public String getName()
 	{
-		return null;
+		return firstName + " " + lastName;
 	}
 	public Faculty(int id, String firstName, String lastName, LocalDate dateOfBirth, String address, String city,
 			String state, int zipCode, String title, String socialSecNum, String password) 
@@ -147,6 +148,12 @@ public class Faculty implements User
 	public void setSocialSecNum(String socialSecNum)
 	{
 		this.socialSecNum = socialSecNum;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	public String getPassword() 
 	{

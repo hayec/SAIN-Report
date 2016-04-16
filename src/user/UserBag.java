@@ -125,7 +125,7 @@ public class UserBag
 		return returnUser;
 	}
 	@SuppressWarnings("unchecked")
-	public Student[] getStudents(String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear, int gpa, Major major, int yearEnrolled)//Any undesired requirements should be designated as negative or null
+	public Student[] getStudents(String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear, double gpa, Major major, int yearEnrolled)//Any undesired requirements should be designated as negative or null
 	{
 		Student[] returnStudent = null;
 		ArrayList<Student> students = new ArrayList<Student>();//All students in the bag

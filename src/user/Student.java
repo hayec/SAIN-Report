@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class Student implements User 
 {
+	private String username;
 	private int id;
 	private String firstName;
 	private String lastName;
@@ -56,7 +57,7 @@ public class Student implements User
 	@Override
 	public String getName() 
 	{
-		return firstName + lastName;
+		return firstName + " " + lastName;
 	}
 	@Override
 	public boolean correctPassword(String password) 
@@ -181,6 +182,12 @@ public class Student implements User
 	public void setMajor(Major major) 
 	{
 		this.major = major;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	public String getPassword() 
 	{
