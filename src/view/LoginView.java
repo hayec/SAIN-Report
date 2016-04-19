@@ -104,6 +104,9 @@ public class LoginView
 	@SuppressWarnings("unchecked")
 	public void staffView(boolean admin, User user)
 	{
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
 		Hyperlink hplChangePass = new Hyperlink("Change Password");
 		hplChangePass.setOnAction(e->
@@ -179,36 +182,63 @@ public class LoginView
 		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
 		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblID = new Label("ID # : ");
+		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
+		grid.add(txtID,  1, 0);
 		Label lblFirstName = new Label("First Name : ");
+		grid.add(lblFirstName,  0, 1);
 		TextField txtFirstName = new TextField();
+		grid.add(txtFirstName,  1, 1);
 		Label lblLastName = new Label("Last Name : ");
+		grid.add(lblLastName,  0, 2);
 		TextField txtLastName = new TextField();
+		grid.add(txtLastName,  1, 2);
 		Label lblAddress = new Label("Address : ");
+		grid.add(lblAddress,  0, 3);
 		TextField txtAddress = new TextField();
+		grid.add(txtAddress,  1, 3);
 		Label lblCity = new Label("City : ");
+		grid.add(lblCity,  0, 4);
 		TextField txtCity = new TextField();
+		grid.add(txtCity,  1, 4);
 		Label lblZipCode = new Label("Zip Code : ");
+		grid.add(lblZipCode,  0, 5);
 		TextField txtZipCode = new TextField();
+		grid.add(txtZipCode,  1, 5);
 		Label lblState = new Label("State : ");
+		grid.add(lblState,  0, 6);
 		TextField txtState = new TextField();
+		grid.add(txtState,  1, 6);
 		Label lblGPA = new Label("GPA : ");
+		grid.add(lblGPA,  0, 7);
 		TextField txtGPA = new TextField();
+		grid.add(txtGPA,  1, 7);
 		Label lblSSN = new Label("Social Security # : ");
+		grid.add(lblSSN,  0, 8);
 		TextField txtSSN = new TextField();
+		grid.add(txtSSN,  1, 8);
 		Label lblYearEnrolled = new Label("Year Enrolled : ");
+		grid.add(lblYearEnrolled,  0, 9);
 		TextField txtYearEnrolled = new TextField();
+		grid.add(txtYearEnrolled,  1, 9);
 		Label lblBirthYear = new Label("Year of Birth : ");
+		grid.add(lblBirthYear,  0, 10);
 		TextField txtBirthYear = new TextField();
+		grid.add(txtBirthYear,  1, 10);
 		Label lblMajor = new Label("Major : ");
+		grid.add(lblMajor,  0, 11);
 		ComboBox<String> cmbMajor = new ComboBox<String>();
+		grid.add(cmbMajor,  1, 11);
 		Label lblStudents = new Label("Results : ");
+		grid.add(lblStudents,  0, 12);
 		ListView<String> lstStudents = new ListView<String>();
+		grid.add(lstStudents, 0, 13);
 		lstStudents.setMaxHeight(300);
 		lstStudents.setMaxWidth(600);
-		VBox vbxResults = new VBox();
+		grid.setAlignment(Pos.CENTER);
+		/*VBox vbxResults = new VBox();
 		vbxResults.getChildren().addAll(lblStudents, lstStudents);
-		vbxResults.setAlignment(Pos.CENTER);
+		vbxResults.setAlignment(Pos.CENTER);*/
 		Button btnSearch = new Button("Search");
 		Button btnSelect = new Button("Select Student");
 		Button btnClear = new Button("Clear");
@@ -218,7 +248,7 @@ public class LoginView
 			hbxButtons.getChildren().addAll(btnClear, btnSearch, btnSelect, btnEdit);
 		else
 			hbxButtons.getChildren().addAll(btnClear, btnSearch, btnSelect);
-		VBox vbxLabel = new VBox();
+		/*VBox vbxLabel = new VBox();
 		vbxLabel.getChildren().addAll(lblID, lblFirstName, lblLastName, lblAddress, lblCity, lblZipCode, lblState, lblGPA, lblSSN, lblYearEnrolled, lblBirthYear, lblMajor);
 		vbxLabel.setAlignment(Pos.CENTER);
 		vbxLabel.setSpacing(30);
@@ -227,7 +257,7 @@ public class LoginView
 		vbxText.setAlignment(Pos.CENTER);
 		vbxText.setSpacing(15);
 		HBox hbxInput = new HBox();
-		hbxInput.getChildren().addAll(vbxLabel, vbxText);
+		hbxInput.getChildren().addAll(vbxLabel, vbxText);*/
 		if(!admin)//Don't allow faculty to edit student data
 			btnEdit.setVisible(false);
 		btnSearch.setOnAction(e->{
@@ -270,7 +300,7 @@ public class LoginView
 			lstStudents.getItems().removeAll();
 		});
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, hbxInput, vbxResults);
+		pane.getChildren().addAll(hbxAccount, grid);
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
