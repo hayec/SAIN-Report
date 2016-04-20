@@ -45,7 +45,7 @@ public class StaffView
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void start(boolean admin, User user)
+	public void start(boolean admin, User user, String[] majors)
 	{
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -172,6 +172,8 @@ public class StaffView
 		grid.add(lblMajor,  0, 11);
 		ComboBox<String> cmbMajor = new ComboBox<String>();
 		grid.add(cmbMajor,  1, 11);
+		for(int i = 0; i < majors.length; i++)
+			cmbMajor.getItems().add(majors[i]);
 		Label lblStudents = new Label("Results : ");
 		grid.add(lblStudents,  0, 12);
 		ListView<String> lstStudents = new ListView<String>();
@@ -220,7 +222,7 @@ public class StaffView
 			if(listenerAdmin != null)
 				listenerAdmin.verify(ev);
 			if(ev.isValid())
-				adminEdit(user, ev.getStudent());
+				adminEdit(user, ev.getStudent(), majors);
 			else
 			{
 				Alert alert = new Alert(AlertType.ERROR, "Error!  Invalid ID detected!  Please enter a valid ID, then try again.", ButtonType.OK);
@@ -249,7 +251,7 @@ public class StaffView
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
 	}
-	public void adminEdit(User user, Student student)
+	public void adminEdit(User user, Student student, String[] majors)
 	{
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -378,6 +380,8 @@ public class StaffView
 		grid.add(lblMajor,  0, 12);
 		ComboBox<String> cmbMajor = new ComboBox<String>();
 		grid.add(cmbMajor,  1, 12);
+		for(int i = 0; i < majors.length; i++)
+			cmbMajor.getItems().add(majors[i]);
 		Label lblPassword = new Label("Password : ");
 		grid.add(lblPassword, 0, 13);
 		PasswordField txtPassword = new PasswordField();
@@ -388,7 +392,7 @@ public class StaffView
 		Button btnClear = new Button("Clear");
 		HBox hbxButtons = new HBox();
 		btnBack.setOnAction(e->{
-			start(true, user);
+			start(true, user, majors);
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
 		btnEdit.setOnAction(e->{

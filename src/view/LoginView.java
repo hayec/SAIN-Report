@@ -32,6 +32,7 @@ import eventHandlers.*;
 public class LoginView 
 {
 	LoginListener listenerLogin;
+	NewAccountListener listenerAcct;
 	Stage primaryStage;
 	public LoginView(Stage primaryStage)
 	{
@@ -92,15 +93,49 @@ public class LoginView
 		btnExit.setOnAction(e ->{
 			primaryStage.close();
 		});
-		//Add horizontal panes in descending order of username, password, error message, and buttons
 		pane.getChildren().addAll(hbxInput, lblLoginStatus, hbxButton);
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 500, 300);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
+	public void newUser()
+	{
+		Label lblDefault = new Label("Please create an administrative account to continue : ");
+		Label lblUsername = new Label("Username(ID #) : ");
+		TextField txtUsername = new TextField();
+		Label lblPassword = new Label("Password : ");
+		PasswordField txtPassword = new PasswordField();
+		Button btnContinue = new Button("Continue");
+		btnContinue.setOnAction(e->
+		{
+			NewAccountEventObject ev = new NewAccountEventObject(btnContinue, txtUsername.getText(), txtPassword.getText());
+			if(listenerAcct != null)
+				listenerAcct.newAccount(ev);
+			if(!ev.isValidPassword())
+			{
+				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		VBox vbxLabels = new VBox();
+		vbxLabels.getChildren().addAll(lblUsername, lblPassword);
+		VBox vbxText = new VBox();
+		vbxText.getChildren().addAll(txtUsername, txtPassword);
+		HBox hbxInput = new HBox();
+		hbxInput.getChildren().addAll(vbxLabels, vbxText);
+		VBox pane = new VBox();
+		pane.getChildren().addAll(lblDefault, hbxInput, btnContinue);
+		Scene scene = new Scene(pane, 400, 400);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
 	public void setListenerLogin(LoginListener listenerLogin)
 	{
 		this.listenerLogin = listenerLogin;
+	}
+	public void setListenerAccount(NewAccountListener listenerAcct)
+	{
+		this.listenerAcct = listenerAcct;
 	}
 }

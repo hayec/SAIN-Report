@@ -14,14 +14,22 @@ public class Major
 	{
 		return null;//Placeholder
 	}
-	public Course[] coursesNeeded(Student student)
+	//public Course[] coursesNeeded(Student student)
 	{
 		
 	}
 	
-	public int numOfSemestersNeeded(Student student)
+	//public int numOfSemestersNeeded(Student student)
 	{
 		
+	}
+	public String getName() 
+	{
+		return name;
+	}
+	public void setName(String name) 
+	{
+		this.name = name;
 	}
 	public String toString()
 	{

@@ -16,7 +16,11 @@ public class Administrator implements User
 	private String title;
 	private String socialSecNum;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
-	public Administrator(String firstName, String lastName){this.firstName = firstName; this.lastName = lastName;}
+	public Administrator(int id, String password)
+	{
+		this.id = id;
+		this.password = password;
+	}
 	public Administrator(int id, String firstName, String lastName, LocalDate dateOfBirth, String address, String city,
 			String state, int zipCode, String title, String socialSecNum, String password) 
 	{

@@ -32,12 +32,14 @@ public class StudentView
 	PasswordListener listenerPassword;
 	LogoutListener listenerLogout;
 	BackListener listenerBack;
+	String[] majorCache;
 	public StudentView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void studentStart(User user, Student student)
+	public void studentStart(User user, Student student, String[] majors)
 	{
+		majorCache = majors;
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
 		Hyperlink hplChangePass = new Hyperlink("Change Password");
 		hplChangePass.setOnAction(e->
@@ -92,8 +94,10 @@ public class StudentView
 			});
 		});
 		Label lblMajor = new Label("Please select a major to continue : ");
-		ComboBox<Major> cmbMajor = new ComboBox<Major>();
-		cmbMajor.setValue(student.getMajor());
+		ComboBox<String> cmbMajor = new ComboBox<String>();
+		for(int i = 0; i < majors.length; i++)
+			cmbMajor.getItems().add(majors[i]);
+		cmbMajor.setValue(student.getMajor().getName());
 		HBox hbxInput = new HBox();
 		hbxInput.getChildren().addAll(lblMajor, cmbMajor);
 		hbxInput.setAlignment(Pos.CENTER);
@@ -201,7 +205,7 @@ public class StudentView
 		btnBack.setOnAction(e->
 		{
 			if(user.isStudent())
-				studentStart(user, student);
+				studentStart(user, student, majorCache);
 			else
 			{
 				BackEventObject ev = new BackEventObject(btnBack);

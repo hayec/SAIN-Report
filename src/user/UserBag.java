@@ -10,6 +10,11 @@ public class UserBag
 	{
 		users.add(user);
 	}
+	public void addUser(User[] newUsers)
+	{
+		for(int i = 0; i < newUsers.length; i++)
+			users.add(newUsers[i]);
+	}
 	public User getUser(int id)
 	{
 		User returnUser = null;
@@ -30,6 +35,10 @@ public class UserBag
 				break;
 			}
 		}
+	}
+	public User[] getUsers()
+	{
+		return users.toArray(new User[users.size()]);
 	}
 	@SuppressWarnings("unchecked")
 	public User[] getUsers(String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear)//Any undesired requirements should be designated as negative or null

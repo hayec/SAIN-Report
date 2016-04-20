@@ -12,6 +12,11 @@ public class CourseBag
 	{
 		courses.add(course);
 	}
+	public void addCourse(Course[] newCourses)
+	{
+		for(int i = 0; i < newCourses.length; i++)
+			courses.add(newCourses[i]);
+	}
 	public Course getCourse(String courseCode)
 	{
 		Course returnCourse = null;
