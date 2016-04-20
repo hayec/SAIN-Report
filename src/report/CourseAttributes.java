@@ -14,6 +14,7 @@ public class CourseAttributes
 	boolean socScience;
 	boolean language;
 	boolean philosophy;
+	public CourseAttributes() {}
 	public CourseAttributes(boolean physEd, boolean history, boolean labScience, boolean math, boolean humanities,
 			boolean business, boolean english, boolean communications, boolean amerHis, boolean socScience,
 			boolean language, boolean philosophy) 

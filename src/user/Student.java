@@ -1,6 +1,10 @@
 package user;
 
 import java.time.LocalDate;
+import report.Course;
+import report.CourseBag;
+
+import java.util.ArrayList;
 
 public class Student implements User 
 {
@@ -8,7 +12,7 @@ public class Student implements User
 	private int id;
 	private String firstName;
 	private String lastName;
-	private double gpa;
+	private double gpa;//Placeholder, make derived attribute
 	private LocalDate dateEnrolled;
 	private LocalDate dateOfBirth;
 	private String socialSecNum;
@@ -19,12 +23,13 @@ public class Student implements User
 	private String campus;
 	private Major major;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
-	public Student(int id, String firstName, String lastName, double gpa, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String campus, Major major)
+	//private ArrayList<Course> courseWork = new ArrayList<Course>();
+	public CourseBag courseWork = new CourseBag();
+	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String campus, Major major)
 	{
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.gpa = gpa;
 		this.dateEnrolled = dateEnrolled;
 		this.dateOfBirth = dateOfBirth;
 		this.socialSecNum = socialSecNum;
@@ -33,6 +38,22 @@ public class Student implements User
 		this.city = city;
 		this.zipCode = zipCode;
 		this.campus = campus;
+	}
+	public Student clone()
+	{
+		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, campus, major);
+	}
+	public void addCourse(Course course)
+	{
+		courseWork.addCourse(course);
+	}
+	public void removeCourse(Course course)
+	{
+		courseWork.removeCourse(course.getCourseCode());
+	}
+	public Course[] getCourseWork()
+	{
+		return courseWork.getCourses();
 	}
 	@Override
 	public boolean isStudent() 
@@ -52,7 +73,7 @@ public class Student implements User
 	@Override
 	public Object getUser() 
 	{
-		return new Student(id, firstName, lastName, gpa, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, campus, major);
+		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, campus, major);
 	}
 	@Override
 	public String getName() 
@@ -202,6 +223,28 @@ public class Student implements User
 		}
 		else
 			return false;
+	}
+	public Course[] coursesNeeded()
+	{
+		return major.coursesNeeded(this);
+	}
+	public int semestersNeeded()
+	{
+		return major.numOfSemestersNeeded(this);
+	}
+	public int numOfCredits()
+	{
+		int credits = 0;
+		for(Course c : courseWork.getCourses())
+			credits += c.getCredits();
+		return credits;
+	}
+	public int numOfCreditsPassed()
+	{
+		int credits = 0;
+		for(Course c : courseWork.getCourses())
+			credits += c.getCredits();
+		return credits;
 	}
 
 }

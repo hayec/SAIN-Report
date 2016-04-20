@@ -4,27 +4,37 @@ import java.io.Serializable;
 
 public class CourseDownload implements Serializable
 {
-	String courseCode = "";
-	String description = "";
+	String courseCode;
+	String title;
+	String description;
 	boolean ammerman;
 	boolean grant;
 	boolean eastern;
 	String[] prerequisites = new String[5];
+	String[] corequisites = new String[5];
 	String[] attributes = new String[15];
 	int credits = 0;
 	String level;
-	public CourseDownload(String courseCode, String description, boolean ammerman, boolean grant, boolean eastern,
-			String[] prerequisites, String[] attributes, int credits, String level) {
+	public CourseDownload(String courseCode, String title, String description, boolean ammerman, boolean grant, boolean eastern,
+			String[] prerequisites, String[] corequisites, String[] attributes, int credits, String level) {
 		super();
 		this.courseCode = courseCode;
+		this.title = title;
 		this.description = description;
 		this.ammerman = ammerman;
 		this.grant = grant;
 		this.eastern = eastern;
 		this.prerequisites = prerequisites;
+		this.corequisites = corequisites;
 		this.attributes = attributes;
 		this.credits = credits;
 		this.level = level;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	public String getCourseCode() {
 		return courseCode;

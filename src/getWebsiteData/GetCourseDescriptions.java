@@ -2,6 +2,7 @@ package getWebsiteData;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Scanner;
 public class GetCourseDescriptions {
 
@@ -9,15 +10,19 @@ public class GetCourseDescriptions {
 	{
 		String courseCode = "";
 		String description = "";
+		String title = "";
 		URL url;
 	    InputStream is = null;
 	    BufferedReader br;
 	    String line = new String();
 		Scanner fileIn = new Scanner(new File("Courses.txt"));
 		String temp;
-		String[] prerequisites = new String[5];
-		String[] attributes = new String[15];
-		int prereqCount = 0;
+		ArrayList<String> prereqArray = new ArrayList<String>();
+		ArrayList<String> coreqArray = new ArrayList<String>();
+		ArrayList<String> attrArray = new ArrayList<String>();
+		String[] prerequisites = null;
+		String[] corequisites = null;
+		String[] attributes = null;
 		boolean ammerman = false;
 		boolean grant = false;
 		boolean eastern = false;
@@ -27,6 +32,7 @@ public class GetCourseDescriptions {
 		int atrIndex = 0;
 		String level = new String();
 		int atrCounter = 0;
+		int prereqIndex = 0;
 		while(fileIn.hasNextLine())
 		{
 			courseCode = fileIn.nextLine();
@@ -42,12 +48,22 @@ public class GetCourseDescriptions {
 		        {
 		            line += temp;
 		        }
+		        line = line.substring(line.indexOf("\">" + courseCode.substring(0, 3)) + ("\">" + courseCode + "  - ").length());
+		        title = line.substring(0, line.indexOf("</a>"));
 		        line = line.substring(line.indexOf("</a></td></tr><tr><TD CLASS=\"ntdefault\">") + "</a></td></tr><tr><TD CLASS=\"ntdefault\">".length());
 		        description = line.substring(0, line.indexOf("Offered on"));
 		        if(line.contains("Prerequisite: "))
 		        {
 		        	line = line.substring(line.indexOf("Prerequisite"));
-		        	for(int i = 0; i <= 50; i++)//50 is an arbitrarily long number which should encompass all prerequisistes
+		        	if(!line.contains("Corequisite"))
+		        	{
+		        		prereqIndex = 50;//50 is an arbitrarily long number which should encompass all prerequisistes
+		        	}
+		        	else
+		        	{
+		        		prereqIndex = line.indexOf("Corequisite");
+		        	}
+		        	for(int i = 0; i <= 50; i++)
 	        		{
 	        			if(Character.isUpperCase(line.charAt(i)))
 	        				capIndex++;
@@ -56,7 +72,25 @@ public class GetCourseDescriptions {
 	        			if(capIndex == 3)
 	        			{
 	        				capIndex = 0;
-	        				prerequisites[prereqCount] = line.substring(i - 2, i + 3);
+	        				prereqArray.add(line.substring(i - 2, i + 3));
+	        				i = i + 3;
+	        			}
+	        		}
+		        	capIndex = 0;
+		        }
+		        if(line.contains("Corequisite: "))
+		        {
+		        	line = line.substring(line.indexOf("Corequisite"));
+		        	for(int i = 0; i <= 50; i++)//50 is an arbitrarily long number which should encompass all corequisistes
+	        		{
+	        			if(Character.isUpperCase(line.charAt(i)))
+	        				capIndex++;
+	        			else
+	        				capIndex = 0;
+	        			if(capIndex == 3)
+	        			{
+	        				capIndex = 0;
+	        				coreqArray.add(line.substring(i - 2, i + 3));
 	        				i = i + 3;
 	        			}
 	        		} 	
@@ -85,11 +119,10 @@ public class GetCourseDescriptions {
 		        	if(Character.isUpperCase(line.charAt(i)))
 		        		if(startingIndex >= 0 && atrCounter == 2)
 		        		{
-		        			attributes[atrIndex] = line.substring(startingIndex, i + 1);
+		        			attrArray.add(line.substring(startingIndex, i + 1));
 		        			startingIndex = -1;
 		        			atrCounter = 0;
-		        			atrIndex++;
-		        		}
+		        		}	
 		        		else if(startingIndex >= 0)
 		        			atrCounter++;
 		        		else
@@ -106,22 +139,29 @@ public class GetCourseDescriptions {
 		        }
 			}
 			catch(Exception e){}
+			prerequisites = prereqArray.toArray(new String[prereqArray.size()]);
+			corequisites = coreqArray.toArray(new String[prereqArray.size()]);
+			attributes = attrArray.toArray(new String[prereqArray.size()]);
 			if(description != null && description != "")
 			{
 				File file = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Course Descriptions\\" + courseCode + ".bin");
 				FileOutputStream fileOut = new FileOutputStream(file);
 				ObjectOutputStream objOut = new ObjectOutputStream(fileOut);
-				objOut.writeObject(new CourseDownload(courseCode, description, ammerman, grant, eastern, prerequisites, attributes, credits, level));
+				objOut.writeObject(new CourseDownload(courseCode, title, description, ammerman, grant, eastern, prerequisites, corequisites, attributes, credits, level));
+				objOut.close();
+				fileOut.close();
 			}
-			System.out.println(courseCode + " " + description + " " + attributes[0]);
+			System.out.println(courseCode + " " + title + " " + description);
 			startingIndex = -1;
-			credits = prereqCount = capIndex = atrIndex = atrCounter = 0;
+			credits = capIndex = atrIndex = atrCounter = 0;
 			ammerman = eastern = grant = false;
-			prerequisites = new String[5];
-			attributes = new String[15];
+			prereqArray = new ArrayList<String>();
+			coreqArray = new ArrayList<String>();
+			attrArray = new ArrayList<String>();
 			line = level = "";
 			description = "";	
 		}
+		fileIn.close();
 	}
 
 }
