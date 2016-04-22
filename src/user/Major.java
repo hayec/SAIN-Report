@@ -40,6 +40,20 @@ public class Major
 		else
 			return 0;
 	}
+	public Course[] getMajorCoursesDone(Student student)
+	{
+		ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
+		ArrayList<Course> returnCourse = new ArrayList<Course>();
+		for(int i = 0; i < studentCourses.size(); i++)
+		{
+			for(int j = 0; j < reqCourses.length; j++)
+			{
+				if(reqCourses[j].equals(studentCourses.get(i)))//Make equals method
+					returnCourse.add(studentCourses.get(i));
+			}
+		}
+		return returnCourse.toArray(new Course[returnCourse.size()]);
+	}
 	public Course[] getMajorCoursesReq(ArrayList<Course> studentCourses)
 	{
 		for(int i = 0; i < studentCourses.size(); i++)
@@ -128,6 +142,36 @@ public class Major
 			}
 		}
 		return studentCourses.toArray(new Course[studentCourses.size()]);
+	}
+	public int getNumOfSemestersReq(Student student)
+	{
+		ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
+		ArrayList<Course> prerequisites = new ArrayList<Course>();
+		ArrayList<Course> temp = new ArrayList<Course>();
+		int semesters = 0;
+		prerequisites = studentCourses;
+		boolean loop = true;
+		while(loop)
+		{
+			for(Course c : prerequisites)
+			{
+				if(c.getPrerequisites() != null)
+					for(int i = 0; i < c.getPrerequisites().length; i++)
+						if(!student.courseWork.getCourse(c.getPrerequisites()[i].getCourseCode()).isSuccessful())
+							temp.add(c.getPrerequisites()[i]);
+			}
+			if(temp.size() > 0)
+			{
+				semesters++;
+				prerequisites = temp;
+				temp = new ArrayList<Course>();
+			}
+			else
+			{
+				loop = false;
+			}
+		}
+		return semesters;
 	}
 	private ArrayList<Course> getGenReqsSatisfied(ArrayList<Course> studentCourses)
 	{

@@ -12,7 +12,6 @@ public class Student implements User
 	private int id;
 	private String firstName;
 	private String lastName;
-	private double gpa;//Placeholder, make derived attribute
 	private LocalDate dateEnrolled;
 	private LocalDate dateOfBirth;
 	private String socialSecNum;
@@ -23,7 +22,6 @@ public class Student implements User
 	private String campus;
 	private Major major;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
-	//private ArrayList<Course> courseWork = new ArrayList<Course>();
 	public CourseBag courseWork = new CourseBag();
 	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String campus, Major major)
 	{
@@ -114,11 +112,11 @@ public class Student implements User
 	}
 	public double getGpa() 
 	{
+		double gpa = 0;
+		for(Course c : courseWork.getCourses())
+			gpa += c.getCourseGrade() * c.getCredits();
+		gpa /= numOfCredits();
 		return gpa;
-	}
-	public void setGpa(double gpa) 
-	{
-		this.gpa = gpa;
 	}
 	public LocalDate getDateEnrolled() 
 	{
@@ -224,15 +222,9 @@ public class Student implements User
 		else
 			return false;
 	}
-	public Course[] coursesNeeded()
-	{
-		return null;
-		//return major.coursesNeeded(this);
-	}
 	public int semestersNeeded()
 	{
-		return 0;
-		//return major.numOfSemestersNeeded(this);
+		return major.getNumOfSemestersReq(this);
 	}
 	public int numOfCredits()
 	{
@@ -248,5 +240,20 @@ public class Student implements User
 			credits += c.getCredits();
 		return credits;
 	}
-
+	public Course[] getPassedCourses()
+	{
+		ArrayList<Course> returnCourse = new ArrayList<Course>();
+		for(Course c : courseWork.getCourses())
+			if(c.isSuccessful())
+				returnCourse.add(c);
+		return returnCourse.toArray(new Course[returnCourse.size()]);
+	}
+	public Course[] getFailedCourses()
+	{
+		ArrayList<Course> returnCourse = new ArrayList<Course>();
+		for(Course c : courseWork.getCourses())
+			if(!c.isSuccessful())
+				returnCourse.add(c);
+		return returnCourse.toArray(new Course[returnCourse.size()]);
+	}
 }

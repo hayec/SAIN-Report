@@ -10,8 +10,8 @@ public class Course
 	private boolean ammerman;
 	private boolean grant;
 	private boolean eastern;
-	private String[] prerequisites = new String[5];
-	private String[] corequisites = new String[5];
+	private Course[] prerequisites;
+	private Course[] corequisites;
 	private int credits;
 	private boolean complete;
 	private double courseGrade;
@@ -42,7 +42,7 @@ public class Course
 		this.CAttributes = CAttributes;
 	}
 	public Course(String courseCode, String courseTitle, String courseDescription, boolean ammerman, boolean grant,
-			boolean eastern, String[] prerequisites, String[] corequisites, int credits, boolean complete,
+			boolean eastern, Course[] prerequisites, Course[] corequisites, int credits, boolean complete,
 			double courseGrade, boolean transferCourse) {
 		super();
 		this.courseCode = courseCode;
@@ -87,19 +87,19 @@ public class Course
 	{
 		this.eastern = eastern;
 	}
-	public String[] getPrerequisites() 
+	public Course[] getPrerequisites() 
 	{
 		return prerequisites;
 	}
-	public void setPrerequisites(String[] prerequisites) 
+	public void setPrerequisites(Course[] prerequisites) 
 	{
 		this.prerequisites = prerequisites;
 	}
-	public String[] getCorequisites() 
+	public Course[] getCorequisites() 
 	{
 		return corequisites;
 	}
-	public void setCorequisites(String[] corequisites) 
+	public void setCorequisites(Course[] corequisites) 
 	{
 		this.corequisites = corequisites;
 	}
@@ -146,9 +146,9 @@ public class Course
 	{
 		return courseCode + " " + courseTitle + " " + credits + " credits";
 	}
-	public String[] prerequisitesSatisfied(Course[] course)
+	public Course[] prerequisitesSatisfied(Course[] course)
 	{
-		ArrayList<String> courseResults = new ArrayList<String>();
+		ArrayList<Course> courseResults = new ArrayList<Course>();
 		//tempCourse = (ArrayList<Course>) courseResults.clone();
 		boolean loop = true;
 		boolean subLoop = false;

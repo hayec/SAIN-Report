@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import report.Course;
 import user.Major;
+import user.MajorBag;
 import user.Student;
 import user.User;
 
@@ -103,16 +104,27 @@ public class StudentView
 		hbxInput.setAlignment(Pos.CENTER);
 		hbxInput.setSpacing(15);
 		Button btnContinue = new Button("Continue");
+		btnContinue.setOnAction(e->{
+			Student tempStudent = student.clone();
+			tempStudent.setMajor(MajorBag.getMajor(cmbMajor.getValue()));
+			studentView(user, tempStudent);
+		});
+		Button btnViewSAIN = new Button("View SAIN Report");
+		btnViewSAIN.setOnAction(e->{
+			studentView(user, student);
+		});
 		HBox hbxButtons = new HBox();
-		hbxButtons.getChildren().addAll(btnContinue);
 		if(!user.isStudent())
 		{
 			Button btnBack = new Button("Back");
 			hbxButtons.getChildren().addAll(btnBack);
 			btnBack.setOnAction(e ->{
-				
+				BackEventObject ev = new BackEventObject(btnBack);
+				if(listenerBack != null)
+					listenerBack.back(ev);
 			});
 		}
+		hbxButtons.getChildren().addAll(btnContinue, btnViewSAIN);
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(15);
 		VBox pane = new VBox();
@@ -183,10 +195,20 @@ public class StudentView
 		Label lblNumOfCreditsPass = new Label("Number of Credits Successfully Completed : " + student.numOfCreditsPassed());
 		Label lblCoursePass = new Label("Courses Successfully Completed : ");
 		ListView<Course> lstCoursesPassed = new ListView<Course>();
-		Label lblCourseFail = new Label("Courses Unsuccessfuly Completed : ");
+		Label lblMajorCoursesPass = new Label("Major Requirements Successfully Completed : ");
+		ListView<Course> lstMajorCoursesPassed = new ListView<Course>();
+		Label lblCourseFail = new Label("Courses Unsuccessfully Completed : ");
 		ListView<Course> lstCoursesFailed = new ListView<Course>();
 		Label lblCourseNeed = new Label("Courses Necessary for Graduation : ");
 		ListView<Course> lstCoursesNeeded = new ListView<Course>();
+		for(int i = 0; i <= student.getPassedCourses().length; i++)
+			lstCoursesPassed.getItems().add(student.getPassedCourses()[i]);
+		for(int i = 0; i <= student.getMajor().getMajorCoursesDone(student).length; i++)
+			lstMajorCoursesPassed.getItems().add(student.getMajor().getMajorCoursesDone(student)[i]);
+		for(int i = 0; i <= student.getFailedCourses().length; i++)
+			lstCoursesFailed.getItems().add(student.getFailedCourses()[i]);
+		for(int i = 0; i <= student.getMajor().getCoursesReq(student).length; i++)
+			lstCoursesNeeded.getItems().add(student.getMajor().getCoursesReq(student)[i]);
 		for(int i = 0; i < student.getCourseWork().length; i++)
 		{
 			if(student.getCourseWork()[i].isSuccessful())
@@ -194,8 +216,6 @@ public class StudentView
 			else
 				lstCoursesFailed.getItems().add(student.getCourseWork()[i]);
 		}
-		for(int i = 0; i < student.coursesNeeded().length; i++)
-			lstCoursesNeeded.getItems().add(student.coursesNeeded()[i]);
 		for(Course c : lstCoursesNeeded.getItems())
 		{
 			//Color code items
@@ -213,7 +233,25 @@ public class StudentView
 					listenerBack.back(ev);
 			}
 		});
-			
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.add(lblSelectedMajor, 0, 0);
+		grid.add(lblNumOfCredits, 0, 1);
+		grid.add(lblNumOfCreditsPass, 0, 2);
+		grid.add(lblCoursePass, 0, 3);
+		grid.add(lstCoursesPassed, 0, 4);
+		grid.add(lblMajorCoursesPass, 1, 3);
+		grid.add(lstMajorCoursesPassed, 1, 4);
+		grid.add(lblCourseFail, 2, 3);
+		grid.add(lstCoursesFailed, 2, 4);
+		grid.add(lblCourseNeed, 3, 3);
+		grid.add(lstCoursesNeeded, 3, 4);
+		grid.add(lblSemestersNeeded, 0, 5);
+		grid.add(btnBack, 0, 6);
+		Scene scene = new Scene(grid, 1920, 1080);
+		primaryStage.setScene(scene);
+		primaryStage.show();			
 	}
 	public void setListenerPassword(PasswordListener listenerPassword) 
 	{

@@ -25,6 +25,7 @@ import user.MajorBag;
 import user.Student;
 import user.User;
 import user.UserBag;
+import view.AdminView;
 import view.LoginView;
 import view.StaffView;
 import view.StudentView;
@@ -44,6 +45,7 @@ public class SAINController
 	LoginView loginView;
 	StudentView studentView;
 	StaffView staffView;
+	AdminView adminView;
 	User currentUser;
 	UserBag users = new UserBag();
 	CourseBag courses = new CourseBag();
@@ -53,6 +55,7 @@ public class SAINController
 		loginView = new LoginView(primaryStage);
 		studentView = new StudentView(primaryStage);
 		staffView = new StaffView(primaryStage);
+		adminView = new AdminView(primaryStage);
 		try{md = MessageDigest.getInstance("MD5");}catch(Exception e){}
 		loginView.setListenerAccount(new NewAccountListener()
 		{
@@ -108,8 +111,8 @@ public class SAINController
 			public void search(SearchEventObject ev)
 			{
 				Major tempMajor = null;
-				if(Major.getMajor(ev.getMajor()) != null)
-					tempMajor = Major.getMajor(ev.getMajor());
+				if(MajorBag.getMajor(ev.getMajor()) != null)
+					tempMajor = MajorBag.getMajor(ev.getMajor());
 				else if (ev.getMajor() != "")
 					ev.setInputValid(false);
 				if(ev.getGpa() <= 4.0 && ev.getGpa() <= 0)
@@ -139,6 +142,15 @@ public class SAINController
 				loginView.start();
 			}
 		});
+		adminView.setListenerLogout(new LogoutListener()
+		{
+			@Override
+			public void logout(LogoutEventObject ev)
+			{
+				currentUser = null;
+				loginView.start();
+			}
+		});
 		staffView.setListenerPassword(new PasswordListener()
 		{
 			@Override
@@ -154,6 +166,20 @@ public class SAINController
 			}
 		});
 		studentView.setListenerPassword(new PasswordListener()
+		{
+			@Override
+			public void changePassword(PasswordEventObject ev)
+			{
+				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
+					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
+						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString()); //Save user data!!!(Placeholder)
+					else
+						ev.setPassMatch(false);
+				else
+					ev.setOldPassSuccessful(false);
+			}
+		});
+		adminView.setListenerPassword(new PasswordListener()
 		{
 			@Override
 			public void changePassword(PasswordEventObject ev)
