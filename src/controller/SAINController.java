@@ -40,15 +40,19 @@ import java.util.ArrayList;
 public class SAINController
 {
 	MessageDigest md;
-	Stage primaryStage = new Stage();
-	LoginView loginView = new LoginView(primaryStage);
-	StudentView studentView = new StudentView(primaryStage);
-	StaffView staffView = new StaffView(primaryStage);
+	Stage primaryStage;
+	LoginView loginView;
+	StudentView studentView;
+	StaffView staffView;
 	User currentUser;
 	UserBag users = new UserBag();
 	CourseBag courses = new CourseBag();
-	public SAINController()
+	public SAINController(Stage primaryStage)
 	{
+		this.primaryStage = primaryStage;
+		loginView = new LoginView(primaryStage);
+		studentView = new StudentView(primaryStage);
+		staffView = new StaffView(primaryStage);
 		try{md = MessageDigest.getInstance("MD5");}catch(Exception e){}
 		loginView.setListenerAccount(new NewAccountListener()
 		{
@@ -201,6 +205,12 @@ public class SAINController
 				users.addUser(ev.getStudent());
 			}
 		});
+		try {
+			loadData();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	public void loadData() throws ClassNotFoundException, IOException
 	{
@@ -208,53 +218,59 @@ public class SAINController
 		FileInputStream fileUserIn;
 		FileInputStream fileMajorIn;
 		boolean loop = true;
-		if(new File("Courses.bin").isFile())
-			fileCourseIn = new FileInputStream(new File("Courses.bin"));
-		else
-			fileCourseIn = null;
-		if(new File("Users.bin").isFile())
-			fileUserIn = new FileInputStream(new File("Users.bin"));
-		else
-			fileUserIn = null;
-		if(new File("Majors.bin").isFile())
-			fileMajorIn = new FileInputStream(new File("Majors.bin"));
-		else
-			fileMajorIn = null;
-		ObjectInputStream objCourseIn = new ObjectInputStream(fileCourseIn);
-		ObjectInputStream objUserIn = new ObjectInputStream(fileUserIn);
-		ObjectInputStream objMajorIn = new ObjectInputStream(fileMajorIn);
 		ArrayList<User> tempUsers = new ArrayList<User>();
 		ArrayList<Major> tempMajors = new ArrayList<Major>();
 		ArrayList<Course> tempCourses = new ArrayList<Course>();
-		while(loop)
+		if(new File("Courses.bin").isFile())
 		{
-			tempUsers.add((User) objUserIn.readObject());
-			if(tempUsers.get(tempUsers.size() - 1) == null)
+			fileCourseIn = new FileInputStream(new File("Courses.bin"));
+			ObjectInputStream objCourseIn = new ObjectInputStream(fileCourseIn);
+			while(loop)
 			{
-				tempUsers.remove(tempUsers.size() - 1);
-				loop = false;
+				tempCourses.add((Course) objCourseIn.readObject());
+				if(tempCourses.get(tempCourses.size() - 1) == null)
+				{
+					tempCourses.remove(tempCourses.size() - 1);
+					loop = false;
+				}
+			}
+			loop = true;
+		}
+		else
+			fileCourseIn = null;
+		if(new File("Users.bin").isFile())
+		{
+			fileUserIn = new FileInputStream(new File("Users.bin"));
+			ObjectInputStream objUserIn = new ObjectInputStream(fileUserIn);
+			while(loop)
+			{
+				tempUsers.add((User) objUserIn.readObject());
+				if(tempUsers.get(tempUsers.size() - 1) == null)
+				{
+					tempUsers.remove(tempUsers.size() - 1);
+					loop = false;
+				}
+			}
+			loop = true;
+		}
+		else
+			fileUserIn = null;
+		if(new File("Majors.bin").isFile())
+		{
+			fileMajorIn = new FileInputStream(new File("Majors.bin"));
+			ObjectInputStream objMajorIn = new ObjectInputStream(fileMajorIn);
+			while(loop)
+			{
+				tempMajors.add((Major) objMajorIn.readObject());
+				if(tempMajors.get(tempMajors.size() - 1) == null)
+				{
+					tempMajors.remove(tempMajors.size() - 1);
+					loop = false;
+				}
 			}
 		}
-		loop = true;
-		while(loop)
-		{
-			tempCourses.add((Course) objCourseIn.readObject());
-			if(tempCourses.get(tempCourses.size() - 1) == null)
-			{
-				tempCourses.remove(tempCourses.size() - 1);
-				loop = false;
-			}
-		}
-		loop = true;
-		while(loop)
-		{
-			tempMajors.add((Major) objMajorIn.readObject());
-			if(tempMajors.get(tempMajors.size() - 1) == null)
-			{
-				tempMajors.remove(tempMajors.size() - 1);
-				loop = false;
-			}
-		}
+		else
+			fileMajorIn = null;
 		users.addUser(tempUsers.toArray(new User[tempUsers.size()]));
 		MajorBag.addMajor(tempMajors.toArray(new Major[tempMajors.size()]));
 		courses.addCourse(tempCourses.toArray(new Course[tempCourses.size()]));

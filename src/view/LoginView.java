@@ -120,13 +120,18 @@ public class LoginView
 		});
 		VBox vbxLabels = new VBox();
 		vbxLabels.getChildren().addAll(lblUsername, lblPassword);
+		vbxLabels.setSpacing(20);
 		VBox vbxText = new VBox();
 		vbxText.getChildren().addAll(txtUsername, txtPassword);
+		vbxText.setSpacing(10);
 		HBox hbxInput = new HBox();
 		hbxInput.getChildren().addAll(vbxLabels, vbxText);
+		hbxInput.setAlignment(Pos.CENTER);
 		VBox pane = new VBox();
 		pane.getChildren().addAll(lblDefault, hbxInput, btnContinue);
-		Scene scene = new Scene(pane, 400, 400);
+		pane.setAlignment(Pos.CENTER);
+		pane.setSpacing(10);
+		Scene scene = new Scene(pane, 500, 300);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

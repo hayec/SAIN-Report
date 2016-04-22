@@ -37,6 +37,10 @@ public class Course
 	{
 		return courseDescription;
 	}
+	public Course(CourseAttributes CAttributes)
+	{
+		this.CAttributes = CAttributes;
+	}
 	public Course(String courseCode, String courseTitle, String courseDescription, boolean ammerman, boolean grant,
 			boolean eastern, String[] prerequisites, String[] corequisites, int credits, boolean complete,
 			double courseGrade, boolean transferCourse) {

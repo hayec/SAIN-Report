@@ -226,11 +226,13 @@ public class Student implements User
 	}
 	public Course[] coursesNeeded()
 	{
-		return major.coursesNeeded(this);
+		return null;
+		//return major.coursesNeeded(this);
 	}
 	public int semestersNeeded()
 	{
-		return major.numOfSemestersNeeded(this);
+		return 0;
+		//return major.numOfSemestersNeeded(this);
 	}
 	public int numOfCredits()
 	{

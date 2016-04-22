@@ -192,6 +192,8 @@ public class StaffView
 			hbxButtons.getChildren().addAll(btnClear, btnSearch, btnSelect);
 		if(!admin)//Don't allow faculty to edit student data
 			btnEdit.setVisible(false);
+		hbxButtons.setAlignment(Pos.CENTER);
+		hbxButtons.setSpacing(20);
 		btnSearch.setOnAction(e->{
 			SearchEventObject ev = new SearchEventObject(btnSearch, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), Integer.parseInt(txtZipCode.getText()), txtSSN.getText(), Integer.parseInt(txtYearEnrolled.getText()), Integer.parseInt(txtBirthYear.getText()), cmbMajor.getValue(), Double.parseDouble(txtGPA.getText()));
 			if(listenerSearch != null)
@@ -246,6 +248,7 @@ public class StaffView
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
+		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SAIN Report");
