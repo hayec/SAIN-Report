@@ -232,7 +232,7 @@ public class AdminView
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, 0);
-		txtID.setText(Integer.toString(student.getId()));
+		//txtID.setText(Integer.toString(student.getId()));
 		txtID.setEditable(false);
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, 1);
@@ -278,8 +278,8 @@ public class AdminView
 		grid.add(lblMajor,  0, 12);
 		ComboBox<String> cmbMajor = new ComboBox<String>();
 		grid.add(cmbMajor,  1, 12);
-		for(int i = 0; i < majors.length; i++)
-			cmbMajor.getItems().add(majors[i]);
+		//for(int i = 0; i < majors.length; i++)
+			//cmbMajor.getItems().add(majors[i]);
 		Label lblPassword = new Label("Password : ");
 		grid.add(lblPassword, 0, 13);
 		PasswordField txtPassword = new PasswordField();
@@ -290,7 +290,7 @@ public class AdminView
 		Button btnClear = new Button("Clear");
 		HBox hbxButtons = new HBox();
 		btnBack.setOnAction(e->{
-			start(true, user, majors);
+		//	start(true, user, majors);
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
 		btnEdit.setOnAction(e->{
@@ -299,8 +299,8 @@ public class AdminView
 				if(Integer.parseInt(txtZipCode.getText()) > 99999 || Integer.parseInt(txtZipCode.getText()) < 0)
 					throw new IllegalArgumentException();
 				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
-				if(listenerEdit != null)
-					listenerEdit.edit(ev);
+			//	if(listenerEdit != null)
+			//		listenerEdit.edit(ev);
 			}
 			catch(IllegalArgumentException ie)
 			{

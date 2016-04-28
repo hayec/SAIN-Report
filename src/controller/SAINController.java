@@ -237,6 +237,8 @@ public class SAINController
 		{
 			e.printStackTrace();
 		}
+		if(!primaryStage.isShowing())
+			loginView.start();
 	}
 	public void loadData() throws ClassNotFoundException, IOException
 	{
