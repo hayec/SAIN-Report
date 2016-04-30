@@ -5,15 +5,15 @@ import java.util.Arrays;
 
 import report.Course;
 import report.CourseAttributes;
+import report.CourseBag;
 
 public class Major 
 {
 	String name;
-	int reqCredits;
 	double minGPA;
 	int numOfCreditsReq;
-	final int creditsAtSCCCReq = 36;
-	final int maxSemCredits = 19;
+	final int CREDITS_AT_SCCC = 36;
+	final int MAX_SEM_CREDITS = 19;
 	int physEdReq;
 	int hisReq;
 	int labSciReq;
@@ -26,8 +26,25 @@ public class Major
 	int socSciReq;
 	int langReq;
 	int phlReq;
-	int creditsReq;
 	Course[] reqCourses;
+	public Major(String name, int physEdReq, int hisReq, int labSciReq, int mathReq, int humReq, int busReq, int engReq, int comReq, int amerHisReq, int socSciReq, int langReq, int phlReq, int numOfCreditsReq, Course[] reqCourses)
+	{
+		this.name = name;
+		this.physEdReq = physEdReq;
+		this.hisReq = hisReq;
+		this.labSciReq = labSciReq;
+		this.mathReq = mathReq;
+		this.humReq = humReq;
+		this.busReq = busReq;
+		this.engReq = engReq;
+		this.comReq = comReq;
+		this.amerHisReq = amerHisReq;
+		this.socSciReq = socSciReq;
+		this.langReq = langReq;
+		this.phlReq = phlReq;
+		this.numOfCreditsReq = numOfCreditsReq;
+		this.reqCourses = reqCourses;
+	}
 	public int getCreditsReq(Student student)
 	{
 		ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
@@ -143,7 +160,7 @@ public class Major
 		}
 		return studentCourses.toArray(new Course[studentCourses.size()]);
 	}
-	public int getNumOfSemestersReq(Student student)
+	public int getNumOfSemestersReq(Student student, CourseBag courses)
 	{
 		ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
 		ArrayList<Course> prerequisites = new ArrayList<Course>();
@@ -157,8 +174,8 @@ public class Major
 			{
 				if(c.getPrerequisites() != null)
 					for(int i = 0; i < c.getPrerequisites().length; i++)
-						if(!student.courseWork.getCourse(c.getPrerequisites()[i].getCourseCode()).isSuccessful())
-							temp.add(c.getPrerequisites()[i]);
+						if(!student.courseWork.getCourse(c.getPrerequisites()[i]).isSuccessful())
+							temp.add(courses.getCourse(c.getPrerequisites()[i]));
 			}
 			if(temp.size() > 0)
 			{

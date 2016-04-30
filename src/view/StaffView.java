@@ -404,7 +404,7 @@ public class StaffView
 			{
 				if(Integer.parseInt(txtZipCode.getText()) > 99999 || Integer.parseInt(txtZipCode.getText()) < 0)
 					throw new IllegalArgumentException();
-				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
+				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
 				if(listenerEdit != null)
 					listenerEdit.edit(ev);
 			}

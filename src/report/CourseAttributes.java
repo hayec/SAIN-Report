@@ -1,6 +1,8 @@
 package report;
 
-public class CourseAttributes 
+import java.io.Serializable;
+
+public class CourseAttributes implements Serializable
 {
 	boolean physEd;
 	boolean history;

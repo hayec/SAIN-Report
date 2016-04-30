@@ -4,6 +4,12 @@ import eventHandlers.AdminEditEventObject;
 import eventHandlers.AdminEditListener;
 import eventHandlers.BackEventObject;
 import eventHandlers.BackListener;
+import eventHandlers.CreateAccountEventObject;
+import eventHandlers.CreateAccountListener;
+import eventHandlers.DeleteCourseEventObject;
+import eventHandlers.DeleteCourseListener;
+import eventHandlers.DeleteMajorEventObject;
+import eventHandlers.DeleteMajorListener;
 import eventHandlers.EditEventObject;
 import eventHandlers.EditListener;
 import eventHandlers.LoginEventObject;
@@ -20,6 +26,7 @@ import javafx.stage.Stage;
 import report.Course;
 import report.CourseBag;
 import user.Administrator;
+import user.Faculty;
 import user.Major;
 import user.MajorBag;
 import user.Student;
@@ -33,9 +40,12 @@ import view.StudentView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class SAINController
@@ -57,6 +67,7 @@ public class SAINController
 		staffView = new StaffView(primaryStage);
 		adminView = new AdminView(primaryStage);
 		try{md = MessageDigest.getInstance("MD5");}catch(Exception e){}
+		/**********************Login Listeners**********************************/
 		loginView.setListenerAccount(new NewAccountListener()
 		{
 			@Override
@@ -76,7 +87,7 @@ public class SAINController
 				{
 					users.addUser(new Administrator(Integer.parseInt(ev.getUsername()), md.digest(ev.getPassword().getBytes()).toString()));
 					currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
-					staffView.start(true, currentUser, MajorBag.getMajors());
+					staffView.start(true, currentUser, MajorBag.getMajorNames());
 				}
 			}
 		});
@@ -92,9 +103,9 @@ public class SAINController
 						ev.setCredentialsValid(true);
 						currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
 						if(currentUser.isStudent())
-							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajors());
+							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajorNames(), courses);
 						else
-							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
+							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
 					}
 					else
 						ev.setCredentialsValid(false);
@@ -105,25 +116,7 @@ public class SAINController
 				}
 			}
 		});
-		staffView.setListenerSearch(new SearchListener()
-		{
-			@Override
-			public void search(SearchEventObject ev)
-			{
-				Major tempMajor = null;
-				if(MajorBag.getMajor(ev.getMajor()) != null)
-					tempMajor = MajorBag.getMajor(ev.getMajor());
-				else if (ev.getMajor() != "")
-					ev.setInputValid(false);
-				if(ev.getGpa() <= 4.0 && ev.getGpa() <= 0)
-				{
-					ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), ev.getZipCode(), ev.getState(), ev.getBirthYear(), ev.getGpa(), tempMajor, ev.getYearEnrolled()));
-					ev.setInputValid(true);
-				}
-				else
-					ev.setInputValid(false);
-			}
-		});
+		/**************Logout Listeners******************************************/
 		staffView.setListenerLogout(new LogoutListener()
 		{
 			@Override
@@ -151,6 +144,7 @@ public class SAINController
 				loginView.start();
 			}
 		});
+		/*********************Password Listeners*********************************/
 		staffView.setListenerPassword(new PasswordListener()
 		{
 			@Override
@@ -193,13 +187,102 @@ public class SAINController
 					ev.setOldPassSuccessful(false);
 			}
 		});
+		/***************************Search Listeners*******************************************/
+		staffView.setListenerSearch(new SearchListener()
+		{
+			@Override
+			public void search(SearchEventObject ev)
+			{
+				Major tempMajor = null;
+				if(MajorBag.getMajor(ev.getMajor()) != null)
+					tempMajor = MajorBag.getMajor(ev.getMajor());
+				else if (ev.getMajor() != "")
+					ev.setInputValid(false);
+				if(ev.getGpa() <= 4.0 && ev.getGpa() <= 0)
+				{
+					ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), ev.getZipCode(), ev.getState(), ev.getBirthYear(), ev.getGpa(), tempMajor, ev.getYearEnrolled()));
+					ev.setInputValid(true);
+				}
+				else
+					ev.setInputValid(false);
+			}
+		});
 		studentView.setListenerBack(new BackListener()
 		{
 			public void back(BackEventObject ev)
 			{
-				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
+				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
 			}
 		});
+		/***********************New Account Listeners*****************************************/
+		adminView.setListenerNewAccount(new CreateAccountListener(){
+			public void createAccount(CreateAccountEventObject ev)
+			{
+				int id;
+				try {
+					id = Integer.parseInt(ev.getId());
+				} catch(Exception e) {
+					id = -1;
+					ev.setErrorMessage("ID# is formatted incorrectly.");
+				}
+				if(ev.getId().equals("") || ev.getId() == null) {
+					if(ev.getMajor() != null) {//If there is a declared major, then this must be a student
+						id = generateId(true);
+						if(id < 0) {
+							ev.setErrorMessage("All ID numbers are currently in use.  Please delete an account of the same type to continue.  Alternatively, contact the software developer to extend the number of allowed users.");
+						}
+					} else {
+						id = generateId(false);
+						if(id < 0) {
+							ev.setErrorMessage("All ID numbers are currently in use.  Please delete an account of the same type to continue.  Alternatively, contact the software developer to extend the number of allowed users.");
+						}
+					}
+						
+				}
+				if(id >= 0) {
+					if(users.getUser(Integer.parseInt(ev.getId())) != null) {
+						ev.setErrorMessage("User ID is already in use.  Please choose another ID number.  Alternatively, leave the field blank and an ID number will be automatically generated.");
+					}
+					
+				}
+				int zipCode;
+				try {
+					zipCode = Integer.parseInt(ev.getZipCode());
+				} catch(Exception e) {
+					zipCode = -1;
+					ev.setErrorMessage("Zip code is formatted incorrectly.");
+				}
+				if(zipCode < 0 || zipCode > 99999) {
+					ev.setErrorMessage("Zip code must be a number between 00000 and 99999");
+				}
+				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
+					ev.setErrorMessage("New user must be at least 13 years old.");
+				}
+				if(ev.getDateEnrolled().isAfter(LocalDate.now())) {
+					ev.setErrorMessage("Date of Enrollment cannot be in the future.");
+				}
+				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
+					ev.setErrorMessage("New user must not be more than 120 years old.");
+				}
+				if(ev.getDateEnrolled().isAfter(LocalDate.parse("1959-12-01"))) {
+					ev.setErrorMessage("Date of enrollment cannot be prior to college founding.");
+				}
+				if(ev.getErrorMessage().length() == 0) {
+					if(ev.getMajor() == null) {
+						if(ev.isAdmin()) {
+							users.addUser(new Administrator(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+						} else {
+							users.addUser(new Faculty(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+						}
+					} else {
+						users.addUser(new Student(id, ev.getFirstName(), ev.getLastName(), ev.getDateEnrolled(), ev.getDateOfBirth(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), zipCode, ev.getState(), ev.getCampus(), ev.getMajor(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+					}		
+					ev.setId(id);
+				}
+					
+			}
+		});
+		/****************Edit Listeners*******************************************************/
 		staffView.setListenerAdmin(new AdminEditListener()
 		{
 			@Override
@@ -229,6 +312,18 @@ public class SAINController
 			{
 				users.removeUser(ev.getStudent().getId());
 				users.addUser(ev.getStudent());
+			}
+		});
+		adminView.setListenerMajorDelete(new DeleteMajorListener() {
+			@Override
+			public void delete(DeleteMajorEventObject ev) {
+				MajorBag.removeMajor(ev.getTarget().getName());
+			}
+		});
+		adminView.setListenerCourseDelete(new DeleteCourseListener() {
+			@Override
+			public void delete(DeleteCourseEventObject ev) {
+				courses.removeCourse(ev.getTarget().getCourseCode());
 			}
 		});
 		try {
@@ -305,9 +400,62 @@ public class SAINController
 		if(fileUserIn == null)
 			loginView.newUser();
 	}
-	public void saveData()
+	public void saveData() throws IOException
 	{
-		
+		File fileCourse = new File("Courses.bin");
+		File fileUser = new File("Users.bin");
+		File fileMajor = new File("Majors.bin");
+		fileCourse.createNewFile();
+		fileUser.createNewFile();
+		fileMajor.createNewFile();
+		ObjectOutputStream courseOut = new ObjectOutputStream(new FileOutputStream(fileCourse));
+		ObjectOutputStream userOut = new ObjectOutputStream(new FileOutputStream(fileUser));
+		ObjectOutputStream majorOut = new ObjectOutputStream(new FileOutputStream(fileMajor));
+		for(Course c : courses.getCourses()) {
+			courseOut.writeObject(c);
+		}
+		for(User u : users.getUsers()) {
+			userOut.writeObject(u);
+		}
+		for(Major m : MajorBag.getMajors()) {
+			majorOut.writeObject(m);
+		}		
+		courseOut.close();
+		userOut.close();
+		majorOut.close();
+	}
+	public String validateAccount(Student student)
+	{
+		return null;
+	}
+	public String validateAccount(Faculty faculty)
+	{
+		return null;
+	}
+	public String validateAccount(Administrator admin)
+	{
+		return null;
+	}
+	public int generateId(boolean student)
+	{
+		int returnInt = -1;
+		if(!student) {
+			for(int i = 80000000; i <= 99999999; i++) {
+				if(users.getUser(i) == null) {
+					returnInt = i;
+					break;
+				}
+			}
+		}
+		else {
+			for(int i = 00000000; i <= 79999999; i++) {
+				if(users.getUser(i) == null) {
+					returnInt = i;
+					break;
+				}
+			}
+		}
+		return returnInt;
 	}
 }
 

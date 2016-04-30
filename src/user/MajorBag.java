@@ -40,7 +40,11 @@ public class MajorBag
 			}
 		}
 	}
-	public static String[] getMajors()
+	public static Major[] getMajors()
+	{
+		return majors.toArray(new Major[majors.size()]);
+	}
+	public static String[] getMajorNames()
 	{
 		ArrayList<String> majorNames = new ArrayList<String>();
 		for(Major m : majors)

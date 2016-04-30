@@ -1,8 +1,9 @@
 package report;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Course 
+public class Course implements Serializable
 {
 	private String courseCode;
 	private String courseTitle;
@@ -10,8 +11,8 @@ public class Course
 	private boolean ammerman;
 	private boolean grant;
 	private boolean eastern;
-	private Course[] prerequisites;
-	private Course[] corequisites;
+	private String[] prerequisites;
+	private String[] corequisites;
 	private int credits;
 	private boolean complete;
 	private double courseGrade;
@@ -37,12 +38,13 @@ public class Course
 	{
 		return courseDescription;
 	}
+	public Course() {}
 	public Course(CourseAttributes CAttributes)
 	{
 		this.CAttributes = CAttributes;
 	}
 	public Course(String courseCode, String courseTitle, String courseDescription, boolean ammerman, boolean grant,
-			boolean eastern, Course[] prerequisites, Course[] corequisites, int credits, boolean complete,
+			boolean eastern, String[] prerequisites, String[] corequisites, int credits, boolean complete,
 			double courseGrade, boolean transferCourse) {
 		super();
 		this.courseCode = courseCode;
@@ -57,6 +59,20 @@ public class Course
 		this.complete = complete;
 		this.courseGrade = courseGrade;
 		this.transferCourse = transferCourse;
+		CAttributes = new CourseAttributes();
+	}
+	public Course(String courseCode, String courseTitle, String courseDescription, boolean ammerman, boolean grant,
+			boolean eastern, String[] prerequisites, String[] corequisites, int credits) {
+		super();
+		this.courseCode = courseCode;
+		this.courseTitle = courseTitle;
+		this.courseDescription = courseDescription;
+		this.ammerman = ammerman;
+		this.grant = grant;
+		this.eastern = eastern;
+		this.prerequisites = prerequisites;
+		this.corequisites = corequisites;
+		this.credits = credits;
 		CAttributes = new CourseAttributes();
 	}
 	public void setCourseDescription(String courseDescription)
@@ -87,19 +103,19 @@ public class Course
 	{
 		this.eastern = eastern;
 	}
-	public Course[] getPrerequisites() 
+	public String[] getPrerequisites() 
 	{
 		return prerequisites;
 	}
-	public void setPrerequisites(Course[] prerequisites) 
+	public void setPrerequisites(String[] prerequisites) 
 	{
 		this.prerequisites = prerequisites;
 	}
-	public Course[] getCorequisites() 
+	public String[] getCorequisites() 
 	{
 		return corequisites;
 	}
-	public void setCorequisites(Course[] corequisites) 
+	public void setCorequisites(String[] corequisites) 
 	{
 		this.corequisites = corequisites;
 	}
@@ -146,7 +162,7 @@ public class Course
 	{
 		return courseCode + " " + courseTitle + " " + credits + " credits";
 	}
-	public Course[] prerequisitesSatisfied(Course[] course)
+	public Course[] prerequisitesSatisfied(Course[] course, CourseBag courses)
 	{
 		ArrayList<Course> courseResults = new ArrayList<Course>();
 		//tempCourse = (ArrayList<Course>) courseResults.clone();
@@ -165,7 +181,7 @@ public class Course
 			}
 			else
 			{
-				courseResults.add(prerequisites[i]);
+				courseResults.add(courses.getCourse(prerequisites[i]));
 			}
 			subLoop = false;
 		}
@@ -175,7 +191,7 @@ public class Course
 		}
 		else
 		{
-			return prerequisites;
+			return courseResults.toArray(new Course[courseResults.size()]);//Removed prerequisites
 		}
 	}
 }

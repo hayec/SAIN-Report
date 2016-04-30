@@ -23,7 +23,7 @@ public class Student implements User
 	private Major major;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
 	public CourseBag courseWork = new CourseBag();
-	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String campus, Major major)
+	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String state, String campus, Major major)
 	{
 		this.id = id;
 		this.firstName = firstName;
@@ -37,9 +37,25 @@ public class Student implements User
 		this.zipCode = zipCode;
 		this.campus = campus;
 	}
+	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String state, String campus, Major major, String username, String password)
+	{
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dateEnrolled = dateEnrolled;
+		this.dateOfBirth = dateOfBirth;
+		this.socialSecNum = socialSecNum;
+		this.major = major;
+		this.address = address;
+		this.city = city;
+		this.zipCode = zipCode;
+		this.campus = campus;
+		this.username = username;
+		this.password = password;
+	}
 	public Student clone()
 	{
-		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, campus, major);
+		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, state, campus, major);
 	}
 	public void addCourse(Course course)
 	{
@@ -71,7 +87,7 @@ public class Student implements User
 	@Override
 	public Object getUser() 
 	{
-		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, campus, major);
+		return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, state, campus, major);
 	}
 	@Override
 	public String getName() 
@@ -222,9 +238,9 @@ public class Student implements User
 		else
 			return false;
 	}
-	public int semestersNeeded()
+	public int semestersNeeded(CourseBag allCourses)
 	{
-		return major.getNumOfSemestersReq(this);
+		return major.getNumOfSemestersReq(this, allCourses);
 	}
 	public int numOfCredits()
 	{

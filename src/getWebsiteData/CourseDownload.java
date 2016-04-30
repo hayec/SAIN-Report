@@ -48,6 +48,12 @@ public class CourseDownload implements Serializable
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public String[] getCorequisites() {
+		return corequisites;
+	}
+	public void setCorequisites(String[] corequisites) {
+		this.corequisites = corequisites;
+	}
 	public boolean isAmmerman() {
 		return ammerman;
 	}

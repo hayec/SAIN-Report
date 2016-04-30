@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import report.Course;
+import report.CourseBag;
 import user.Major;
 import user.MajorBag;
 import user.Student;
@@ -38,7 +39,7 @@ public class StudentView
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void studentStart(User user, Student student, String[] majors)
+	public void studentStart(User user, Student student, String[] majors, CourseBag allCourses)
 	{
 		majorCache = majors;
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
@@ -107,11 +108,11 @@ public class StudentView
 		btnContinue.setOnAction(e->{
 			Student tempStudent = student.clone();
 			tempStudent.setMajor(MajorBag.getMajor(cmbMajor.getValue()));
-			studentView(user, tempStudent);
+			studentView(user, tempStudent, allCourses);
 		});
 		Button btnViewSAIN = new Button("View SAIN Report");
 		btnViewSAIN.setOnAction(e->{
-			studentView(user, student);
+			studentView(user, student, allCourses);
 		});
 		HBox hbxButtons = new HBox();
 		if(!user.isStudent())
@@ -135,7 +136,7 @@ public class StudentView
 		primaryStage.setScene(scene);
 		
 	}
-	public void studentView(User user, Student student)
+	public void studentView(User user, Student student, CourseBag allCourses)
 	{
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
 		Hyperlink hplChangePass = new Hyperlink("Change Password");
@@ -220,12 +221,12 @@ public class StudentView
 		{
 			//Color code items
 		}
-		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded() + " semesters are necessary to complete this degree");
+		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree");
 		Button btnBack = new Button("Back");
 		btnBack.setOnAction(e->
 		{
 			if(user.isStudent())
-				studentStart(user, student, majorCache);
+				studentStart(user, student, majorCache, allCourses);
 			else
 			{
 				BackEventObject ev = new BackEventObject(btnBack);

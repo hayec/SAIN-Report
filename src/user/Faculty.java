@@ -13,7 +13,6 @@ public class Faculty implements User
 	private String city;
 	private String state;
 	private int zipCode;
-	private String title;
 	private String socialSecNum;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
 	@Override
@@ -22,7 +21,7 @@ public class Faculty implements User
 		return firstName + " " + lastName;
 	}
 	public Faculty(int id, String firstName, String lastName, LocalDate dateOfBirth, String address, String city,
-			String state, int zipCode, String title, String socialSecNum, String password) 
+			String state, int zipCode, String socialSecNum, String username, String password) 
 	{
 		this.id = id;
 		this.firstName = firstName;
@@ -32,7 +31,7 @@ public class Faculty implements User
 		this.city = city;
 		this.state = state;
 		this.zipCode = zipCode;
-		this.title = title;
+		this.username = username;
 		this.socialSecNum = socialSecNum;
 		this.password = password;
 	}
@@ -62,7 +61,7 @@ public class Faculty implements User
 	@Override
 	public Object getUser() 
 	{
-		return new Faculty(id, firstName, lastName, dateOfBirth, address, city, state, zipCode, title, socialSecNum, password);
+		return new Faculty(id, firstName, lastName, dateOfBirth, address, city, state, zipCode, socialSecNum, username, password);
 	}
 	public int getId() 
 	{
@@ -131,14 +130,6 @@ public class Faculty implements User
 	public void setZipCode(int zipCode)
 	{
 		this.zipCode = zipCode;
-	}
-	public String getTitle() 
-	{
-		return title;
-	}
-	public void setTitle(String title) 
-	{
-		this.title = title;
 	}
 	public String getSocialSecNum() 
 	{

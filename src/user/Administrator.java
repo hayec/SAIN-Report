@@ -13,7 +13,6 @@ public class Administrator implements User
 	private String city;
 	private String state;
 	private int zipCode;
-	private String title;
 	private String socialSecNum;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
 	public Administrator(int id, String password)
@@ -22,7 +21,7 @@ public class Administrator implements User
 		this.password = password;
 	}
 	public Administrator(int id, String firstName, String lastName, LocalDate dateOfBirth, String address, String city,
-			String state, int zipCode, String title, String socialSecNum, String password) 
+			String state, int zipCode, String socialSecNum, String username, String password) 
 	{
 		this.id = id;
 		this.firstName = firstName;
@@ -32,8 +31,8 @@ public class Administrator implements User
 		this.city = city;
 		this.state = state;
 		this.zipCode = zipCode;
-		this.title = title;
 		this.socialSecNum = socialSecNum;
+		this.username = username;
 		this.password = password;
 	}
 	@Override
@@ -67,7 +66,7 @@ public class Administrator implements User
 	@Override
 	public Object getUser() 
 	{
-		return new Administrator(id, firstName, lastName, dateOfBirth, address, city, state, zipCode, title, socialSecNum, password);
+		return new Administrator(id, firstName, lastName, dateOfBirth, address, city, state, zipCode, socialSecNum, username, password);
 	}
 	public int getId() 
 	{
@@ -136,14 +135,6 @@ public class Administrator implements User
 	public void setZipCode(int zipCode) 
 	{
 		this.zipCode = zipCode;
-	}
-	public String getTitle() 
-	{
-		return title;
-	}
-	public void setTitle(String title) 
-	{
-		this.title = title;
 	}
 	public String getSocialSecNum() 
 	{
