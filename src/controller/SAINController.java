@@ -73,6 +73,7 @@ public class SAINController
 			@Override
 			public void newAccount(NewAccountEventObject ev)
 			{
+				/*
 				if(Integer.parseInt(ev.getUsername()) > 99999999 || Integer.parseInt(ev.getUsername()) < 90000000)
 				{
 					ev.setValidPassword(false);
@@ -83,12 +84,15 @@ public class SAINController
 					ev.setValidPassword(false);
 					ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
 				}
+				
 				else
-				{
-					users.addUser(new Administrator(Integer.parseInt(ev.getUsername()), md.digest(ev.getPassword().getBytes()).toString()));
-					currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
-					staffView.start(true, currentUser, MajorBag.getMajorNames());
-				}
+				{*/
+				int id = generateId(false);
+					users.addUser(new Administrator(id, ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString(), "Default", ""));
+					currentUser = users.getUser(id);
+					adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
+				//}
+				saveData();
 			}
 		});
 		loginView.setListenerLogin(new LoginListener()
@@ -104,8 +108,10 @@ public class SAINController
 						currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
 						if(currentUser.isStudent())
 							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajorNames(), courses);
-						else
+						else if(currentUser.isFacutly())
 							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
+						else
+							adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
 					}
 					else
 						ev.setCredentialsValid(false);
@@ -152,7 +158,10 @@ public class SAINController
 			{
 				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
 					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString()); //Save user data!!!(Placeholder)
+					{
+						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
+						saveData();
+					}
 					else
 						ev.setPassMatch(false);
 				else
@@ -166,7 +175,10 @@ public class SAINController
 			{
 				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
 					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString()); //Save user data!!!(Placeholder)
+					{
+						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
+						saveData();
+					}
 					else
 						ev.setPassMatch(false);
 				else
@@ -180,7 +192,10 @@ public class SAINController
 			{
 				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
 					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString()); //Save user data!!!(Placeholder)
+					{
+						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
+						saveData();
+					}
 					else
 						ev.setPassMatch(false);
 				else
@@ -214,6 +229,7 @@ public class SAINController
 				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
 			}
 		});
+		
 		/***********************New Account Listeners*****************************************/
 		adminView.setListenerNewAccount(new CreateAccountListener(){
 			public void createAccount(CreateAccountEventObject ev)
@@ -236,8 +252,7 @@ public class SAINController
 						if(id < 0) {
 							ev.setErrorMessage("All ID numbers are currently in use.  Please delete an account of the same type to continue.  Alternatively, contact the software developer to extend the number of allowed users.");
 						}
-					}
-						
+					}					
 				}
 				if(id >= 0) {
 					if(users.getUser(Integer.parseInt(ev.getId())) != null) {
@@ -279,7 +294,7 @@ public class SAINController
 					}		
 					ev.setId(id);
 				}
-					
+				saveData();
 			}
 		});
 		/****************Edit Listeners*******************************************************/
@@ -312,18 +327,21 @@ public class SAINController
 			{
 				users.removeUser(ev.getStudent().getId());
 				users.addUser(ev.getStudent());
+				saveData();
 			}
 		});
 		adminView.setListenerMajorDelete(new DeleteMajorListener() {
 			@Override
 			public void delete(DeleteMajorEventObject ev) {
 				MajorBag.removeMajor(ev.getTarget().getName());
+				saveData();
 			}
 		});
 		adminView.setListenerCourseDelete(new DeleteCourseListener() {
 			@Override
 			public void delete(DeleteCourseEventObject ev) {
 				courses.removeCourse(ev.getTarget().getCourseCode());
+				saveData();
 			}
 		});
 		try {
@@ -350,10 +368,9 @@ public class SAINController
 			ObjectInputStream objCourseIn = new ObjectInputStream(fileCourseIn);
 			while(loop)
 			{
+				try {
 				tempCourses.add((Course) objCourseIn.readObject());
-				if(tempCourses.get(tempCourses.size() - 1) == null)
-				{
-					tempCourses.remove(tempCourses.size() - 1);
+				} catch(Exception e) {
 					loop = false;
 				}
 			}
@@ -367,10 +384,9 @@ public class SAINController
 			ObjectInputStream objUserIn = new ObjectInputStream(fileUserIn);
 			while(loop)
 			{
-				tempUsers.add((User) objUserIn.readObject());
-				if(tempUsers.get(tempUsers.size() - 1) == null)
-				{
-					tempUsers.remove(tempUsers.size() - 1);
+				try {
+					tempUsers.add((User) objUserIn.readObject());
+				} catch(Exception e) {
 					loop = false;
 				}
 			}
@@ -384,10 +400,9 @@ public class SAINController
 			ObjectInputStream objMajorIn = new ObjectInputStream(fileMajorIn);
 			while(loop)
 			{
+				try {
 				tempMajors.add((Major) objMajorIn.readObject());
-				if(tempMajors.get(tempMajors.size() - 1) == null)
-				{
-					tempMajors.remove(tempMajors.size() - 1);
+				} catch(Exception e) {
 					loop = false;
 				}
 			}
@@ -400,29 +415,37 @@ public class SAINController
 		if(fileUserIn == null)
 			loginView.newUser();
 	}
-	public void saveData() throws IOException
+	public boolean saveData()
 	{
-		File fileCourse = new File("Courses.bin");
-		File fileUser = new File("Users.bin");
-		File fileMajor = new File("Majors.bin");
-		fileCourse.createNewFile();
-		fileUser.createNewFile();
-		fileMajor.createNewFile();
-		ObjectOutputStream courseOut = new ObjectOutputStream(new FileOutputStream(fileCourse));
-		ObjectOutputStream userOut = new ObjectOutputStream(new FileOutputStream(fileUser));
-		ObjectOutputStream majorOut = new ObjectOutputStream(new FileOutputStream(fileMajor));
-		for(Course c : courses.getCourses()) {
-			courseOut.writeObject(c);
+		try 
+		{
+			File fileCourse = new File("Courses.bin");
+			File fileUser = new File("Users.bin");
+			File fileMajor = new File("Majors.bin");
+			fileCourse.createNewFile();
+			fileUser.createNewFile();
+			fileMajor.createNewFile();
+			ObjectOutputStream courseOut = new ObjectOutputStream(new FileOutputStream(fileCourse));
+			ObjectOutputStream userOut = new ObjectOutputStream(new FileOutputStream(fileUser));
+			ObjectOutputStream majorOut = new ObjectOutputStream(new FileOutputStream(fileMajor));
+			for(Course c : courses.getCourses()) {
+				courseOut.writeObject(c);
+			}
+			for(User u : users.getUsers()) {
+				userOut.writeObject(u);
+			}
+			for(Major m : MajorBag.getMajors()) {
+				majorOut.writeObject(m);
+			}		
+			courseOut.close();
+			userOut.close();
+			majorOut.close();
+			return true;
 		}
-		for(User u : users.getUsers()) {
-			userOut.writeObject(u);
+		catch(Exception e)
+		{
+			return false;
 		}
-		for(Major m : MajorBag.getMajors()) {
-			majorOut.writeObject(m);
-		}		
-		courseOut.close();
-		userOut.close();
-		majorOut.close();
 	}
 	public String validateAccount(Student student)
 	{

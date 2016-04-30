@@ -1,7 +1,8 @@
 package view;
 
 import java.time.LocalDate;
-
+import eventHandlers.BackEventObject;
+import eventHandlers.BackListener;
 import eventHandlers.CreateAccountEventObject;
 import eventHandlers.CreateAccountListener;
 import eventHandlers.DeleteCourseListener;
@@ -16,6 +17,8 @@ import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
 import eventHandlers.SearchListener;
 import eventHandlers.DeleteCourseEventObject;
+import eventHandlers.AddMajorListener;
+import eventHandlers.AddCourseListener;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -44,13 +47,16 @@ public class AdminView
 	LogoutListener listenerLogout;
 	PasswordListener listenerPassword;
 	CreateAccountListener listenerAccount;
+	AddMajorListener listenerMajorAdd;
+	AddCourseListener listenerCourseAdd;
 	DeleteMajorListener listenerMajorDelete;
 	DeleteCourseListener listenerCourseDelete;
+	BackListener listenerStudentSearch;
 	public AdminView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void adminView(Administrator user)
+	public void adminView(Administrator user, Major[] majors, Course[] courses)
 	{
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
 		Hyperlink hplChangePass = new Hyperlink("Change Password");
@@ -139,13 +145,13 @@ public class AdminView
 				acctStage.close();
 			});
 			btnStudent.setOnAction(ea->{
-				createAccount(user, false, true);
+				createAccount(user, false, true, majors, courses);
 			});
 			btnFaculty.setOnAction(ea->{
-				createAccount(user, false, false);
+				createAccount(user, false, false, majors, courses);
 			});
 			btnAdministrator.setOnAction(ea->{
-				createAccount(user, true, false);
+				createAccount(user, true, false, majors, courses);
 			});
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnStudent, btnFaculty, btnAdministrator);
@@ -160,7 +166,10 @@ public class AdminView
 		});
 		btnSearchStudents.setOnAction(e->
 		{
-			
+			BackEventObject ev = new BackEventObject(btnSearchStudents);
+			if(listenerStudentSearch != null) {
+				listenerStudentSearch.back(ev);
+			}
 		});
 		btnManageCourses.setOnAction(e->
 		{
@@ -168,18 +177,14 @@ public class AdminView
 			courseStage.setTitle("Manage Courses");
 			Label lblCourses = new Label("Courses");
 			ListView<Course> lstCourses = new ListView<Course>();
-			for(Major m : MajorBag.getMajors()) {
-				lstCourses.getItems().add(m);
+			for(Course c : courses) {
+				lstCourses.getItems().add(c);
 			}	
 			Button btnCancel = new Button("Close");
-			Button btnSave = new Button("Save");
 			Button btnDelete = new Button("Delete Course");
 			Button btnAdd = new Button("Add Course");
 			btnCancel.setOnAction(ea->{
 				courseStage.close();
-			});
-			btnSave.setOnAction(ea->{
-				createAccount(user, false, true);
 			});
 			btnDelete.setOnAction(ea->{
 				try {
@@ -192,10 +197,10 @@ public class AdminView
 				}
 			});
 			btnAdd.setOnAction(ea->{
-				createAccount(user, true, false);
+				createAccount(user, true, false, majors, courses);
 			});
 			HBox hbxButtons = new HBox();
-			hbxButtons.getChildren().addAll(btnCancel, btnSave, btnDelete, btnAdd);
+			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
 			Scene acctScene = new Scene(hbxButtons, 300, 100);
 			courseStage.setScene(acctScene);
@@ -211,30 +216,27 @@ public class AdminView
 				lstMajors.getItems().add(m);
 			}	
 			Button btnCancel = new Button("Close");
-			Button btnSave = new Button("Save");
 			Button btnDelete = new Button("Delete Major");
 			Button btnAdd = new Button("Add Major");
 			btnCancel.setOnAction(ea->{
 				courseStage.close();
-			});
-			btnSave.setOnAction(ea->{
-				createAccount(user, false, true);
 			});
 			btnDelete.setOnAction(ea->{
 				try {
 					DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
 					if(listenerMajorDelete != null) {
 						listenerMajorDelete.delete(ev);
+						lstMajors.getItems().remove(lstMajors.getSelectionModel().getSelectedIndex());
 					}
 				} catch(Exception ex) {
 					
 				}
 			});
 			btnAdd.setOnAction(ea->{
-				createAccount(user, true, false);
+				createAccount(user, true, false, majors, courses);
 			});
 			HBox hbxButtons = new HBox();
-			hbxButtons.getChildren().addAll(btnCancel, btnSave, btnDelete, btnAdd);
+			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
 			Scene acctScene = new Scene(hbxButtons, 300, 100);
 			courseStage.setScene(acctScene);
@@ -243,6 +245,7 @@ public class AdminView
 		HBox hbxButtons = new HBox();
 		VBox pane = new VBox();
 		HBox hbxLogout = new HBox();
+		hbxButtons.getChildren().addAll(btnSearchStudents, btnSearchAdmin, btnCreateAccount, btnManageMajors, btnManageCourses);
 		hbxLogout.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
 		pane.getChildren().addAll(hbxLogout, hbxButtons);
 		hbxButtons.setAlignment(Pos.CENTER);
@@ -251,11 +254,11 @@ public class AdminView
 		hbxLogout.setSpacing(20);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(50);
-		Scene scene = new Scene(pane, 400, 400);
+		Scene scene = new Scene(pane, 600, 250);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
-	public void createAccount(Administrator user, boolean admin, boolean student)
+	public void createAccount(Administrator user, boolean admin, boolean student, Major[] majors, Course[] courses)
 	{
 		int line = 0;
 		GridPane grid = new GridPane();
@@ -403,7 +406,7 @@ public class AdminView
 		grid.add(txtPassword, 1, line);
 		grid.setAlignment(Pos.CENTER);
 		Button btnBack = new Button("Cancel");
-		Button btnCreate = new Button();
+		Button btnCreate;
 		if(student) {
 			btnCreate = new Button("Create Student");
 		} else if (admin) {
@@ -414,7 +417,7 @@ public class AdminView
 		Button btnClear = new Button("Clear");
 		HBox hbxButtons = new HBox();
 		btnBack.setOnAction(e->{
-			adminView(user);
+			adminView(user, majors, courses);
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnCreate, btnClear);
 		btnCreate.setOnAction(e->{
@@ -484,5 +487,7 @@ public class AdminView
 	public void setListenerCourseDelete(DeleteCourseListener listenerCourseDelete) {
 		this.listenerCourseDelete = listenerCourseDelete;
 	}
-	
+	public void setListenerStudentSearch(BackListener listenerStudentSearch) {
+		this.listenerStudentSearch = listenerStudentSearch;
+	}
 }
