@@ -1,5 +1,6 @@
 package user;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -7,7 +8,7 @@ import report.Course;
 import report.CourseAttributes;
 import report.CourseBag;
 
-public class Major 
+public class Major implements Serializable
 {
 	String name;
 	double minGPA;

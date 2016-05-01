@@ -500,7 +500,7 @@ public class AdminView
 		hbxLogout.setSpacing(20);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(50);
-		Scene scene = new Scene(pane, 600, 250);
+		Scene scene = new Scene(pane, 1000, 200);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

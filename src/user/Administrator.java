@@ -1,8 +1,9 @@
 package user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Administrator implements User
+public class Administrator implements User, Serializable
 {
 	private String username;
 	private int id;

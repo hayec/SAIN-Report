@@ -1,12 +1,13 @@
 package user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import report.Course;
 import report.CourseBag;
 
 import java.util.ArrayList;
 
-public class Student implements User 
+public class Student implements User, Serializable
 {
 	private String username;
 	private int id;

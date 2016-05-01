@@ -49,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -71,7 +72,8 @@ public class SAINController
 		studentView = new StudentView(primaryStage);
 		staffView = new StaffView(primaryStage);
 		adminView = new AdminView(primaryStage);
-		try{md = MessageDigest.getInstance("MD5");}catch(Exception e){}
+		try{md = MessageDigest.getInstance("MD5");} catch(Exception e) {}
+		
 		/**********************Login Listeners**********************************/
 		loginView.setListenerAccount(new NewAccountListener()
 		{
@@ -87,7 +89,7 @@ public class SAINController
 				{
 					ev.setValidPassword(true);
 					int id = generateId(false);
-					users.addUser(new Administrator(id, ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString(), "Default", ""));
+					users.addUser(new Administrator(id, ev.getUsername(), new String(md.digest(ev.getPassword().getBytes())), "Default", ""));
 					currentUser = users.getUser(id);
 					adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
 					saveData();
@@ -101,10 +103,10 @@ public class SAINController
 			{
 				try
 				{
-					if(users.getUser(ev.getUsername()).correctPassword(md.digest(ev.getPassword().getBytes()).toString()))
+					if(users.getUser(ev.getUsername()).correctPassword(new String(md.digest(ev.getPassword().getBytes()))))
 					{
 						ev.setCredentialsValid(true);
-						currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
+						currentUser = users.getUser(ev.getUsername());
 						if(currentUser.isStudent())
 							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajorNames(), courses);
 						else if(currentUser.isFacutly())
@@ -228,7 +230,13 @@ public class SAINController
 				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
 			}
 		});
-		
+		adminView.setListenerStudentSearch(new BackListener(){
+			@Override
+			public void back(BackEventObject ev)
+			{
+				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
+			}
+		});
 		/***********************New Account Listeners*****************************************/
 		adminView.setListenerNewAccount(new CreateAccountListener(){
 			public void createAccount(CreateAccountEventObject ev)
@@ -464,7 +472,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-					users.addUser((User) objUserIn.readObject());
+					users.addUser((Administrator) objUserIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}

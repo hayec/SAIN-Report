@@ -1,8 +1,9 @@
 package user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Faculty implements User 
+public class Faculty implements User, Serializable
 {
 	String username;
 	private int id;

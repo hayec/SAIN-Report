@@ -1,8 +1,9 @@
 package user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public interface User 
+public interface User extends Serializable
 {
 	public String getUsername();
 	public String getName();	

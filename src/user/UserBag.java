@@ -30,7 +30,7 @@ public class UserBag
 		User returnUser = null;
 		for(User u : users)
 		{
-			if(u.getUsername() == username)
+			if(u.getUsername().equals(username))
 				returnUser = u;
 		}
 		return returnUser;
