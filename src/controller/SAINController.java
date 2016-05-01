@@ -157,16 +157,25 @@ public class SAINController
 			@Override
 			public void changePassword(PasswordEventObject ev)
 			{
-				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
-					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-					{
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
-						saveData();
+				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
+				{
+					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
+						ev.setSuccessful(false);
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
+							saveData();
+						}
+						else {
+							ev.setSuccessful(false);
+							ev.setErrorMessage("Error, new passwords do not match!");
+						}
 					}
-					else
-						ev.setPassMatch(false);
-				else
-					ev.setOldPassSuccessful(false);
+				}
+				else {
+					ev.setSuccessful(false);
+					ev.setErrorMessage("Error, old password is incorrect!");
+				}
 			}
 		});
 		studentView.setListenerPassword(new PasswordListener()
@@ -174,16 +183,25 @@ public class SAINController
 			@Override
 			public void changePassword(PasswordEventObject ev)
 			{
-				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
-					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-					{
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
-						saveData();
+				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
+				{
+					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
+						ev.setSuccessful(false);
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
+							saveData();
+						}
+						else {
+							ev.setSuccessful(false);
+							ev.setErrorMessage("Error, new passwords do not match!");
+						}
 					}
-					else
-						ev.setPassMatch(false);
-				else
-					ev.setOldPassSuccessful(false);
+				}
+				else {
+					ev.setSuccessful(false);
+					ev.setErrorMessage("Error, old password is incorrect!");
+				}
 			}
 		});
 		adminView.setListenerPassword(new PasswordListener()
@@ -191,16 +209,25 @@ public class SAINController
 			@Override
 			public void changePassword(PasswordEventObject ev)
 			{
-				if(currentUser.correctPassword(md.digest(ev.getOldPassword().getBytes()).toString()))
-					if(ev.getNewPassword().equals(ev.getNewPasswordConf()))
-					{
-						currentUser.setPassword(md.digest(ev.getNewPassword().getBytes()).toString());
-						saveData();
+				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
+				{
+					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
+						ev.setSuccessful(false);
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
+							saveData();
+						}
+						else {
+							ev.setSuccessful(false);
+							ev.setErrorMessage("Error, new passwords do not match!");
+						}
 					}
-					else
-						ev.setPassMatch(false);
-				else
-					ev.setOldPassSuccessful(false);
+				}
+				else {
+					ev.setSuccessful(false);
+					ev.setErrorMessage("Error, old password is incorrect!");
+				}
 			}
 		});
 		/***************************Search Listeners*******************************************/

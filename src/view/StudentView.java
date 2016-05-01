@@ -76,24 +76,30 @@ public class StudentView
 				if(listenerPassword != null)
 				{
 					listenerPassword.changePassword(ev);
-					if(ev.isOldPassSuccessful() && ev.isPassMatch())
+					if(ev.isSuccessful())
 					{
 						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
 						alert.showAndWait();
 						passStage.close();
 					}
-					else if(!ev.isOldPassSuccessful())
-					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, old password is incorrect.", ButtonType.OK);
-						alert.showAndWait();
-					}
 					else
 					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, new passwords do not match.", ButtonType.OK);
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 						alert.showAndWait();
 					}
 				}
 			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);	
+			passStage.setScene(passScene);
+			passStage.showAndWait();
 		});
 		Label lblMajor = new Label("Please select a major to continue : ");
 		ComboBox<String> cmbMajor = new ComboBox<String>();
@@ -172,24 +178,30 @@ public class StudentView
 				if(listenerPassword != null)
 				{
 					listenerPassword.changePassword(ev);
-					if(ev.isOldPassSuccessful() && ev.isPassMatch())
+					if(ev.isSuccessful())
 					{
 						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
 						alert.showAndWait();
 						passStage.close();
 					}
-					else if(!ev.isOldPassSuccessful())
-					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, old password is incorrect.", ButtonType.OK);
-						alert.showAndWait();
-					}
 					else
 					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, new passwords do not match.", ButtonType.OK);
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 						alert.showAndWait();
 					}
 				}
 			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);	
+			passStage.setScene(passScene);
+			passStage.showAndWait();
 		});
 		Label lblSelectedMajor = new Label("Currently Selected Major is : " + student.getMajor());
 		Label lblNumOfCredits = new Label("Number of Credits Attempted : " + student.numOfCredits());

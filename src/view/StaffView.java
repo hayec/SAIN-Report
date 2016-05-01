@@ -86,20 +86,15 @@ public class StaffView
 				if(listenerPassword != null)
 				{
 					listenerPassword.changePassword(ev);
-					if(ev.isOldPassSuccessful() && ev.isPassMatch())
+					if(ev.isSuccessful())
 					{
 						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
 						alert.showAndWait();
 						passStage.close();
 					}
-					else if(!ev.isOldPassSuccessful())
-					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, old password is incorrect.", ButtonType.OK);
-						alert.showAndWait();
-					}
 					else
 					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, new passwords do not match.", ButtonType.OK);
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 						alert.showAndWait();
 					}
 				}
@@ -295,20 +290,15 @@ public class StaffView
 				if(listenerPassword != null)
 				{
 					listenerPassword.changePassword(ev);
-					if(ev.isOldPassSuccessful() && ev.isPassMatch())
+					if(ev.isSuccessful())
 					{
 						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
 						alert.showAndWait();
 						passStage.close();
 					}
-					else if(!ev.isOldPassSuccessful())
-					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, old password is incorrect.", ButtonType.OK);
-						alert.showAndWait();
-					}
 					else
 					{
-						Alert alert = new Alert(AlertType.ERROR, "Error, new passwords do not match.", ButtonType.OK);
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 						alert.showAndWait();
 					}
 				}
