@@ -73,6 +73,10 @@ public class LoginView
 		btnLogin.setOnAction(e ->
 		{
 			LoginEventObject ev = new LoginEventObject(btnLogin, txtUsername.getText(), txtPassword.getText());
+			if(listenerLogin != null)
+			{
+				listenerLogin.login(ev);
+			}
 			if(!ev.isCredentialsValid())
 			{
 				if(lblLoginStatus.isVisible())

@@ -25,6 +25,16 @@ public class UserBag
 		}
 		return returnUser;
 	}
+	public User getUser(String username)
+	{
+		User returnUser = null;
+		for(User u : users)
+		{
+			if(u.getUsername() == username)
+				returnUser = u;
+		}
+		return returnUser;
+	}
 	public void removeUser(int id)
 	{
 		for(User u : users)

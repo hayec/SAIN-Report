@@ -1,5 +1,9 @@
 package controller;
 
+import eventHandlers.AddCourseEventObject;
+import eventHandlers.AddCourseListener;
+import eventHandlers.AddMajorEventObject;
+import eventHandlers.AddMajorListener;
 import eventHandlers.AdminEditEventObject;
 import eventHandlers.AdminEditListener;
 import eventHandlers.BackEventObject;
@@ -24,6 +28,7 @@ import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
 import javafx.stage.Stage;
 import report.Course;
+import report.CourseAttributes;
 import report.CourseBag;
 import user.Administrator;
 import user.Faculty;
@@ -73,26 +78,20 @@ public class SAINController
 			@Override
 			public void newAccount(NewAccountEventObject ev)
 			{
-				/*
-				if(Integer.parseInt(ev.getUsername()) > 99999999 || Integer.parseInt(ev.getUsername()) < 90000000)
-				{
-					ev.setValidPassword(false);
-					ev.setErrorMessage("Error, administrative ID numbers must be between 90000000 and 99999999");
-				}
-				else if(ev.getPassword().equals(ev.getPassword().toLowerCase()) || ev.getPassword().equals(ev.getPassword().toUpperCase()) || ev.getPassword().length() < 8 || ev.getPassword().length() > 32 || !ev.getPassword().matches(".*\\d.*"))
+				if(ev.getPassword().equals(ev.getPassword().toLowerCase()) || ev.getPassword().equals(ev.getPassword().toUpperCase()) || ev.getPassword().length() < 8 || ev.getPassword().length() > 32 || !ev.getPassword().matches(".*\\d.*"))
 				{
 					ev.setValidPassword(false);
 					ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
 				}
-				
 				else
-				{*/
-				int id = generateId(false);
+				{
+					ev.setValidPassword(true);
+					int id = generateId(false);
 					users.addUser(new Administrator(id, ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString(), "Default", ""));
 					currentUser = users.getUser(id);
 					adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
-				//}
-				saveData();
+					saveData();
+				}
 			}
 		});
 		loginView.setListenerLogin(new LoginListener()
@@ -102,7 +101,7 @@ public class SAINController
 			{
 				try
 				{
-					if(users.getUser(Integer.parseInt(ev.getUsername())).correctPassword(md.digest(ev.getPassword().getBytes()).toString()))
+					if(users.getUser(ev.getUsername()).correctPassword(md.digest(ev.getPassword().getBytes()).toString()))
 					{
 						ev.setCredentialsValid(true);
 						currentUser = users.getUser(Integer.parseInt(ev.getUsername()));
@@ -297,6 +296,84 @@ public class SAINController
 				saveData();
 			}
 		});
+		/****************New Major/Course Listeners********************************************/
+		adminView.setListenerMajorAdd(new AddMajorListener(){
+			@Override
+			public void add(AddMajorEventObject ev)
+			{
+				try {
+					if(Integer.parseInt(ev.getAmerHisReq()) < 0 || Integer.parseInt(ev.getBusReq()) < 0 || Integer.parseInt(ev.getComReq()) < 0
+							|| Integer.parseInt(ev.getEngReq()) < 0 || Integer.parseInt(ev.getHisReq()) < 0 || Integer.parseInt(ev.getHumReq()) < 0
+							|| Integer.parseInt(ev.getLabSciReq()) < 0 || Integer.parseInt(ev.getLangReq()) < 0 || Integer.parseInt(ev.getMathReq()) < 0
+							|| Integer.parseInt(ev.getPhlReq()) < 0 || Integer.parseInt(ev.getSocSciReq()) < 0) {
+						ev.setErrorMessage("All requirements must be positive.");
+					} else if (Integer.parseInt(ev.getAmerHisReq()) > 10 || Integer.parseInt(ev.getBusReq()) > 10 || Integer.parseInt(ev.getComReq()) > 10
+					|| Integer.parseInt(ev.getEngReq()) > 10 || Integer.parseInt(ev.getHisReq()) > 10 || Integer.parseInt(ev.getHumReq()) > 10
+					|| Integer.parseInt(ev.getLabSciReq()) > 10 || Integer.parseInt(ev.getLangReq()) > 10 || Integer.parseInt(ev.getMathReq()) > 10
+					|| Integer.parseInt(ev.getPhlReq()) > 10 || Integer.parseInt(ev.getSocSciReq()) > 10) {
+						ev.setErrorMessage("All requirements have a maximum value of 10.");
+					}
+				} catch(Exception e) {
+					ev.setErrorMessage("All requirements must be integers.");
+				}
+				try {
+					if(Double.parseDouble(ev.getMinGPA()) < 0) {
+						ev.setErrorMessage("Min GPA must be positive.");
+					} else if(Double.parseDouble(ev.getMinGPA()) > 4.0) {
+						ev.setErrorMessage("Min GPA cannot be greater than 4.0.");
+					}
+				} catch(Exception e) {
+					ev.setErrorMessage("Min GPA must be a number.");
+				}
+				try {
+					if(Integer.parseInt(ev.getNumOfCreditsReq()) < 0) {
+						ev.setErrorMessage("Required number of credits must be a positive integer.");
+					} else if(Integer.parseInt(ev.getNumOfCreditsReq()) >= 100) {
+						ev.setErrorMessage("Required number of credits must be less than 100.");
+					}
+				} catch(Exception e) {
+					ev.setErrorMessage("Required number of credits must be an integer");
+				}
+				if(ev.getErrorMessage().equals("") || ev.getErrorMessage() == null) {
+					ev.setValid(true);
+				} else {
+					ev.setValid(false);
+				}
+				if(ev.isValid()) {
+					MajorBag.addMajor(new Major(ev.getName(), Integer.parseInt(ev.getPhysEdReq()), Integer.parseInt(ev.getHisReq()), Integer.parseInt(ev.getLabSciReq()),
+							Integer.parseInt(ev.getMathReq()), Integer.parseInt(ev.getHumReq()), Integer.parseInt(ev.getBusReq()), Integer.parseInt(ev.getEngReq()), 
+							Integer.parseInt(ev.getComReq()), Integer.parseInt(ev.getAmerHisReq()), Integer.parseInt(ev.getSocSciReq()), Integer.parseInt(ev.getLangReq()), 
+							Integer.parseInt(ev.getPhlReq()), Integer.parseInt(ev.getNumOfCreditsReq()), ev.getReqCourses()));
+					ev.setMajors(MajorBag.getMajors());
+				}
+			}
+		});
+		adminView.setListenerCourseAdd(new AddCourseListener(){
+			@Override
+			public void add(AddCourseEventObject ev) 
+			{
+				int credits = 0;
+				try {
+					if(Integer.parseInt(ev.getCredits()) < 0) {
+						ev.setErrorMessage("Number of credits must be positive.");
+					}
+					else if(Integer.parseInt(ev.getCredits()) > 6) {
+						ev.setErrorMessage("The maximum number of credits allowed is 6.");
+					}
+					else {
+						credits = Integer.parseInt(ev.getCredits());
+					}
+				} catch(Exception e) {
+					ev.setErrorMessage("Number of credits must be an integer.");
+				}
+				if(ev.getErrorMessage().equals("") || ev.getErrorMessage() == null) {
+					Course c = new Course(ev.getCourseCode(), ev.getCourseTitle(), ev.getCourseDescription(), ev.isAmmerman(), ev.isGrant(), ev.isEastern(), ev.getPrerequisites(), ev.getCorequisites(), credits);
+					c.CAttributes = new CourseAttributes(ev.isPhysEd(), ev.isHistory(), ev.isLabScience(), ev.isMath(), ev.isHumanities(), ev.isBusiness(), ev.isEnglish(), ev.isCommunications(), ev.isAmerHis(), ev.isSocScience(), ev.isLanguage(), ev.isPhilosophy());
+					courses.addCourse(c);
+					ev.setCourses(courses.getCourses());
+				}
+			}
+		});
 		/****************Edit Listeners*******************************************************/
 		staffView.setListenerAdmin(new AdminEditListener()
 		{
@@ -335,6 +412,7 @@ public class SAINController
 			public void delete(DeleteMajorEventObject ev) {
 				MajorBag.removeMajor(ev.getTarget().getName());
 				saveData();
+				ev.setMajors(MajorBag.getMajors());
 			}
 		});
 		adminView.setListenerCourseDelete(new DeleteCourseListener() {
@@ -342,6 +420,7 @@ public class SAINController
 			public void delete(DeleteCourseEventObject ev) {
 				courses.removeCourse(ev.getTarget().getCourseCode());
 				saveData();
+				ev.setCourses(courses.getCourses());
 			}
 		});
 		try {
@@ -369,7 +448,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-				tempCourses.add((Course) objCourseIn.readObject());
+					courses.addCourse((Course) objCourseIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}
@@ -385,7 +464,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-					tempUsers.add((User) objUserIn.readObject());
+					users.addUser((User) objUserIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}
@@ -401,7 +480,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-				tempMajors.add((Major) objMajorIn.readObject());
+				MajorBag.addMajor((Major) objMajorIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}
@@ -409,9 +488,6 @@ public class SAINController
 		}
 		else
 			fileMajorIn = null;
-		users.addUser(tempUsers.toArray(new User[tempUsers.size()]));
-		MajorBag.addMajor(tempMajors.toArray(new Major[tempMajors.size()]));
-		courses.addCourse(tempCourses.toArray(new Course[tempCourses.size()]));
 		if(fileUserIn == null)
 			loginView.newUser();
 	}

@@ -2,6 +2,7 @@ package eventHandlers;
 
 import java.util.EventObject;
 import report.Course;
+import user.Major;
 
 public class AddMajorEventObject extends EventObject
 {
@@ -23,6 +24,7 @@ public class AddMajorEventObject extends EventObject
 	private String phlReq;
 	private Course[] reqCourses;
 	private String errorMessage;
+	private Major[] majors;
 	public AddMajorEventObject(Object source, String name, String minGPA, String numOfCreditsReq, String physEdReq, String hisReq,
 			String labSciReq, String mathReq, String humReq, String busReq, String engReq, String comReq,
 			String amerHisReq, String socSciReq, String langReq, String phlReq, Course[] reqCourses) {
@@ -43,6 +45,12 @@ public class AddMajorEventObject extends EventObject
 		this.langReq = langReq;
 		this.phlReq = phlReq;
 		this.reqCourses = reqCourses;
+	}
+	public Major[] getMajors() {
+		return majors;
+	}
+	public void setMajors(Major[] majors) {
+		this.majors = majors;
 	}
 	public String getErrorMessage() {
 		return errorMessage;
