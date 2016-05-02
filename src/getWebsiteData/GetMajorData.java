@@ -28,6 +28,9 @@ public class GetMajorData
 		String temp;
 		String name;
 		ArrayList<String> courses = new ArrayList<String>();
+		File file = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Major Descriptions\\Majors.bin");
+		FileOutputStream fileOut = new FileOutputStream(file);
+		ObjectOutputStream objOut = new ObjectOutputStream(fileOut);
 		int startingIndex, atrCounter;
 		atrCounter = startingIndex = 0;
 		int physEdReq = 0;
@@ -193,18 +196,16 @@ public class GetMajorData
 	        	for(String c : courses)
 	        		reqCourses[courses.indexOf(c)] = getCourse(c);
 	        	Major tempMajor = new Major(name, physEdReq, hisReq, labSciReq, mathReq, humReq, busReq, engReq, comReq, amerHisReq, socSciReq, langReq, phlReq, numOfCredits, reqCourses);
-	        	File file = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Major Descriptions\\" + name + ".bin");
-				FileOutputStream fileOut = new FileOutputStream(file);
-				ObjectOutputStream objOut = new ObjectOutputStream(fileOut);
 				objOut.writeObject(tempMajor);
-				objOut.close();
-				fileOut.close();
 			}
 			catch(Exception e)
 			{
 				
 			}
+			
 		}
+		objOut.close();
+		fileOut.close();
 	}
 	private static boolean isInts(String string)
 	{

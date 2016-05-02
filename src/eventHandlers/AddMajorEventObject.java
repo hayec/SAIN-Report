@@ -23,7 +23,7 @@ public class AddMajorEventObject extends EventObject
 	private String langReq;
 	private String phlReq;
 	private Course[] reqCourses;
-	private String errorMessage;
+	private String errorMessage = new String();
 	private Major[] majors;
 	public AddMajorEventObject(Object source, String name, String minGPA, String numOfCreditsReq, String physEdReq, String hisReq,
 			String labSciReq, String mathReq, String humReq, String busReq, String engReq, String comReq,

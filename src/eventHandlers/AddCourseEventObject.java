@@ -28,7 +28,7 @@ public class AddCourseEventObject extends EventObject
 	private boolean language;
 	private boolean philosophy;
 	private boolean valid;
-	private String errorMessage;
+	private String errorMessage = new String();
 	private Course[] courses;
 	public AddCourseEventObject(Object source, String courseCode, String courseTitle, String courseDescription, boolean ammerman,
 			boolean grant, boolean eastern, String[] prerequisites, String[] corequisites, String credits,

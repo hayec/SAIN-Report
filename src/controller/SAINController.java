@@ -292,7 +292,12 @@ public class SAINController
 					if(users.getUser(Integer.parseInt(ev.getId())) != null) {
 						ev.setErrorMessage("User ID is already in use.  Please choose another ID number.  Alternatively, leave the field blank and an ID number will be automatically generated.");
 					}
-					
+				}
+				if(ev.getFirstName().equals("") || ev.getFirstName() == null) {
+					ev.setErrorMessage("First Name cannot be left blank");
+				}
+				if(ev.getLastName().equals("") || ev.getLastName() == null) {
+					ev.setErrorMessage("Last Name cannot be left blank");
 				}
 				int zipCode;
 				try {
@@ -336,20 +341,27 @@ public class SAINController
 			@Override
 			public void add(AddMajorEventObject ev)
 			{
+				if(ev.getName().equals("") || ev.getName() == null) {
+					ev.setErrorMessage("Name cannot be left blank!");
+				}
+				if(MajorBag.getMajor(ev.getName()) != null)
+				{
+					ev.setErrorMessage("Major already exists!");
+				}
 				try {
 					if(Integer.parseInt(ev.getAmerHisReq()) < 0 || Integer.parseInt(ev.getBusReq()) < 0 || Integer.parseInt(ev.getComReq()) < 0
 							|| Integer.parseInt(ev.getEngReq()) < 0 || Integer.parseInt(ev.getHisReq()) < 0 || Integer.parseInt(ev.getHumReq()) < 0
 							|| Integer.parseInt(ev.getLabSciReq()) < 0 || Integer.parseInt(ev.getLangReq()) < 0 || Integer.parseInt(ev.getMathReq()) < 0
 							|| Integer.parseInt(ev.getPhlReq()) < 0 || Integer.parseInt(ev.getSocSciReq()) < 0) {
-						ev.setErrorMessage("All requirements must be positive.");
+						ev.setErrorMessage("All course requirements must be positive.");
 					} else if (Integer.parseInt(ev.getAmerHisReq()) > 10 || Integer.parseInt(ev.getBusReq()) > 10 || Integer.parseInt(ev.getComReq()) > 10
 					|| Integer.parseInt(ev.getEngReq()) > 10 || Integer.parseInt(ev.getHisReq()) > 10 || Integer.parseInt(ev.getHumReq()) > 10
 					|| Integer.parseInt(ev.getLabSciReq()) > 10 || Integer.parseInt(ev.getLangReq()) > 10 || Integer.parseInt(ev.getMathReq()) > 10
 					|| Integer.parseInt(ev.getPhlReq()) > 10 || Integer.parseInt(ev.getSocSciReq()) > 10) {
-						ev.setErrorMessage("All requirements have a maximum value of 10.");
+						ev.setErrorMessage("All course requirements have a maximum value of 10.");
 					}
 				} catch(Exception e) {
-					ev.setErrorMessage("All requirements must be integers.");
+					ev.setErrorMessage("All course requirements must be integers.");
 				}
 				try {
 					if(Double.parseDouble(ev.getMinGPA()) < 0) {
@@ -406,6 +418,8 @@ public class SAINController
 					c.CAttributes = new CourseAttributes(ev.isPhysEd(), ev.isHistory(), ev.isLabScience(), ev.isMath(), ev.isHumanities(), ev.isBusiness(), ev.isEnglish(), ev.isCommunications(), ev.isAmerHis(), ev.isSocScience(), ev.isLanguage(), ev.isPhilosophy());
 					courses.addCourse(c);
 					ev.setCourses(courses.getCourses());
+					ev.setValid(true);
+					saveData();
 				}
 			}
 		});

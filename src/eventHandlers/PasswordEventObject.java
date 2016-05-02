@@ -7,10 +7,8 @@ public class PasswordEventObject extends EventObject
 	private String oldPassword;
 	private String newPassword;
 	private String newPasswordConf;
-	private boolean oldPassSuccessful;
-	private boolean passMatch;
 	private boolean successful;
-	private String errorMessage;
+	private String errorMessage = new String();
 	public PasswordEventObject(Object source)
 	{
 		super(source);
@@ -21,22 +19,6 @@ public class PasswordEventObject extends EventObject
 		this.oldPassword = oldPassword;
 		this.newPassword = newPassword;
 		this.newPasswordConf = newPasswordConf;
-	}
-	public boolean isOldPassSuccessful()
-	{
-		return oldPassSuccessful;
-	}
-	public void setOldPassSuccessful(boolean oldPassSuccessful)
-	{
-		this.oldPassSuccessful = oldPassSuccessful;
-	}
-	public boolean isPassMatch() 
-	{
-		return passMatch;
-	}
-	public void setPassMatch(boolean passMatch)
-	{
-		this.passMatch = passMatch;
 	}
 	public String getOldPassword() 
 	{

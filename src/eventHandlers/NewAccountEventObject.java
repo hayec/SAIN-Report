@@ -9,7 +9,7 @@ public class NewAccountEventObject extends EventObject
 	private String password;
 	private boolean isValidPassword;
 	private boolean accountValid;
-	private String errorMessage;
+	private String errorMessage = new String();
 	private User user;
 	public NewAccountEventObject(Object source, String username, String password)
 	{

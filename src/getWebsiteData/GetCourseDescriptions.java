@@ -72,7 +72,7 @@ public class GetCourseDescriptions {
 	        			if(capIndex == 3)
 	        			{
 	        				capIndex = 0;
-	        				prereqArray.add(line.substring(i - 2, i + 3));
+	        				prereqArray.add(line.substring(i - 2, i + 4));
 	        				i = i + 3;
 	        			}
 	        		}
@@ -90,7 +90,7 @@ public class GetCourseDescriptions {
 	        			if(capIndex == 3)
 	        			{
 	        				capIndex = 0;
-	        				coreqArray.add(line.substring(i - 2, i + 3));
+	        				coreqArray.add(line.substring(i - 2, i + 4));
 	        				i = i + 3;
 	        			}
 	        		} 	

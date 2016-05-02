@@ -21,6 +21,7 @@ import eventHandlers.AddMajorListener;
 import eventHandlers.AddCourseEventObject;
 import eventHandlers.AddCourseListener;
 import eventHandlers.AddMajorEventObject;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -158,8 +159,10 @@ public class AdminView
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnStudent, btnFaculty, btnAdministrator);
 			hbxButtons.setAlignment(Pos.CENTER);
-			Scene acctScene = new Scene(hbxButtons, 300, 100);
+			hbxButtons.setSpacing(20);
+			Scene acctScene = new Scene(hbxButtons, 650, 100);
 			acctStage.setScene(acctScene);
+			acctStage.setTitle("Add New Account");
 			acctStage.showAndWait();
 		});
 		btnSearchAdmin.setOnAction(e->
@@ -177,7 +180,7 @@ public class AdminView
 		{
 			Stage courseStage = new Stage();
 			courseStage.setTitle("Manage Courses");
-			Label lblCourses = new Label("Courses");
+			Label lblCourses = new Label("Courses : ");
 			ListView<Course> lstCourses = new ListView<Course>();
 			for(Course c : courses) {
 				lstCourses.getItems().add(c);
@@ -189,11 +192,16 @@ public class AdminView
 				courseStage.close();
 			});
 			btnDelete.setOnAction(ea->{
+				try {
 				DeleteCourseEventObject ev = new DeleteCourseEventObject(btnDelete, lstCourses.getSelectionModel().getSelectedItem());
 				if(listenerCourseDelete != null) {
 					listenerCourseDelete.delete(ev);
 					lstCourses.getItems().remove(lstCourses.getSelectionModel().getSelectedIndex());
 					courses = ev.getCourses();
+				}
+				}catch(Exception ex){
+					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+					alert.showAndWait();
 				}
 			});
 			btnAdd.setOnAction(ea->{
@@ -202,6 +210,7 @@ public class AdminView
 				GridPane gridOut = new GridPane();
 				gridOut.setHgap(10);
 				gridOut.setVgap(10);
+				gridOut.setPadding(new Insets(30, 0, 10, 30));
 				Label lblCourseCode = new Label("Course Code : ");
 				Label lblCourseTitle = new Label("Course Title : ");
 				Label lblCourseDescription = new Label("Course Description : ");
@@ -254,6 +263,9 @@ public class AdminView
 				gridOut.add(chkPhl, 0, 20);				
 				Label lblCourse = new Label("Courses : ");
 				ListView<Course> lstCourse = new ListView<Course>();
+				for(Course c : courses) {
+					lstCourse.getItems().add(c);
+				}	
 				Label lblRightArrow = new Label("-->");
 				Button btnAddCourse = new Button("Add Course");
 				Label lblLeftArrow = new Label("<--");
@@ -272,6 +284,9 @@ public class AdminView
 				hbxCourses.setSpacing(30);
 				Label lblCoursesA = new Label("Courses");
 				ListView<Course> lstCoursesA = new ListView<Course>();
+				for(Course c : courses) {
+					lstCoursesA.getItems().add(c);
+				}	
 				Label lblRightArrowA = new Label("-->");
 				Button btnAddCourseA = new Button("Add Course");
 				Label lblLeftArrowA = new Label("<--");
@@ -279,11 +294,11 @@ public class AdminView
 				Label lblCoursesReqA = new Label("Prerequisite Courses");
 				ListView<Course> lstCoursesReqA = new ListView<Course>();
 				VBox vbxCourseButtonsA = new VBox();
-				vbxCourseButtons.getChildren().addAll(lblRightArrowA, btnAddCourseA, lblLeftArrowA, btnRemoveCourseA);
+				vbxCourseButtonsA.getChildren().addAll(lblRightArrowA, btnAddCourseA, lblLeftArrowA, btnRemoveCourseA);
 				VBox vbxCoursesA = new VBox();
-				vbxCourses.getChildren().addAll(lblCoursesA, lstCoursesA);
+				vbxCoursesA.getChildren().addAll(lblCoursesA, lstCoursesA);
 				VBox vbxCoursesReqA = new VBox();
-				vbxCoursesReq.getChildren().addAll(lblCoursesReqA, lstCoursesReqA);
+				vbxCoursesReqA.getChildren().addAll(lblCoursesReqA, lstCoursesReqA);
 				HBox hbxCoursesA = new HBox();
 				hbxCoursesA.getChildren().addAll(vbxCoursesA, vbxCourseButtonsA, vbxCoursesReqA);
 				hbxCoursesA.setAlignment(Pos.CENTER);
@@ -296,8 +311,61 @@ public class AdminView
 				Button btnAddThis = new Button("Add Course");
 				HBox hbxButtons = new HBox();
 				hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
+				hbxButtons.setAlignment(Pos.CENTER);
+				hbxButtons.setSpacing(20);
 				btnCancelThis.setOnAction(eac->{
 					newCourseStage.close();
+				});
+				btnAddCourse.setOnAction(eac->{
+					try {
+						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
+				});
+				btnRemoveCourse.setOnAction(eac->{
+					try 
+					{
+						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+						lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
+				});
+				btnAddCourseA.setOnAction(eac->{
+					try 
+					{
+						if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+					lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
+				});
+				btnRemoveCourseA.setOnAction(eac->{
+					try 
+					{
+						if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+						lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
 				});
 				btnAddThis.setOnAction(eac->{
 					AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
@@ -313,19 +381,29 @@ public class AdminView
 						alert.showAndWait();
 					} else {
 						courses = ev.getCourses();
-						courseStage.close();
+						lstCourses.getItems().clear();
+						for(Course c : courses) {
+							lstCourses.getItems().add(c);
+						}	
+						newCourseStage.close();
 					}
 				});
 				VBox pane = new VBox();
 				pane.getChildren().addAll(gridOut, vbxReqs, hbxButtons);
-				Scene scene = new Scene(pane, 600, 800);
+				Scene scene = new Scene(pane, 1080, 1500);
 				newCourseStage.setScene(scene);
 				newCourseStage.showAndWait();
 			});
+			lstCourses.setMaxWidth(350);
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
-			Scene acctScene = new Scene(hbxButtons, 300, 100);
+			hbxButtons.setSpacing(20);
+			VBox pane = new VBox();
+			pane.getChildren().addAll(lblCourses, lstCourses, hbxButtons);
+			pane.setSpacing(30);
+			pane.setAlignment(Pos.CENTER);
+			Scene acctScene = new Scene(pane, 400, 650);
 			courseStage.setScene(acctScene);
 			courseStage.showAndWait();
 		});
@@ -335,9 +413,10 @@ public class AdminView
 			majorStage.setTitle("Manage Majors");
 			Label lblMajors = new Label("Majors");
 			ListView<Major> lstMajors = new ListView<Major>();
-			for(Major m : MajorBag.getMajors()) {
+			for(Major m : majors) {
 				lstMajors.getItems().add(m);
 			}	
+			lstMajors.setMaxWidth(250);
 			Button btnCancel = new Button("Close");
 			Button btnDelete = new Button("Delete Major");
 			Button btnAdd = new Button("Add Major");
@@ -345,11 +424,16 @@ public class AdminView
 				majorStage.close();
 			});
 			btnDelete.setOnAction(ea->{
+				try {
 				DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
 				if(listenerMajorDelete != null) {
 					listenerMajorDelete.delete(ev);
 					lstMajors.getItems().remove(lstMajors.getSelectionModel().getSelectedIndex());
 					majors = ev.getMajors();					
+				}
+				} catch(Exception ex) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
+					alert.showAndWait();
 				}
 			});
 			btnAdd.setOnAction(ea->{
@@ -358,7 +442,9 @@ public class AdminView
 				GridPane gridOut = new GridPane();
 				gridOut.setHgap(10);
 				gridOut.setVgap(10);
-				Label lblRequirements = new Label("Requirements : ");
+				gridOut.setPadding(new Insets(30, 0, 10, 30));
+				Label lblRequirements = new Label("Major Requirements : ");
+				lblRequirements.setAlignment(Pos.CENTER);
 				Label lblName = new Label("Name : ");
 				Label lblMinGPA = new Label("Minimum GPA : ");
 				Label lblNumOfCredits = new Label("Number of Credits : ");
@@ -414,21 +500,27 @@ public class AdminView
 				gridOut.add(txtHum, 1, 7);
 				gridOut.add(txtBus, 1, 8);
 				gridOut.add(txtEng, 1, 9);
-				gridOut.add(txtCom, 1, 11);
+				gridOut.add(txtCom, 1, 10);
 				gridOut.add(txtAmerHis, 1, 11);
 				gridOut.add(txtSocSci, 1, 12);
 				gridOut.add(txtLang, 1, 13);
 				gridOut.add(txtPhl, 1, 14);
 				Label lblCourses = new Label("Courses");
 				ListView<Course> lstCourses = new ListView<Course>();
+				for(Course c : courses) {
+					lstCourses.getItems().add(c);
+				}	
 				Label lblRightArrow = new Label("-->");
 				Button btnAddCourse = new Button("Add Course");
 				Label lblLeftArrow = new Label("<--");
 				Button btnRemoveCourse = new Button("Remove Course");
 				Label lblCoursesReq = new Label("Courses Required");
 				ListView<Course> lstCoursesReq = new ListView<Course>();
+				lstCourses.setMaxHeight(200);
+				lstCoursesReq.setMaxHeight(200);
 				VBox vbxCourseButtons = new VBox();
 				vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
+				vbxCourseButtons.setAlignment(Pos.CENTER);
 				VBox vbxCourses = new VBox();
 				vbxCourses.getChildren().addAll(lblCourses, lstCourses);
 				VBox vbxCoursesReq = new VBox();
@@ -441,6 +533,8 @@ public class AdminView
 				Button btnAddThis = new Button("Add Major");
 				HBox hbxButtons = new HBox();
 				hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
+				hbxButtons.setAlignment(Pos.CENTER);
+				hbxButtons.setSpacing(20);
 				btnCancelThis.setOnAction(eac->{
 					newMajorStage.close();
 				});
@@ -458,28 +552,53 @@ public class AdminView
 					} else {
 						majors = evm.getMajors();
 						newMajorStage.close();
+						lstMajors.getItems().clear();
+						for(Major m : majors) {
+							lstMajors.getItems().add(m);
+						}	
 					}
 				});
 				btnAddCourse.setOnAction(eac->{
-					lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+					try {
+						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
 				});
 				btnRemoveCourse.setOnAction(eac->{
-					lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+					try 
+					{
+						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+						{
+							throw new IllegalArgumentException();
+						}
+						lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+					} catch(Exception ex) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+						alert.showAndWait();
+					}
 				});
 				VBox pane = new VBox();
 				pane.getChildren().addAll(lblRequirements, gridOut, hbxCourses, hbxButtons);
-				Scene scene = new Scene(pane, 1280, 720);
+				Scene scene = new Scene(pane, 1280, 1080);
 				newMajorStage.setScene(scene);
+				newMajorStage.setTitle("New Major");
 				newMajorStage.showAndWait();
 			});
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
+			hbxButtons.setSpacing(20);
 			VBox pane = new VBox();
 			pane.getChildren().addAll(lblMajors, lstMajors, hbxButtons);
 			pane.setAlignment(Pos.CENTER);
 			pane.setSpacing(20);
-			Scene acctScene = new Scene(pane, 300, 100);
+			Scene acctScene = new Scene(pane, 400, 650);
 			majorStage.setScene(acctScene);
 			majorStage.showAndWait();
 		});
@@ -497,6 +616,7 @@ public class AdminView
 		pane.setSpacing(50);
 		Scene scene = new Scene(pane, 1000, 200);
 		primaryStage.setScene(scene);
+		primaryStage.setTitle("Administrative View");
 		primaryStage.show();
 	}
 	public void createAccount(Administrator user, boolean admin, boolean student, Major[] majorsIn, Course[] coursesIn)
@@ -581,7 +701,6 @@ public class AdminView
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, line);
 		//txtID.setText(Integer.toString(student.getId()));
-		txtID.setEditable(false);
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, ++line);
 		TextField txtFirstName = new TextField();
@@ -658,6 +777,8 @@ public class AdminView
 			adminView(user, majors, courses);
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnCreate, btnClear);
+		hbxButtons.setAlignment(Pos.CENTER);
+		hbxButtons.setSpacing(20);
 		btnCreate.setOnAction(e->{
 			try
 			{
