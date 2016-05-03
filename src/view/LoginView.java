@@ -101,6 +101,7 @@ public class LoginView
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 500, 300);
 		primaryStage.setScene(scene);
+		primaryStage.setTitle("Login");
 		primaryStage.show();
 	}
 	public void newUser()

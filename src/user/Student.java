@@ -239,9 +239,9 @@ public class Student implements User, Serializable
 		else
 			return false;
 	}
-	public int semestersNeeded(CourseBag allCourses)
+	public int semestersNeeded(Course[] allCourses)
 	{
-		return major.getNumOfSemestersReq(this, allCourses);
+		return major.getNumOfSemestersReq(this, new CourseBag(allCourses));
 	}
 	public int numOfCredits()
 	{

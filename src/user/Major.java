@@ -46,6 +46,9 @@ public class Major implements Serializable
 		this.numOfCreditsReq = numOfCreditsReq;
 		this.reqCourses = reqCourses;
 	}
+	public Major() {
+	
+	}
 	public int getCreditsReq(Student student)
 	{
 		ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
@@ -401,6 +404,51 @@ public class Major implements Serializable
 	public void setName(String name) 
 	{
 		this.name = name;
+	}
+	public double getMinGPA() {
+		return minGPA;
+	}
+	public int getNumOfCreditsReq() {
+		return numOfCreditsReq;
+	}
+	public int getPhysEdReq() {
+		return physEdReq;
+	}
+	public int getHisReq() {
+		return hisReq;
+	}
+	public int getLabSciReq() {
+		return labSciReq;
+	}
+	public int getMathReq() {
+		return mathReq;
+	}
+	public int getHumReq() {
+		return humReq;
+	}
+	public int getBusReq() {
+		return busReq;
+	}
+	public int getEngReq() {
+		return engReq;
+	}
+	public int getComReq() {
+		return comReq;
+	}
+	public int getAmerHisReq() {
+		return amerHisReq;
+	}
+	public int getSocSciReq() {
+		return socSciReq;
+	}
+	public int getLangReq() {
+		return langReq;
+	}
+	public int getPhlReq() {
+		return phlReq;
+	}
+	public Course[] getReqCourses() {
+		return reqCourses;
 	}
 	public String toString()
 	{

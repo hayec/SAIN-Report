@@ -46,7 +46,7 @@ public class StaffView
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void start(boolean admin, User user, String[] majors)
+	public void start(boolean admin, User user, Major[] majors)
 	{
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -166,7 +166,7 @@ public class StaffView
 		grid.add(txtBirthYear,  1, 10);
 		Label lblMajor = new Label("Major : ");
 		grid.add(lblMajor,  0, 11);
-		ComboBox<String> cmbMajor = new ComboBox<String>();
+		ComboBox<Major> cmbMajor = new ComboBox<Major>();
 		grid.add(cmbMajor,  1, 11);
 		for(int i = 0; i < majors.length; i++)
 			cmbMajor.getItems().add(majors[i]);
@@ -191,7 +191,7 @@ public class StaffView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		btnSearch.setOnAction(e->{
-			SearchEventObject ev = new SearchEventObject(btnSearch, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), Integer.parseInt(txtZipCode.getText()), txtSSN.getText(), Integer.parseInt(txtYearEnrolled.getText()), Integer.parseInt(txtBirthYear.getText()), cmbMajor.getValue(), Double.parseDouble(txtGPA.getText()));
+			SearchEventObject ev = new SearchEventObject(btnSearch, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), Integer.parseInt(txtZipCode.getText()), txtSSN.getText(), Integer.parseInt(txtYearEnrolled.getText()), Integer.parseInt(txtBirthYear.getText()), cmbMajor.getValue().getName(), Double.parseDouble(txtGPA.getText()));
 			if(listenerSearch != null)
 			{
 				listenerSearch.search(ev);
@@ -250,7 +250,7 @@ public class StaffView
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
 	}
-	public void adminEdit(User user, Student student, String[] majors)
+	public void adminEdit(User user, Student student, Major[] majors)
 	{
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -372,15 +372,26 @@ public class StaffView
 		grid.add(dtpBirthDate,  1, 11);
 		Label lblMajor = new Label("Major : ");
 		grid.add(lblMajor,  0, 12);
-		ComboBox<String> cmbMajor = new ComboBox<String>();
+		ComboBox<Major> cmbMajor = new ComboBox<Major>();
 		grid.add(cmbMajor,  1, 12);
 		for(int i = 0; i < majors.length; i++)
 			cmbMajor.getItems().add(majors[i]);
 		Label lblPassword = new Label("Password : ");
 		grid.add(lblPassword, 0, 13);
 		PasswordField txtPassword = new PasswordField();
+		txtPassword.setPromptText("Leave this field blank to leave the password unchanged.");
 		grid.add(txtPassword, 1, 13);
 		grid.setAlignment(Pos.CENTER);
+		txtFirstName.setText(student.getFirstName());
+		txtLastName.setText(student.getLastName());
+		txtAddress.setText(student.getAddress());
+		txtCity.setText(student.getCity());
+		txtZipCode.setText(Integer.toString(student.getZipCode()));
+		txtState.setText(student.getState());
+		txtSSN.setText(student.getSocialSecNum());
+		dtpBirthDate.setValue(student.getDateOfBirth());
+		dtpDateEnrolled.setValue(student.getDateEnrolled());
+		txtCampus.setText(student.getCampus());
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Student Data");
 		Button btnClear = new Button("Clear");
@@ -392,15 +403,17 @@ public class StaffView
 		btnEdit.setOnAction(e->{
 			try
 			{
-				if(Integer.parseInt(txtZipCode.getText()) > 99999 || Integer.parseInt(txtZipCode.getText()) < 0)
-					throw new IllegalArgumentException();
-				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
+				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), cmbMajor.getValue()));
 				if(listenerEdit != null)
 					listenerEdit.edit(ev);
+				if(!ev.isValid()) {
+					Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+					alert.showAndWait();
+				}
 			}
-			catch(IllegalArgumentException ie)
+			catch(Exception ie)
 			{
-				Alert alert = new Alert(AlertType.ERROR, "Error, zip code is invalid.", ButtonType.OK);
+				Alert alert = new Alert(AlertType.ERROR, "Error, zip code must be an integer.", ButtonType.OK);
 				alert.showAndWait();
 			}
 		});
@@ -415,6 +428,8 @@ public class StaffView
 			dtpDateEnrolled.setValue(LocalDate.now());
 			dtpBirthDate.setValue(LocalDate.now());
 			cmbMajor.setValue(null);
+			txtPassword.clear();
+			
 		});
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);

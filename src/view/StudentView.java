@@ -5,6 +5,8 @@ import eventHandlers.BackListener;
 import eventHandlers.LogoutListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.SAINEventObject;
+import eventHandlers.SAINListener;
 import eventHandlers.SearchListener;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -34,12 +36,13 @@ public class StudentView
 	PasswordListener listenerPassword;
 	LogoutListener listenerLogout;
 	BackListener listenerBack;
-	String[] majorCache;
+	SAINListener listenerSAIN;
+	Major[] majorCache;
 	public StudentView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
 	}
-	public void studentStart(User user, Student student, String[] majors, CourseBag allCourses)
+	public void studentStart(User user, Student student, Major[] majors, Course[] allCourses)
 	{
 		majorCache = majors;
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
@@ -101,11 +104,12 @@ public class StudentView
 			passStage.setScene(passScene);
 			passStage.showAndWait();
 		});
+		Label lblCurrentMajor = new Label("Your currently declared major is : " + student.getMajor());
 		Label lblMajor = new Label("Please select a major to continue : ");
-		ComboBox<String> cmbMajor = new ComboBox<String>();
+		ComboBox<Major> cmbMajor = new ComboBox<Major>();
 		for(int i = 0; i < majors.length; i++)
 			cmbMajor.getItems().add(majors[i]);
-		cmbMajor.setValue(student.getMajor().getName());
+		cmbMajor.setValue(student.getMajor());
 		HBox hbxInput = new HBox();
 		hbxInput.getChildren().addAll(lblMajor, cmbMajor);
 		hbxInput.setAlignment(Pos.CENTER);
@@ -113,12 +117,20 @@ public class StudentView
 		Button btnContinue = new Button("Continue");
 		btnContinue.setOnAction(e->{
 			Student tempStudent = student.clone();
-			tempStudent.setMajor(MajorBag.getMajor(cmbMajor.getValue()));
+			tempStudent.setMajor(cmbMajor.getValue());
 			studentView(user, tempStudent, allCourses);
 		});
 		Button btnViewSAIN = new Button("View SAIN Report");
 		btnViewSAIN.setOnAction(e->{
-			studentView(user, student, allCourses);
+			SAINEventObject ev = new SAINEventObject(btnViewSAIN, cmbMajor.getSelectionModel().getSelectedItem(), user, student);
+			if(listenerSAIN != null) {
+				listenerSAIN.getReport(ev);
+				if(!ev.isValid())
+				{
+					Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+					alert.showAndWait();
+				}
+			}
 		});
 		HBox hbxButtons = new HBox();
 		if(!user.isStudent())
@@ -135,14 +147,14 @@ public class StudentView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(15);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxInput, hbxButtons);
+		pane.getChildren().addAll(lblCurrentMajor, hbxInput, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(15);
 		Scene scene = new Scene(pane, 400, 400);
 		primaryStage.setScene(scene);
 		
 	}
-	public void studentView(User user, Student student, CourseBag allCourses)
+	public void studentView(User user, Student student, Course[] allCourses)
 	{
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
 		Hyperlink hplChangePass = new Hyperlink("Change Password");
@@ -277,5 +289,9 @@ public class StudentView
 	public void setListenerBack(BackListener listenerBack)
 	{
 		this.listenerBack = listenerBack;
+	}
+	public void setListenerSAIN(SAINListener listenerSAIN)
+	{
+		this.listenerSAIN = listenerSAIN;
 	}
 }

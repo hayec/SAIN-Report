@@ -8,6 +8,14 @@ import user.User;
 public class CourseBag 
 {
 	private ArrayList<Course> courses = new ArrayList<Course>();
+	public CourseBag() {}
+	public CourseBag(Course[] newCourses)
+	{
+		for(int i = 0; i < newCourses.length; i++)
+		{
+			courses.add(newCourses[i]);
+		}
+	}
 	public void addCourse(Course course)
 	{
 		courses.add(course);

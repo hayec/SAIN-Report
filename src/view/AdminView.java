@@ -1,6 +1,8 @@
 package view;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+
 import eventHandlers.BackEventObject;
 import eventHandlers.BackListener;
 import eventHandlers.CreateAccountEventObject;
@@ -43,6 +45,7 @@ import javafx.stage.Stage;
 import user.Administrator;
 import user.MajorBag;
 import user.Student;
+import user.User;
 import user.Major;
 import report.Course;
 public class AdminView 
@@ -149,12 +152,15 @@ public class AdminView
 			});
 			btnStudent.setOnAction(ea->{
 				createAccount(user, false, true, majors, courses);
+				acctStage.close();
 			});
 			btnFaculty.setOnAction(ea->{
 				createAccount(user, false, false, majors, courses);
+				acctStage.close();
 			});
 			btnAdministrator.setOnAction(ea->{
 				createAccount(user, true, false, majors, courses);
+				acctStage.close();
 			});
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnStudent, btnFaculty, btnAdministrator);
@@ -187,6 +193,7 @@ public class AdminView
 			}	
 			Button btnCancel = new Button("Close");
 			Button btnDelete = new Button("Delete Course");
+			Button btnEdit = new Button("Edit Course");
 			Button btnAdd = new Button("Add Course");
 			btnCancel.setOnAction(ea->{
 				courseStage.close();
@@ -205,198 +212,30 @@ public class AdminView
 				}
 			});
 			btnAdd.setOnAction(ea->{
-				Stage newCourseStage = new Stage();
-				newCourseStage.setTitle("Add Course");
-				GridPane gridOut = new GridPane();
-				gridOut.setHgap(10);
-				gridOut.setVgap(10);
-				gridOut.setPadding(new Insets(30, 0, 10, 30));
-				Label lblCourseCode = new Label("Course Code : ");
-				Label lblCourseTitle = new Label("Course Title : ");
-				Label lblCourseDescription = new Label("Course Description : ");
-				Label lblCredits = new Label("Credits : ");
-				TextField txtCourseCode = new TextField();
-				TextField txtCourseTitle = new TextField();
-				TextField txtCourseDescription = new TextField();
-				TextField txtCredits = new TextField();
-				gridOut.add(lblCourseCode, 0, 0);
-				gridOut.add(lblCourseTitle, 0, 1);
-				gridOut.add(lblCourseDescription, 0, 2);
-				gridOut.add(lblCredits, 0, 3);
-				gridOut.add(txtCourseCode, 1, 0);
-				gridOut.add(txtCourseTitle, 1, 1);
-				gridOut.add(txtCourseDescription, 1, 2);
-				gridOut.add(txtCredits, 1, 3);		
-				Label lblCampus = new Label("Campus : \n");
-				CheckBox chkAmmerman = new CheckBox("Ammerman : ");
-				CheckBox chkGrant = new CheckBox("Grant : ");
-				CheckBox chkEastern = new CheckBox("Eastern : ");
-				gridOut.add(lblCampus, 0, 4);
-				gridOut.add(chkAmmerman, 0, 5);
-				gridOut.add(chkGrant, 0, 6);
-				gridOut.add(chkEastern, 0, 7);			
-				Label lblAttr = new Label("Attributes : ");
-				CheckBox chkPhysEd = new CheckBox("Physical Education : ");
-				CheckBox chkHistory = new CheckBox("History : ");
-				CheckBox chkLabScience = new CheckBox("Laboratory Science : ");
-				CheckBox chkMath = new CheckBox("Mathematics : ");
-				CheckBox chkHum = new CheckBox("Humanities : ");
-				CheckBox chkBus = new CheckBox("Business : ");
-				CheckBox chkEng = new CheckBox("English : ");
-				CheckBox chkCom = new CheckBox("Communications : ");
-				CheckBox chkAmerHis = new CheckBox("American History : ");
-				CheckBox chkSocSci = new CheckBox("Social Science : ");
-				CheckBox chkLang = new CheckBox("Language : ");
-				CheckBox chkPhl = new CheckBox("Philosophy : ");
-				gridOut.add(lblAttr, 0, 8);
-				gridOut.add(chkPhysEd, 0, 9);
-				gridOut.add(chkHistory, 0, 10);
-				gridOut.add(chkLabScience, 0, 11);
-				gridOut.add(chkMath, 0, 12);
-				gridOut.add(chkHum, 0, 13);
-				gridOut.add(chkBus, 0, 14);
-				gridOut.add(chkEng, 0, 15);
-				gridOut.add(chkCom, 0, 16);
-				gridOut.add(chkAmerHis, 0, 17);
-				gridOut.add(chkSocSci, 0, 18);
-				gridOut.add(chkLang, 0, 19);
-				gridOut.add(chkPhl, 0, 20);				
-				Label lblCourse = new Label("Courses : ");
-				ListView<Course> lstCourse = new ListView<Course>();
+				addCourseView(false, new Course());
+				lstCourses.getItems().clear();
 				for(Course c : courses) {
-					lstCourse.getItems().add(c);
+					lstCourses.getItems().add(c);
 				}	
-				Label lblRightArrow = new Label("-->");
-				Button btnAddCourse = new Button("Add Course");
-				Label lblLeftArrow = new Label("<--");
-				Button btnRemoveCourse = new Button("Remove Course");
-				Label lblCoursesReq = new Label("Corequisite Courses");
-				ListView<Course> lstCoursesReq = new ListView<Course>();
-				VBox vbxCourseButtons = new VBox();
-				vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
-				VBox vbxCourses = new VBox();
-				vbxCourses.getChildren().addAll(lblCourse, lstCourse);
-				VBox vbxCoursesReq = new VBox();
-				vbxCoursesReq.getChildren().addAll(lblCoursesReq, lstCoursesReq);
-				HBox hbxCourses = new HBox();
-				hbxCourses.getChildren().addAll(vbxCourses, vbxCourseButtons, vbxCoursesReq);
-				hbxCourses.setAlignment(Pos.CENTER);
-				hbxCourses.setSpacing(30);
-				Label lblCoursesA = new Label("Courses");
-				ListView<Course> lstCoursesA = new ListView<Course>();
+			});
+			btnEdit.setOnAction(ea-> {
+				try 
+				{
+					addCourseView(true, lstCourses.getSelectionModel().getSelectedItem());
+				}
+				catch(Exception ex)
+				{
+					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+				lstCourses.getItems().clear();
 				for(Course c : courses) {
-					lstCoursesA.getItems().add(c);
+					lstCourses.getItems().add(c);
 				}	
-				Label lblRightArrowA = new Label("-->");
-				Button btnAddCourseA = new Button("Add Course");
-				Label lblLeftArrowA = new Label("<--");
-				Button btnRemoveCourseA = new Button("Remove Course");
-				Label lblCoursesReqA = new Label("Prerequisite Courses");
-				ListView<Course> lstCoursesReqA = new ListView<Course>();
-				VBox vbxCourseButtonsA = new VBox();
-				vbxCourseButtonsA.getChildren().addAll(lblRightArrowA, btnAddCourseA, lblLeftArrowA, btnRemoveCourseA);
-				VBox vbxCoursesA = new VBox();
-				vbxCoursesA.getChildren().addAll(lblCoursesA, lstCoursesA);
-				VBox vbxCoursesReqA = new VBox();
-				vbxCoursesReqA.getChildren().addAll(lblCoursesReqA, lstCoursesReqA);
-				HBox hbxCoursesA = new HBox();
-				hbxCoursesA.getChildren().addAll(vbxCoursesA, vbxCourseButtonsA, vbxCoursesReqA);
-				hbxCoursesA.setAlignment(Pos.CENTER);
-				hbxCoursesA.setSpacing(30);
-				VBox vbxReqs = new VBox();
-				vbxReqs.getChildren().addAll(hbxCourses, hbxCoursesA);
-				vbxReqs.setSpacing(30);
-				vbxReqs.setAlignment(Pos.CENTER);
-				Button btnCancelThis = new Button("Cancel");
-				Button btnAddThis = new Button("Add Course");
-				HBox hbxButtons = new HBox();
-				hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
-				hbxButtons.setAlignment(Pos.CENTER);
-				hbxButtons.setSpacing(20);
-				btnCancelThis.setOnAction(eac->{
-					newCourseStage.close();
-				});
-				btnAddCourse.setOnAction(eac->{
-					try {
-						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				btnRemoveCourse.setOnAction(eac->{
-					try 
-					{
-						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-						lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				btnAddCourseA.setOnAction(eac->{
-					try 
-					{
-						if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-					lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				btnRemoveCourseA.setOnAction(eac->{
-					try 
-					{
-						if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-						lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				btnAddThis.setOnAction(eac->{
-					AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
-							chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCourse.getItems().toArray(new String[lstCourse.getItems().size()]), 
-							lstCoursesA.getItems().toArray(new String[lstCoursesA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
-							chkLabScience.isSelected(), chkMath.isSelected(), chkHum.isSelected(), chkBus.isSelected(), chkEng.isSelected(), chkCom.isSelected(), 
-							chkAmerHis.isSelected(), chkSocSci.isSelected(), chkLang.isSelected(), chkPhl.isSelected());
-					if(listenerCourseAdd != null) {
-						listenerCourseAdd.add(ev);
-					}
-					if(!ev.isValid()) {
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					} else {
-						courses = ev.getCourses();
-						lstCourses.getItems().clear();
-						for(Course c : courses) {
-							lstCourses.getItems().add(c);
-						}	
-						newCourseStage.close();
-					}
-				});
-				VBox pane = new VBox();
-				pane.getChildren().addAll(gridOut, vbxReqs, hbxButtons);
-				Scene scene = new Scene(pane, 1080, 1500);
-				newCourseStage.setScene(scene);
-				newCourseStage.showAndWait();
 			});
 			lstCourses.setMaxWidth(350);
 			HBox hbxButtons = new HBox();
-			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
+			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnEdit, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
 			hbxButtons.setSpacing(20);
 			VBox pane = new VBox();
@@ -418,6 +257,7 @@ public class AdminView
 			}	
 			lstMajors.setMaxWidth(250);
 			Button btnCancel = new Button("Close");
+			Button btnEdit = new Button("Edit Major");
 			Button btnDelete = new Button("Delete Major");
 			Button btnAdd = new Button("Add Major");
 			btnCancel.setOnAction(ea->{
@@ -437,158 +277,26 @@ public class AdminView
 				}
 			});
 			btnAdd.setOnAction(ea->{
-				Stage newMajorStage = new Stage();
-				newMajorStage.setTitle("Add Major");
-				GridPane gridOut = new GridPane();
-				gridOut.setHgap(10);
-				gridOut.setVgap(10);
-				gridOut.setPadding(new Insets(30, 0, 10, 30));
-				Label lblRequirements = new Label("Major Requirements : ");
-				lblRequirements.setAlignment(Pos.CENTER);
-				Label lblName = new Label("Name : ");
-				Label lblMinGPA = new Label("Minimum GPA : ");
-				Label lblNumOfCredits = new Label("Number of Credits : ");
-				Label lblPhysEd = new Label("Physical Education Courses : ");
-				Label lblHis = new Label("History Courses : ");
-				Label lblLabSci = new Label("Laboratory Science Courses : ");
-				Label lblMath = new Label("Mathematics Courses : ");
-				Label lblHum = new Label("Humanities Courses : ");
-				Label lblBus = new Label("Business Courses : ");
-				Label lblEng = new Label("English Courses : ");
-				Label lblCom = new Label("Communications Courses : ");
-				Label lblAmerHis = new Label("American History Courses : ");
-				Label lblSocSci = new Label("Social Science Courses : ");
-				Label lblLang = new Label("Foreign Language Courses : ");
-				Label lblPhl = new Label("Philsophy Courses : ");
-				TextField txtName = new TextField();
-				TextField txtMinGPA = new TextField();
-				TextField txtNumOfCredits = new TextField();
-				TextField txtPhysEd = new TextField();
-				TextField txtHis = new TextField();
-				TextField txtLabSci = new TextField();
-				TextField txtMath = new TextField();
-				TextField txtHum = new TextField();
-				TextField txtBus = new TextField();
-				TextField txtEng = new TextField();
-				TextField txtCom = new TextField();
-				TextField txtAmerHis = new TextField();
-				TextField txtSocSci = new TextField();
-				TextField txtLang = new TextField();
-				TextField txtPhl = new TextField();
-				gridOut.add(lblName, 0, 0);
-				gridOut.add(lblMinGPA, 0, 1);
-				gridOut.add(lblNumOfCredits, 0, 2);
-				gridOut.add(lblPhysEd, 0, 3);
-				gridOut.add(lblHis, 0, 4);
-				gridOut.add(lblLabSci, 0, 5);
-				gridOut.add(lblMath, 0, 6);
-				gridOut.add(lblHum, 0, 7);
-				gridOut.add(lblBus, 0, 8);
-				gridOut.add(lblEng, 0, 9);
-				gridOut.add(lblCom, 0, 10);
-				gridOut.add(lblAmerHis, 0, 11);
-				gridOut.add(lblSocSci, 0, 12);
-				gridOut.add(lblLang, 0, 13);
-				gridOut.add(lblPhl, 0, 14);
-				gridOut.add(txtName, 1, 0);
-				gridOut.add(txtMinGPA, 1, 1);
-				gridOut.add(txtNumOfCredits, 1, 2);
-				gridOut.add(txtPhysEd, 1, 3);
-				gridOut.add(txtHis, 1, 4);
-				gridOut.add(txtLabSci, 1, 5);
-				gridOut.add(txtMath, 1, 6);
-				gridOut.add(txtHum, 1, 7);
-				gridOut.add(txtBus, 1, 8);
-				gridOut.add(txtEng, 1, 9);
-				gridOut.add(txtCom, 1, 10);
-				gridOut.add(txtAmerHis, 1, 11);
-				gridOut.add(txtSocSci, 1, 12);
-				gridOut.add(txtLang, 1, 13);
-				gridOut.add(txtPhl, 1, 14);
-				Label lblCourses = new Label("Courses");
-				ListView<Course> lstCourses = new ListView<Course>();
-				for(Course c : courses) {
-					lstCourses.getItems().add(c);
+				addMajorView(false, new Major());
+				lstMajors.getItems().clear();
+				for(Major m : majors) {
+					lstMajors.getItems().add(m);
 				}	
-				Label lblRightArrow = new Label("-->");
-				Button btnAddCourse = new Button("Add Course");
-				Label lblLeftArrow = new Label("<--");
-				Button btnRemoveCourse = new Button("Remove Course");
-				Label lblCoursesReq = new Label("Courses Required");
-				ListView<Course> lstCoursesReq = new ListView<Course>();
-				lstCourses.setMaxHeight(200);
-				lstCoursesReq.setMaxHeight(200);
-				VBox vbxCourseButtons = new VBox();
-				vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
-				vbxCourseButtons.setAlignment(Pos.CENTER);
-				VBox vbxCourses = new VBox();
-				vbxCourses.getChildren().addAll(lblCourses, lstCourses);
-				VBox vbxCoursesReq = new VBox();
-				vbxCoursesReq.getChildren().addAll(lblCoursesReq, lstCoursesReq);
-				HBox hbxCourses = new HBox();
-				hbxCourses.getChildren().addAll(vbxCourses, vbxCourseButtons, vbxCoursesReq);
-				hbxCourses.setAlignment(Pos.CENTER);
-				hbxCourses.setSpacing(30);
-				Button btnCancelThis = new Button("Cancel");
-				Button btnAddThis = new Button("Add Major");
-				HBox hbxButtons = new HBox();
-				hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
-				hbxButtons.setAlignment(Pos.CENTER);
-				hbxButtons.setSpacing(20);
-				btnCancelThis.setOnAction(eac->{
-					newMajorStage.close();
-				});
-				btnAddThis.setOnAction(eac->{
-					AddMajorEventObject evm = new AddMajorEventObject(btnAddThis, txtName.getText(), txtMinGPA.getText(), 
-					txtNumOfCredits.getText(), txtPhysEd.getText(), txtHis.getText(), txtLabSci.getText(), txtMath.getText(), 
-					txtHum.getText(), txtBus.getText(), txtEng.getText(), txtCom.getText(), txtAmerHis.getText(), txtSocSci.getText(),
-					txtLang.getText(), txtPhl.getText(), lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()]));
-					if(listenerMajorAdd != null){
-						listenerMajorAdd.add(evm);
-					}
-					if(!evm.isValid()) {
-						Alert alert = new Alert(AlertType.ERROR, evm.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					} else {
-						majors = evm.getMajors();
-						newMajorStage.close();
-						lstMajors.getItems().clear();
-						for(Major m : majors) {
-							lstMajors.getItems().add(m);
-						}	
-					}
-				});
-				btnAddCourse.setOnAction(eac->{
-					try {
-						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				btnRemoveCourse.setOnAction(eac->{
-					try 
-					{
-						if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
-						{
-							throw new IllegalArgumentException();
-						}
-						lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
-					} catch(Exception ex) {
-						Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-						alert.showAndWait();
-					}
-				});
-				VBox pane = new VBox();
-				pane.getChildren().addAll(lblRequirements, gridOut, hbxCourses, hbxButtons);
-				Scene scene = new Scene(pane, 1280, 1080);
-				newMajorStage.setScene(scene);
-				newMajorStage.setTitle("New Major");
-				newMajorStage.showAndWait();
+			});
+			btnEdit.setOnAction(ea->{
+				try 
+				{
+					addMajorView(true, lstMajors.getSelectionModel().getSelectedItem());
+				}
+				catch(Exception ex)
+				{
+					Alert alert = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+				lstMajors.getItems().clear();
+				for(Major m : majors) {
+					lstMajors.getItems().add(m);
+				}	
 			});
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
@@ -753,6 +461,11 @@ public class AdminView
 		}
 		for(int i = 0; i < MajorBag.getMajors().length; i++)
 			cmbMajor.getItems().add(MajorBag.getMajors()[i]);
+		if(cmbMajor.getItems().size() == 0)
+		{
+			cmbMajor.getItems().add(new Major());
+			cmbMajor.setValue(new Major());
+		}
 		Label lblUsername = new Label("Username : ");
 		grid.add(lblUsername,  0, ++line);
 		TextField txtUsername = new TextField();
@@ -801,6 +514,7 @@ public class AdminView
 				{
 					Alert alert = new Alert(AlertType.INFORMATION, "Account successfully created. ID# : " + ev.getId(), ButtonType.OK);
 					alert.showAndWait();
+					adminView(user, majors, courses);
 				}
 			}
 			catch(Exception ex)
@@ -809,6 +523,7 @@ public class AdminView
 			}
 		});
 		btnClear.setOnAction(e->{
+			txtID.clear();
 			txtFirstName.clear();
 			txtLastName.clear();
 			txtAddress.clear();
@@ -819,13 +534,580 @@ public class AdminView
 			dtpDateEnrolled.setValue(LocalDate.now());
 			dtpBirthDate.setValue(LocalDate.now());
 			cmbMajor.setValue(null);
+			txtUsername.clear();
+			txtPassword.clear();
+		});
+		VBox pane = new VBox();
+		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+		pane.setAlignment(Pos.CENTER);
+		pane.setSpacing(20);
+		Scene scene = new Scene(pane, 800, 1100);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("SAIN Report");
+		primaryStage.show();
+	}
+	public void addCourseView(boolean edit, Course course)
+	{
+		Stage newCourseStage = new Stage();
+		if(!edit)
+		{
+			newCourseStage.setTitle("Add Course");
+		}
+		else 
+		{
+			newCourseStage.setTitle("Edit Course");
+		}
+		GridPane gridOut = new GridPane();
+		gridOut.setHgap(10);
+		gridOut.setVgap(10);
+		gridOut.setPadding(new Insets(30, 0, 10, 30));
+		Label lblCourseCode = new Label("Course Code : ");
+		Label lblCourseTitle = new Label("Course Title : ");
+		Label lblCourseDescription = new Label("Course Description : ");
+		Label lblCredits = new Label("Credits : ");
+		TextField txtCourseCode = new TextField();
+		TextField txtCourseTitle = new TextField();
+		TextField txtCourseDescription = new TextField();
+		TextField txtCredits = new TextField();
+		gridOut.add(lblCourseCode, 0, 0);
+		gridOut.add(lblCourseTitle, 0, 1);
+		gridOut.add(lblCourseDescription, 0, 2);
+		gridOut.add(lblCredits, 0, 3);
+		gridOut.add(txtCourseCode, 1, 0);
+		gridOut.add(txtCourseTitle, 1, 1);
+		gridOut.add(txtCourseDescription, 1, 2);
+		gridOut.add(txtCredits, 1, 3);		
+		Label lblCampus = new Label("Campus : \n");
+		CheckBox chkAmmerman = new CheckBox("Ammerman : ");
+		CheckBox chkGrant = new CheckBox("Grant : ");
+		CheckBox chkEastern = new CheckBox("Eastern : ");
+		gridOut.add(lblCampus, 0, 4);
+		gridOut.add(chkAmmerman, 0, 5);
+		gridOut.add(chkGrant, 0, 6);
+		gridOut.add(chkEastern, 0, 7);			
+		Label lblAttr = new Label("Attributes : ");
+		CheckBox chkPhysEd = new CheckBox("Physical Education : ");
+		CheckBox chkHistory = new CheckBox("History : ");
+		CheckBox chkLabScience = new CheckBox("Laboratory Science : ");
+		CheckBox chkMath = new CheckBox("Mathematics : ");
+		CheckBox chkHum = new CheckBox("Humanities : ");
+		CheckBox chkBus = new CheckBox("Business : ");
+		CheckBox chkEng = new CheckBox("English : ");
+		CheckBox chkCom = new CheckBox("Communications : ");
+		CheckBox chkAmerHis = new CheckBox("American History : ");
+		CheckBox chkSocSci = new CheckBox("Social Science : ");
+		CheckBox chkLang = new CheckBox("Language : ");
+		CheckBox chkPhl = new CheckBox("Philosophy : ");
+		gridOut.add(lblAttr, 0, 8);
+		gridOut.add(chkPhysEd, 0, 9);
+		gridOut.add(chkHistory, 0, 10);
+		gridOut.add(chkLabScience, 0, 11);
+		gridOut.add(chkMath, 0, 12);
+		gridOut.add(chkHum, 0, 13);
+		gridOut.add(chkBus, 0, 14);
+		gridOut.add(chkEng, 0, 15);
+		gridOut.add(chkCom, 0, 16);
+		gridOut.add(chkAmerHis, 0, 17);
+		gridOut.add(chkSocSci, 0, 18);
+		gridOut.add(chkLang, 0, 19);
+		gridOut.add(chkPhl, 0, 20);				
+		Label lblCourse = new Label("Courses : ");
+		ListView<Course> lstCourse = new ListView<Course>();
+		for(Course c : courses) {
+			lstCourse.getItems().add(c);
+		}	
+		
+		Label lblRightArrow = new Label("-->");
+		Button btnAddCourse = new Button("Add Course");
+		Label lblLeftArrow = new Label("<--");
+		Button btnRemoveCourse = new Button("Remove Course");
+		Label lblCoursesReq = new Label("Corequisite Courses");
+		ListView<Course> lstCoursesReq = new ListView<Course>();
+		VBox vbxCourseButtons = new VBox();
+		vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
+		VBox vbxCourses = new VBox();
+		vbxCourses.getChildren().addAll(lblCourse, lstCourse);
+		VBox vbxCoursesReq = new VBox();
+		vbxCoursesReq.getChildren().addAll(lblCoursesReq, lstCoursesReq);
+		HBox hbxCourses = new HBox();
+		hbxCourses.getChildren().addAll(vbxCourses, vbxCourseButtons, vbxCoursesReq);
+		hbxCourses.setAlignment(Pos.CENTER);
+		hbxCourses.setSpacing(30);
+		Label lblCoursesA = new Label("Courses");
+		ListView<Course> lstCoursesA = new ListView<Course>();
+		for(Course c : courses) {
+			lstCoursesA.getItems().add(c);
+		}	
+		Label lblRightArrowA = new Label("-->");
+		Button btnAddCourseA = new Button("Add Course");
+		Label lblLeftArrowA = new Label("<--");
+		Button btnRemoveCourseA = new Button("Remove Course");
+		Label lblCoursesReqA = new Label("Prerequisite Courses");
+		ListView<Course> lstCoursesReqA = new ListView<Course>();
+		VBox vbxCourseButtonsA = new VBox();
+		vbxCourseButtonsA.getChildren().addAll(lblRightArrowA, btnAddCourseA, lblLeftArrowA, btnRemoveCourseA);
+		VBox vbxCoursesA = new VBox();
+		vbxCoursesA.getChildren().addAll(lblCoursesA, lstCoursesA);
+		VBox vbxCoursesReqA = new VBox();
+		vbxCoursesReqA.getChildren().addAll(lblCoursesReqA, lstCoursesReqA);
+		HBox hbxCoursesA = new HBox();
+		hbxCoursesA.getChildren().addAll(vbxCoursesA, vbxCourseButtonsA, vbxCoursesReqA);
+		hbxCoursesA.setAlignment(Pos.CENTER);
+		hbxCoursesA.setSpacing(30);
+		VBox vbxReqs = new VBox();
+		vbxReqs.getChildren().addAll(hbxCourses, hbxCoursesA);
+		vbxReqs.setSpacing(30);
+		vbxReqs.setAlignment(Pos.CENTER);
+		Button btnCancelThis = new Button("Cancel");
+		Button btnAddThis = new Button("Add Course");
+		HBox hbxButtons = new HBox();
+		hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
+		hbxButtons.setAlignment(Pos.CENTER);
+		hbxButtons.setSpacing(20);
+		if(edit)
+		{
+			txtCourseCode.setText(course.getCourseCode());
+			txtCourseTitle.setText(course.getCourseTitle());
+			txtCourseDescription.setText(course.getCourseDescription());
+			txtCredits.setText(Integer.toString(course.getCredits()));
+			chkAmmerman.setSelected(course.isAmmerman());
+			chkGrant.setSelected(course.isGrant());
+			chkEastern.setSelected(course.isEastern());
+			chkPhysEd.setSelected(course.CAttributes.isPhysEd());
+			chkHistory.setSelected(course.CAttributes.isHistory());
+			chkLabScience.setSelected(course.CAttributes.isLabScience());
+			chkMath.setSelected(course.CAttributes.isMath());
+			chkHum.setSelected(course.CAttributes.isHumanities());
+			chkBus.setSelected(course.CAttributes.isBusiness());
+			chkEng.setSelected(course.CAttributes.isEnglish());
+			chkCom.setSelected(course.CAttributes.isCommunications());
+			chkAmerHis.setSelected(course.CAttributes.isAmerHis());
+			chkSocSci.setSelected(course.CAttributes.isSocScience());
+			chkLang.setSelected(course.CAttributes.isLanguage());
+			chkPhl.setSelected(course.CAttributes.isPhilosophy());
+			for(String s : course.getPrerequisites())
+			{
+				lstCoursesReq.getItems().add(Arrays.asList(courses).get(Arrays.asList(courses).indexOf(s)));
+			}
+			for(String s : course.getCorequisites())
+			{
+				lstCoursesReqA.getItems().add(Arrays.asList(courses).get(Arrays.asList(courses).indexOf(s)));
+			}
+		}
+		btnCancelThis.setOnAction(eac->{
+			newCourseStage.close();
+		});
+		btnAddCourse.setOnAction(eac->{
+			try {
+				if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+				lstCoursesReq.getItems().add(lstCourse.getSelectionModel().getSelectedItem());
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		btnRemoveCourse.setOnAction(eac->{
+			try 
+			{
+				if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		btnAddCourseA.setOnAction(eac->{
+			try 
+			{
+				if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+			lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		btnRemoveCourseA.setOnAction(eac->{
+			try 
+			{
+				if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+				lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		btnAddThis.setOnAction(eac->{
+			AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
+					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCourse.getItems().toArray(new String[lstCourse.getItems().size()]), 
+					lstCoursesA.getItems().toArray(new String[lstCoursesA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
+					chkLabScience.isSelected(), chkMath.isSelected(), chkHum.isSelected(), chkBus.isSelected(), chkEng.isSelected(), chkCom.isSelected(), 
+					chkAmerHis.isSelected(), chkSocSci.isSelected(), chkLang.isSelected(), chkPhl.isSelected());
+			if(listenerCourseAdd != null) {
+				listenerCourseAdd.add(ev);
+			}
+			if(!ev.isValid()) {
+				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+				alert.showAndWait();
+			} else {
+				courses = ev.getCourses();
+				newCourseStage.close();
+			}
+		});
+		VBox pane = new VBox();
+		pane.getChildren().addAll(gridOut, vbxReqs, hbxButtons);
+		Scene scene = new Scene(pane, 1080, 1500);
+		newCourseStage.setScene(scene);
+		newCourseStage.showAndWait();
+	}
+	public void addMajorView(boolean edit, Major major)
+	{
+		
+			Stage newMajorStage = new Stage();
+			newMajorStage.setTitle("Add Major");
+			GridPane gridOut = new GridPane();
+			gridOut.setHgap(10);
+			gridOut.setVgap(10);
+			gridOut.setPadding(new Insets(30, 0, 10, 30));
+			Label lblRequirements = new Label("Major Requirements : ");
+			lblRequirements.setAlignment(Pos.CENTER);
+			Label lblName = new Label("Name : ");
+			Label lblMinGPA = new Label("Minimum GPA : ");
+			Label lblNumOfCredits = new Label("Number of Credits : ");
+			Label lblPhysEd = new Label("Physical Education Courses : ");
+			Label lblHis = new Label("History Courses : ");
+			Label lblLabSci = new Label("Laboratory Science Courses : ");
+			Label lblMath = new Label("Mathematics Courses : ");
+			Label lblHum = new Label("Humanities Courses : ");
+			Label lblBus = new Label("Business Courses : ");
+			Label lblEng = new Label("English Courses : ");
+			Label lblCom = new Label("Communications Courses : ");
+			Label lblAmerHis = new Label("American History Courses : ");
+			Label lblSocSci = new Label("Social Science Courses : ");
+			Label lblLang = new Label("Foreign Language Courses : ");
+			Label lblPhl = new Label("Philsophy Courses : ");
+			TextField txtName = new TextField();
+			TextField txtMinGPA = new TextField();
+			TextField txtNumOfCredits = new TextField();
+			TextField txtPhysEd = new TextField();
+			TextField txtHis = new TextField();
+			TextField txtLabSci = new TextField();
+			TextField txtMath = new TextField();
+			TextField txtHum = new TextField();
+			TextField txtBus = new TextField();
+			TextField txtEng = new TextField();
+			TextField txtCom = new TextField();
+			TextField txtAmerHis = new TextField();
+			TextField txtSocSci = new TextField();
+			TextField txtLang = new TextField();
+			TextField txtPhl = new TextField();
+			gridOut.add(lblName, 0, 0);
+			gridOut.add(lblMinGPA, 0, 1);
+			gridOut.add(lblNumOfCredits, 0, 2);
+			gridOut.add(lblPhysEd, 0, 3);
+			gridOut.add(lblHis, 0, 4);
+			gridOut.add(lblLabSci, 0, 5);
+			gridOut.add(lblMath, 0, 6);
+			gridOut.add(lblHum, 0, 7);
+			gridOut.add(lblBus, 0, 8);
+			gridOut.add(lblEng, 0, 9);
+			gridOut.add(lblCom, 0, 10);
+			gridOut.add(lblAmerHis, 0, 11);
+			gridOut.add(lblSocSci, 0, 12);
+			gridOut.add(lblLang, 0, 13);
+			gridOut.add(lblPhl, 0, 14);
+			gridOut.add(txtName, 1, 0);
+			gridOut.add(txtMinGPA, 1, 1);
+			gridOut.add(txtNumOfCredits, 1, 2);
+			gridOut.add(txtPhysEd, 1, 3);
+			gridOut.add(txtHis, 1, 4);
+			gridOut.add(txtLabSci, 1, 5);
+			gridOut.add(txtMath, 1, 6);
+			gridOut.add(txtHum, 1, 7);
+			gridOut.add(txtBus, 1, 8);
+			gridOut.add(txtEng, 1, 9);
+			gridOut.add(txtCom, 1, 10);
+			gridOut.add(txtAmerHis, 1, 11);
+			gridOut.add(txtSocSci, 1, 12);
+			gridOut.add(txtLang, 1, 13);
+			gridOut.add(txtPhl, 1, 14);
+			Label lblCourses = new Label("Courses");
+			ListView<Course> lstCourses = new ListView<Course>();
+			for(Course c : courses) {
+				lstCourses.getItems().add(c);
+			}				
+			Label lblRightArrow = new Label("-->");
+			Button btnAddCourse = new Button("Add Course");
+			Label lblLeftArrow = new Label("<--");
+			Button btnRemoveCourse = new Button("Remove Course");
+			Label lblCoursesReq = new Label("Courses Required");
+			ListView<Course> lstCoursesReq = new ListView<Course>();
+			lstCourses.setMaxHeight(200);
+			lstCoursesReq.setMaxHeight(200);
+			VBox vbxCourseButtons = new VBox();
+			vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
+			vbxCourseButtons.setAlignment(Pos.CENTER);
+			VBox vbxCourses = new VBox();
+			vbxCourses.getChildren().addAll(lblCourses, lstCourses);
+			VBox vbxCoursesReq = new VBox();
+			vbxCoursesReq.getChildren().addAll(lblCoursesReq, lstCoursesReq);
+			HBox hbxCourses = new HBox();
+			hbxCourses.getChildren().addAll(vbxCourses, vbxCourseButtons, vbxCoursesReq);
+			hbxCourses.setAlignment(Pos.CENTER);
+			hbxCourses.setSpacing(30);
+			Button btnCancelThis = new Button("Cancel");
+			Button btnAddThis = new Button("Add Major");
+			HBox hbxButtons = new HBox();
+			hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
+			hbxButtons.setAlignment(Pos.CENTER);
+			hbxButtons.setSpacing(20);
+			if(edit) {
+				txtName.setText(major.getName());
+				txtMinGPA.setText(Double.toString(major.getMinGPA()));
+				txtNumOfCredits.setText(Integer.toString(major.getNumOfCreditsReq()));
+				txtPhysEd.setText(Integer.toString(major.getPhysEdReq()));
+				txtHis.setText(Integer.toString(major.getHisReq()));
+				txtLabSci.setText(Integer.toString(major.getLabSciReq()));
+				txtMath.setText(Integer.toString(major.getMathReq()));
+				txtHum.setText(Integer.toString(major.getHumReq()));
+				txtBus.setText(Integer.toString(major.getBusReq()));
+				txtEng.setText(Integer.toString(major.getEngReq()));
+				txtCom.setText(Integer.toString(major.getComReq()));
+				txtAmerHis.setText(Integer.toString(major.getAmerHisReq()));
+				txtSocSci.setText(Integer.toString(major.getSocSciReq()));
+				txtLang.setText(Integer.toString(major.getLangReq()));
+				txtPhl.setText(Integer.toString(major.getPhlReq()));
+				for(Course c : major.getReqCourses())
+				{
+					lstCoursesReq.getItems().add(c);
+				}
+			}
+			btnCancelThis.setOnAction(eac->{
+				newMajorStage.close();
+			});
+			btnAddThis.setOnAction(eac->{
+				AddMajorEventObject evm = new AddMajorEventObject(btnAddThis, txtName.getText(), txtMinGPA.getText(), 
+				txtNumOfCredits.getText(), txtPhysEd.getText(), txtHis.getText(), txtLabSci.getText(), txtMath.getText(), 
+				txtHum.getText(), txtBus.getText(), txtEng.getText(), txtCom.getText(), txtAmerHis.getText(), txtSocSci.getText(),
+				txtLang.getText(), txtPhl.getText(), lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()]));
+				if(listenerMajorAdd != null){
+					listenerMajorAdd.add(evm);
+				}
+				if(!evm.isValid()) {
+					Alert alert = new Alert(AlertType.ERROR, evm.getErrorMessage(), ButtonType.OK);
+					alert.showAndWait();
+				} else {
+					majors = evm.getMajors();
+					newMajorStage.close();
+				}
+			});
+			btnAddCourse.setOnAction(eac->{
+				try {
+					if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+					{
+						throw new IllegalArgumentException();
+					}
+					lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+				} catch(Exception ex) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+			});
+			btnRemoveCourse.setOnAction(eac->{
+				try 
+				{
+					if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+					{
+						throw new IllegalArgumentException();
+					}
+					lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+				} catch(Exception ex) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+			});
+			VBox pane = new VBox();
+			pane.getChildren().addAll(lblRequirements, gridOut, hbxCourses, hbxButtons);
+			Scene scene = new Scene(pane, 1280, 1080);
+			newMajorStage.setScene(scene);
+			newMajorStage.setTitle("New Major");
+			newMajorStage.showAndWait();	
+	}
+	public void editFacultyView(User user, Administrator admin)
+	{
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		Label lblLogoutName = new Label("You are currently signed in as " + admin.getName() + " : ");
+		Hyperlink hplChangePass = new Hyperlink("Change Password");
+		hplChangePass.setOnAction(e->
+		{
+			Stage passStage = new Stage();
+			passStage.setTitle("Change Password");
+			GridPane gridOut = new GridPane();
+			gridOut.setHgap(10);
+			gridOut.setVgap(10);
+			//grid.setPadding(new Insets(20, 150, 10, 10));
+			PasswordField oldPassword = new PasswordField();
+			oldPassword.setPromptText("Old Password");
+			PasswordField newPassword = new PasswordField();
+			newPassword.setPromptText("New Password");
+			PasswordField newPasswordConf = new PasswordField();
+			newPasswordConf.setPromptText("Confim New Password");
+			gridOut.add(new Label("Old Password: "), 0, 0);
+			gridOut.add(oldPassword, 1, 0);
+			gridOut.add(new Label("New Password: "), 0, 1);
+			gridOut.add(newPassword, 1, 1);
+			gridOut.add(new Label("Confirm New Password: "), 0, 2);
+			gridOut.add(newPasswordConf, 1, 2);
+			gridOut.setAlignment(Pos.CENTER);
+			Button btnCancel = new Button("Cancel");
+			btnCancel.setOnAction(ea->
+			{
+				passStage.close();
+			});
+			Button btnChange = new Button("Change Password");
+			btnChange.setOnAction(ea->
+			{
+				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
+				if(listenerPassword != null)
+				{
+					listenerPassword.changePassword(ev);
+					if(ev.isSuccessful())
+					{
+						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
+						alert.showAndWait();
+						passStage.close();
+					}
+					else
+					{
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+						alert.showAndWait();
+					}
+				}
+			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);
+			passStage.setScene(passScene);
+			passStage.showAndWait();
+		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxAccount = new HBox();
+		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxAccount.setAlignment(Pos.TOP_RIGHT);
+		Label lblID = new Label("ID # : ");
+		grid.add(lblID,  0, 0);
+		TextField txtID = new TextField();
+		grid.add(txtID,  1, 0);
+		txtID.setText(Integer.toString(user.getId()));
+		txtID.setEditable(false);
+		Label lblFirstName = new Label("First Name : ");
+		grid.add(lblFirstName,  0, 1);
+		TextField txtFirstName = new TextField();
+		grid.add(txtFirstName,  1, 1);
+		Label lblLastName = new Label("Last Name : ");
+		grid.add(lblLastName,  0, 2);
+		TextField txtLastName = new TextField();
+		grid.add(txtLastName,  1, 2);
+		Label lblAddress = new Label("Address : ");
+		grid.add(lblAddress,  0, 3);
+		TextField txtAddress = new TextField();
+		grid.add(txtAddress,  1, 3);
+		Label lblCity = new Label("City : ");
+		grid.add(lblCity,  0, 4);
+		TextField txtCity = new TextField();
+		grid.add(txtCity,  1, 4);
+		Label lblZipCode = new Label("Zip Code : ");
+		grid.add(lblZipCode,  0, 5);
+		TextField txtZipCode = new TextField();
+		grid.add(txtZipCode,  1, 5);
+		Label lblState = new Label("State : ");
+		grid.add(lblState,  0, 6);
+		TextField txtState = new TextField();
+		grid.add(txtState,  1, 6);
+		Label lblSSN = new Label("Social Security # : ");
+		grid.add(lblSSN,  0, 8);
+		TextField txtSSN = new TextField();
+		grid.add(txtSSN,  1, 8);
+		Label lblBirthDate = new Label("Birth Date : ");
+		grid.add(lblBirthDate,  0, 11);
+		DatePicker dtpBirthDate = new DatePicker();
+		grid.add(dtpBirthDate,  1, 11);
+		Label lblPassword = new Label("Password : ");
+		grid.add(lblPassword, 0, 13);
+		PasswordField txtPassword = new PasswordField();
+		grid.add(txtPassword, 1, 13);
+		grid.setAlignment(Pos.CENTER);
+		Button btnBack = new Button("Cancel");
+		Button btnEdit = new Button("Edit Faculty Data");
+		Button btnClear = new Button("Clear");
+		HBox hbxButtons = new HBox();
+		txtFirstName.setText(user.getFirstName());
+		txtLastName.setText(user.getLastName());
+		txtAddress.setText(user.getAddress());
+		txtCity.setText(user.getCity());
+		txtZipCode.setText(Integer.toString(user.getZipCode()));
+		txtState.setText(user.getState());
+		txtSSN.setText(user.getSocialSecNum());
+		dtpBirthDate.setValue(user.getDateOfBirth());
+		btnBack.setOnAction(e->{
+			adminView(admin, majors, courses);
+		});
+		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
+		btnEdit.setOnAction(e->{
+		/*	try
+			{
+				if(Integer.parseInt(txtZipCode.getText()) > 99999 || Integer.parseInt(txtZipCode.getText()) < 0)
+					throw new IllegalArgumentException();
+				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
+				if(listenerEdit != null)
+					listenerEdit.edit(ev);
+			}
+			catch(IllegalArgumentException ie)
+			{
+				Alert alert = new Alert(AlertType.ERROR, "Error, zip code is invalid.", ButtonType.OK);
+				alert.showAndWait();
+			}*/
+		});
+		btnClear.setOnAction(e->{
+			txtFirstName.clear();
+			txtLastName.clear();
+			txtAddress.clear();
+			txtCity.clear();
+			txtZipCode.clear();
+			txtState.clear();
+			txtSSN.clear();
+			dtpBirthDate.setValue(LocalDate.now());
 		});
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("SAIN Report");
+		primaryStage.setTitle("Edit Faculty Data");			
 		primaryStage.show();
 	}
 	public void setListenerPassword(PasswordListener listenerPassword) 

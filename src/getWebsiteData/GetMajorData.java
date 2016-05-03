@@ -202,7 +202,6 @@ public class GetMajorData
 			{
 				
 			}
-			
 		}
 		objOut.close();
 		fileOut.close();

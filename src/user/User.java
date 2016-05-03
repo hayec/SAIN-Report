@@ -20,6 +20,7 @@ public interface User extends Serializable
 	public String getCity();
 	public String getState();
 	public Object getUser();
+	public LocalDate getDateOfBirth();
 	public int getBirthYear();
 	public void setUsername(String username);
 	public void setId(int id);

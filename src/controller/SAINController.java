@@ -24,6 +24,8 @@ import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.SAINEventObject;
+import eventHandlers.SAINListener;
 import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
 import javafx.stage.Stage;
@@ -108,9 +110,9 @@ public class SAINController
 						ev.setCredentialsValid(true);
 						currentUser = users.getUser(ev.getUsername());
 						if(currentUser.isStudent())
-							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajorNames(), courses);
+							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajors(), courses.getCourses());
 						else if(currentUser.isFacutly())
-							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
+							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
 						else
 							adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
 					}
@@ -162,7 +164,10 @@ public class SAINController
 					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
 						ev.setSuccessful(false);
 						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
 						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							ev.setSuccessful(true);
 							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
 							saveData();
 						}
@@ -188,7 +193,10 @@ public class SAINController
 					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
 						ev.setSuccessful(false);
 						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
 						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							ev.setSuccessful(true);
 							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
 							saveData();
 						}
@@ -214,7 +222,10 @@ public class SAINController
 					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
 						ev.setSuccessful(false);
 						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
 						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							ev.setSuccessful(true);
 							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
 							saveData();
 						}
@@ -254,14 +265,14 @@ public class SAINController
 		{
 			public void back(BackEventObject ev)
 			{
-				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
+				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
 			}
 		});
 		adminView.setListenerStudentSearch(new BackListener(){
 			@Override
 			public void back(BackEventObject ev)
 			{
-				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajorNames());
+				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
 			}
 		});
 		/***********************New Account Listeners*****************************************/
@@ -275,14 +286,18 @@ public class SAINController
 					id = -1;
 					ev.setErrorMessage("ID# is formatted incorrectly.");
 				}
+				if(ev.getPassword().equals(ev.getPassword().toLowerCase()) || ev.getPassword().equals(ev.getPassword().toUpperCase()) || ev.getPassword().length() < 8 || ev.getPassword().length() > 32 || !ev.getPassword().matches(".*\\d.*"))
+				{
+					ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+				}
 				if(ev.getId().equals("") || ev.getId() == null) {
 					if(ev.getMajor() != null) {//If there is a declared major, then this must be a student
-						id = generateId(true);
+						id = generateId(true);//Generate student ID
 						if(id < 0) {
 							ev.setErrorMessage("All ID numbers are currently in use.  Please delete an account of the same type to continue.  Alternatively, contact the software developer to extend the number of allowed users.");
 						}
 					} else {
-						id = generateId(false);
+						id = generateId(false);//Generate staff ID
 						if(id < 0) {
 							ev.setErrorMessage("All ID numbers are currently in use.  Please delete an account of the same type to continue.  Alternatively, contact the software developer to extend the number of allowed users.");
 						}
@@ -291,6 +306,16 @@ public class SAINController
 				if(id >= 0) {
 					if(users.getUser(Integer.parseInt(ev.getId())) != null) {
 						ev.setErrorMessage("User ID is already in use.  Please choose another ID number.  Alternatively, leave the field blank and an ID number will be automatically generated.");
+					}
+				}
+				if(ev.getMajor() != null) {
+					if(id > 79999999) {
+						ev.setErrorMessage("User ID is too large.  Maximum Size is 79999999.  Please choose another ID number.  Alternatively, leave the field blank and an ID number will be automatically generated.");
+					}
+				}
+				else {
+					if(id > 99999999 || id < 80000000) {
+						ev.setErrorMessage("User ID is invalid.  ID number must be in the range of 80000000-99999999.  Please choose another ID number.  Alternatively, leave the field blank and an ID number will be automatically generated.");
 					}
 				}
 				if(ev.getFirstName().equals("") || ev.getFirstName() == null) {
@@ -312,26 +337,35 @@ public class SAINController
 				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
 					ev.setErrorMessage("New user must be at least 13 years old.");
 				}
-				if(ev.getDateEnrolled().isAfter(LocalDate.now())) {
-					ev.setErrorMessage("Date of Enrollment cannot be in the future.");
-				}
-				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
+				if(!ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
 					ev.setErrorMessage("New user must not be more than 120 years old.");
 				}
-				if(ev.getDateEnrolled().isAfter(LocalDate.parse("1959-12-01"))) {
-					ev.setErrorMessage("Date of enrollment cannot be prior to college founding.");
+				if(ev.getMajor() != null) {
+					if(ev.getDateEnrolled().isAfter(LocalDate.now())) {
+						ev.setErrorMessage("Date of enrollment cannot be in the future.");
+					}
+					if(!ev.getDateEnrolled().isAfter(LocalDate.parse("1959-12-01"))) {
+						ev.setErrorMessage("Date of enrollment cannot be prior to college founding.");
+					}
+				}
+				if(users.getUser(ev.getUsername()) != null) {
+					ev.setErrorMessage("Username is already in use.  Please choose another username.");
+				}
+				if(ev.getUsername().equals("") || ev.getUsername() == null) {
+					ev.setErrorMessage("Username cannot be left blank");
 				}
 				if(ev.getErrorMessage().length() == 0) {
 					if(ev.getMajor() == null) {
 						if(ev.isAdmin()) {
-							users.addUser(new Administrator(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+							users.addUser(new Administrator(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), new String(md.digest(ev.getPassword().getBytes()))));
 						} else {
-							users.addUser(new Faculty(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+							users.addUser(new Faculty(id, ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocSecNum(), ev.getUsername(), new String(md.digest(ev.getPassword().getBytes()))));
 						}
 					} else {
-						users.addUser(new Student(id, ev.getFirstName(), ev.getLastName(), ev.getDateEnrolled(), ev.getDateOfBirth(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), zipCode, ev.getState(), ev.getCampus(), ev.getMajor(), ev.getUsername(), md.digest(ev.getPassword().getBytes()).toString()));
+						users.addUser(new Student(id, ev.getFirstName(), ev.getLastName(), ev.getDateEnrolled(), ev.getDateOfBirth(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), zipCode, ev.getState(), ev.getCampus(), ev.getMajor(), ev.getUsername(), new String(md.digest(ev.getPassword().getBytes()))));
 					}		
 					ev.setId(id);
+					ev.setValidAccount(true);
 				}
 				saveData();
 			}
@@ -395,6 +429,23 @@ public class SAINController
 				}
 			}
 		});
+		studentView.setListenerSAIN(new SAINListener(){
+			@Override
+			public void getReport(SAINEventObject ev)
+			{
+				if(ev.getMajor().getName().equals("") || ev.getMajor().getName() == null)
+				{
+					ev.setErrorMessage("Error no major is selected.  Please select a major then try again.");
+				}
+				else
+				{
+					ev.setValid(true);
+					Student temp = ev.getStudent();//Change major if what-if analysis is selected
+					temp.setMajor(ev.getMajor());
+					studentView.studentView(ev.getUser(), temp, courses.getCourses());
+				}
+			}
+		});
 		adminView.setListenerCourseAdd(new AddCourseListener(){
 			@Override
 			public void add(AddCourseEventObject ev) 
@@ -451,9 +502,55 @@ public class SAINController
 			@Override
 			public void edit(EditEventObject ev)
 			{
-				users.removeUser(ev.getStudent().getId());
-				users.addUser(ev.getStudent());
-				saveData();
+				if(!(ev.getStudent().getPassword().equals("") || ev.getStudent().getPassword() == null))//If password field is blank, then leave password alone
+				{
+					if(ev.getStudent().getPassword().equals(ev.getStudent().getPassword().toLowerCase()) || ev.getStudent().getPassword().equals(ev.getStudent().getPassword().toUpperCase()) || ev.getStudent().getPassword().length() < 8 || ev.getStudent().getPassword().length() > 32 || !ev.getStudent().getPassword().matches(".*\\d.*"))
+					{
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else
+					{
+						ev.getStudent().setPassword(md.digest(ev.getStudent().getPassword().getBytes()).toString());
+					}
+				}
+				else
+				{
+					ev.getStudent().setPassword(((Student) users.getUser(ev.getStudent().getId()).getUser()).getPassword()); 
+				}
+				if(ev.getStudent().getFirstName().equals("") || ev.getStudent().getFirstName() == null) {
+					ev.setErrorMessage("First Name cannot be left blank");
+				}
+				if(ev.getStudent().getLastName().equals("") || ev.getStudent().getLastName() == null) {
+					ev.setErrorMessage("Last Name cannot be left blank");
+				}
+				if(ev.getStudent().getZipCode() < 0 || ev.getStudent().getZipCode() > 99999) {
+					ev.setErrorMessage("Zip code must be a number between 00000 and 99999");
+				}
+				if(ev.getStudent().getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
+					ev.setErrorMessage("New user must be at least 13 years old.");
+				}
+				if(ev.getStudent().getDateEnrolled().isAfter(LocalDate.now())) {
+					ev.setErrorMessage("Date of Enrollment cannot be in the future.");
+				}
+				if(!ev.getStudent().getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
+					ev.setErrorMessage("New user must not be more than 120 years old.");
+				}
+				if(!ev.getStudent().getDateEnrolled().isAfter(LocalDate.parse("1959-12-01"))) {
+					ev.setErrorMessage("Date of enrollment cannot be prior to college founding.");
+				}
+				if(users.getUser(ev.getStudent().getUsername()) != null) {
+					ev.setErrorMessage("Username is already in use.  Please choose another username.");
+				}
+				if(ev.getStudent().getUsername().equals("") || ev.getStudent().getUsername() == null) {
+					ev.setErrorMessage("Username cannot be left blank");
+				}
+				if(ev.getErrorMessage().length() == 0) {
+					if(ev.getStudent().getMajor() == null) {
+						users.removeUser(ev.getStudent().getId());
+						users.addUser(ev.getStudent());
+						saveData();
+					}
+				}
 			}
 		});
 		adminView.setListenerMajorDelete(new DeleteMajorListener() {
@@ -513,7 +610,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-					users.addUser((Administrator) objUserIn.readObject());
+					users.addUser((User) objUserIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}

@@ -5,9 +5,10 @@ import user.Student;
 
 public class AdminEditEventObject extends EventObject 
 {
-	String id;
-	Student student;
-	boolean valid = false;
+	private String id;
+	private Student student;
+	private boolean valid = false;
+	private String errorMessage = new String();
 	public AdminEditEventObject(Object source, String id)
 	{
 		super(source);
@@ -32,5 +33,11 @@ public class AdminEditEventObject extends EventObject
 	public void setStudent(Student student) 
 	{
 		this.student = student;
+	}
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 }

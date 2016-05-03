@@ -77,6 +77,10 @@ public class CreateAccountEventObject extends EventObject
 	{
 		return validAccount;
 	}
+	public void setValidAccount(boolean validAccount)
+	{
+		this.validAccount = validAccount;
+	}
 	public boolean isAdmin()
 	{
 		return admin;
