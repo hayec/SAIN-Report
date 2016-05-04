@@ -247,18 +247,73 @@ public class SAINController
 			@Override
 			public void search(SearchEventObject ev)
 			{
+				if(!ev.getId().equals("") && ev.getId() != null) {
+					try{
+						Student[] student = new Student[1];
+						student[0] = (Student) users.getUser(Integer.parseInt(ev.getId()));
+						if(student[0] != null) {
+							ev.setStudentResults(student);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+					catch(Exception e)
+					{
+						
+					}
+				}
+				if(!ev.getUsername().equals("") && ev.getUsername() != null) {
+					try{
+						Student[] student = new Student[1];
+						student[0] = (Student) users.getUser(ev.getUsername());
+						if(student[0] != null) {
+							ev.setStudentResults(student);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+					catch(Exception e)
+					{
+						
+					}
+				}
 				Major tempMajor = null;
 				if(MajorBag.getMajor(ev.getMajor()) != null)
 					tempMajor = MajorBag.getMajor(ev.getMajor());
 				else if (ev.getMajor() != "")
 					ev.setInputValid(false);
-				if(ev.getGpa() <= 4.0 && ev.getGpa() <= 0)
-				{
-					ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), ev.getZipCode(), ev.getState(), ev.getBirthYear(), ev.getGpa(), tempMajor, ev.getYearEnrolled()));
-					ev.setInputValid(true);
-				}
-				else
+				try {
+					if(Double.parseDouble(ev.getGpa()) <= 4.0 && Double.parseDouble(ev.getGpa()) >= 0)
+					{
+						if(ev.getZipCode().equals("") || ev.getZipCode() == null)
+						{
+							if(ev.getGpa().equals("") || ev.getGpa() == null)
+							{
+								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, -1, tempMajor, -1));
+								ev.setInputValid(true);
+							}
+							else
+							{
+								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
+								ev.setInputValid(true);
+							}
+						}
+						else if(ev.getGpa().equals("") || ev.getGpa() == null)
+						{
+							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, -1, tempMajor, -1));
+							ev.setInputValid(true);
+						}
+						else
+						{
+							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
+							ev.setInputValid(true);
+						}
+					}
+					else
+						ev.setInputValid(false);
+				}catch(Exception e){
 					ev.setInputValid(false);
+				}
 			}
 		});
 		studentView.setListenerBack(new BackListener()
@@ -510,7 +565,7 @@ public class SAINController
 					}
 					else
 					{
-						ev.getStudent().setPassword(md.digest(ev.getStudent().getPassword().getBytes()).toString());
+						ev.getStudent().setPassword(new String(md.digest(ev.getStudent().getPassword().getBytes())));
 					}
 				}
 				else

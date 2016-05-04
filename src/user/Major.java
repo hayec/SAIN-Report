@@ -452,6 +452,11 @@ public class Major implements Serializable
 	}
 	public String toString()
 	{
+		if(name == null || name.equals("")) {
+			return "Undeclared";
+		}
+		else {
 		return name;
+		}
 	}
 }

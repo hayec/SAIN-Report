@@ -1,11 +1,12 @@
 package report;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import user.User;
 
-public class CourseBag 
+public class CourseBag implements Serializable 
 {
 	private ArrayList<Course> courses = new ArrayList<Course>();
 	public CourseBag() {}

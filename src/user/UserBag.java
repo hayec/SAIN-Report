@@ -198,7 +198,7 @@ public class UserBag
 				if(u.getGpa() == gpa)
 					studentResults.add(u);
 		}
-		if(major != null)
+		if(major != null && !major.getName().equals("") && major.getName() != null)
 		{
 			tempStudent = (ArrayList<Student>) studentResults.clone();
 			studentResults.clear();

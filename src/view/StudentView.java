@@ -2,6 +2,7 @@ package view;
 
 import eventHandlers.BackEventObject;
 import eventHandlers.BackListener;
+import eventHandlers.LogoutEventObject;
 import eventHandlers.LogoutListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
@@ -104,6 +105,15 @@ public class StudentView
 			passStage.setScene(passScene);
 			passStage.showAndWait();
 		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxAccount = new HBox();
+		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblCurrentMajor = new Label("Your currently declared major is : " + student.getMajor());
 		Label lblMajor = new Label("Please select a major to continue : ");
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
@@ -147,7 +157,7 @@ public class StudentView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(15);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(lblCurrentMajor, hbxInput, hbxButtons);
+		pane.getChildren().addAll(hbxAccount, lblCurrentMajor, hbxInput, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(15);
 		Scene scene = new Scene(pane, 400, 400);
@@ -215,6 +225,15 @@ public class StudentView
 			passStage.setScene(passScene);
 			passStage.showAndWait();
 		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxAccount = new HBox();
+		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblSelectedMajor = new Label("Currently Selected Major is : " + student.getMajor());
 		Label lblNumOfCredits = new Label("Number of Credits Attempted : " + student.numOfCredits());
 		Label lblNumOfCreditsPass = new Label("Number of Credits Successfully Completed : " + student.numOfCreditsPassed());
@@ -226,13 +245,13 @@ public class StudentView
 		ListView<Course> lstCoursesFailed = new ListView<Course>();
 		Label lblCourseNeed = new Label("Courses Necessary for Graduation : ");
 		ListView<Course> lstCoursesNeeded = new ListView<Course>();
-		for(int i = 0; i <= student.getPassedCourses().length; i++)
+		for(int i = 0; i < student.getPassedCourses().length; i++)
 			lstCoursesPassed.getItems().add(student.getPassedCourses()[i]);
-		for(int i = 0; i <= student.getMajor().getMajorCoursesDone(student).length; i++)
+		for(int i = 0; i < student.getMajor().getMajorCoursesDone(student).length; i++)
 			lstMajorCoursesPassed.getItems().add(student.getMajor().getMajorCoursesDone(student)[i]);
-		for(int i = 0; i <= student.getFailedCourses().length; i++)
+		for(int i = 0; i < student.getFailedCourses().length; i++)
 			lstCoursesFailed.getItems().add(student.getFailedCourses()[i]);
-		for(int i = 0; i <= student.getMajor().getCoursesReq(student).length; i++)
+		for(int i = 0; i < student.getMajor().getCoursesReq(student).length; i++)
 			lstCoursesNeeded.getItems().add(student.getMajor().getCoursesReq(student)[i]);
 		for(int i = 0; i < student.getCourseWork().length; i++)
 		{
@@ -245,7 +264,7 @@ public class StudentView
 		{
 			//Color code items
 		}
-		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree");
+		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
 		Button btnBack = new Button("Back");
 		btnBack.setOnAction(e->
 		{
@@ -274,7 +293,10 @@ public class StudentView
 		grid.add(lstCoursesNeeded, 3, 4);
 		grid.add(lblSemestersNeeded, 0, 5);
 		grid.add(btnBack, 0, 6);
-		Scene scene = new Scene(grid, 1920, 1080);
+		VBox pane = new VBox();
+		pane.getChildren().addAll(hbxAccount, grid);
+		pane.setAlignment(Pos.CENTER);
+		Scene scene = new Scene(pane, 1920, 1080);
 		primaryStage.setScene(scene);
 		primaryStage.show();			
 	}

@@ -156,24 +156,25 @@ public class StaffView
 		grid.add(lblSSN,  0, 8);
 		TextField txtSSN = new TextField();
 		grid.add(txtSSN,  1, 8);
-		Label lblYearEnrolled = new Label("Year Enrolled : ");
-		grid.add(lblYearEnrolled,  0, 9);
-		TextField txtYearEnrolled = new TextField();
-		grid.add(txtYearEnrolled,  1, 9);
-		Label lblBirthYear = new Label("Year of Birth : ");
-		grid.add(lblBirthYear,  0, 10);
-		TextField txtBirthYear = new TextField();
-		grid.add(txtBirthYear,  1, 10);
+		Label lblUsername = new Label("Username : ");
+		grid.add(lblUsername,  0, 9);
+		TextField txtUsername = new TextField();
+		grid.add(txtUsername,  1, 9);
 		Label lblMajor = new Label("Major : ");
-		grid.add(lblMajor,  0, 11);
+		grid.add(lblMajor,  0, 10);
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
-		grid.add(cmbMajor,  1, 11);
+		grid.add(cmbMajor,  1, 10);
 		for(int i = 0; i < majors.length; i++)
 			cmbMajor.getItems().add(majors[i]);
+		if(cmbMajor.getItems().size() == 0)
+		{
+			cmbMajor.getItems().add(new Major());
+			cmbMajor.setValue(new Major());
+		}
 		Label lblStudents = new Label("Results : ");
-		grid.add(lblStudents,  0, 12);
+		grid.add(lblStudents,  0, 11);
 		ListView<String> lstStudents = new ListView<String>();
-		grid.add(lstStudents, 0, 13);
+		grid.add(lstStudents, 0, 12);
 		lstStudents.setMaxHeight(300);
 		lstStudents.setMaxWidth(600);
 		grid.setAlignment(Pos.CENTER);
@@ -191,7 +192,8 @@ public class StaffView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		btnSearch.setOnAction(e->{
-			SearchEventObject ev = new SearchEventObject(btnSearch, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), Integer.parseInt(txtZipCode.getText()), txtSSN.getText(), Integer.parseInt(txtYearEnrolled.getText()), Integer.parseInt(txtBirthYear.getText()), cmbMajor.getValue().getName(), Double.parseDouble(txtGPA.getText()));
+			lstStudents.getItems().clear();
+			SearchEventObject ev = new SearchEventObject(btnSearch, txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), cmbMajor.getValue().getName(), txtGPA.getText(), txtUsername.getText());
 			if(listenerSearch != null)
 			{
 				listenerSearch.search(ev);
@@ -215,6 +217,11 @@ public class StaffView
 				}
 			}
 		});
+		cmbMajor.setOnAction(e->{
+			if(cmbMajor.getValue().getName() == null) {
+				cmbMajor.setValue(new Major());
+			}
+		});
 		btnEdit.setOnAction(e->{
 			AdminEditEventObject ev = new AdminEditEventObject(btnEdit, txtID.getText());
 			if(listenerAdmin != null)
@@ -227,7 +234,11 @@ public class StaffView
 				alert.showAndWait();
 			}
 		});
+		btnSelect.setOnAction(e->{
+			
+		});
 		btnClear.setOnAction(e->{
+			txtID.clear();
 			txtFirstName.clear();
 			txtLastName.clear();
 			txtAddress.clear();
@@ -236,10 +247,8 @@ public class StaffView
 			txtState.clear();
 			txtGPA.clear();
 			txtSSN.clear();
-			txtYearEnrolled.clear();
-			txtBirthYear.clear();
 			cmbMajor.setValue(null);
-			lstStudents.getItems().removeAll();
+			lstStudents.getItems().clear();
 		});
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);

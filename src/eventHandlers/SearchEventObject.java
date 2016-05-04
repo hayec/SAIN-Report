@@ -1,5 +1,6 @@
 package eventHandlers;
 
+import java.time.LocalDate;
 import java.util.EventObject;
 
 import user.Major;
@@ -7,29 +8,43 @@ import user.Student;
 
 public class SearchEventObject extends EventObject 
 {
-	private int id;
+	private String id;
 	private String firstName;
 	private String lastName;
 	private String address;
 	private String city;
 	private String state;
-	private int zipCode;
+	private String zipCode;
 	private String socSecNum;
-	private int birthYear;
-	private int yearEnrolled;
 	private String major;
-	private double gpa;
+	private String gpa;
+	private String username;
 	private Student[] studentResults;
 	private boolean inputValid = false;
 	public SearchEventObject(Object source)
 	{
 		super(source);
 	}
-	public SearchEventObject(Object source, int id, String firstName, String lastName, String address, String city, String state, int zipCode, String socSecNum, int birthYear, int yearEnrolled, String major, double gpa)
+	public SearchEventObject(Object source, String id, String firstName, String lastName, String address, String city, String state, String zipCode, String socSecNum, String major, String gpa, String username)
 	{
 		super(source);
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.city = city;
+		this.state = state;
+		this.zipCode = zipCode;
+		this.socSecNum = socSecNum;
+		this.major = major;
+		this.gpa = gpa;
+		this.username = username;
 	}
-	public int getId() 
+	public String getUsername()
+	{
+		return username;
+	}
+	public String getId() 
 	{
 		return id;
 	}
@@ -53,7 +68,7 @@ public class SearchEventObject extends EventObject
 	{
 		return state;
 	}
-	public int getZipCode() 
+	public String getZipCode() 
 	{
 		return zipCode;
 	}
@@ -61,19 +76,11 @@ public class SearchEventObject extends EventObject
 	{
 		return socSecNum;
 	}
-	public int getBirthYear() 
-	{
-		return birthYear;
-	}
-	public int getYearEnrolled() 
-	{
-		return yearEnrolled;
-	}
 	public String getMajor() 
 	{
 		return major;
 	}
-	public double getGpa() 
+	public String getGpa() 
 	{
 		return gpa;
 	}

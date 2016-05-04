@@ -699,7 +699,7 @@ public class AdminView
 		});
 		btnAddCourse.setOnAction(eac->{
 			try {
-				if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+				if(lstCourse.getSelectionModel().getSelectedItem() == null)
 				{
 					throw new IllegalArgumentException();
 				}
@@ -725,7 +725,7 @@ public class AdminView
 		btnAddCourseA.setOnAction(eac->{
 			try 
 			{
-				if(lstCoursesReqA.getSelectionModel().getSelectedItem() == null)
+				if(lstCoursesA.getSelectionModel().getSelectedItem() == null)
 				{
 					throw new IllegalArgumentException();
 				}
@@ -773,7 +773,6 @@ public class AdminView
 	}
 	public void addMajorView(boolean edit, Major major)
 	{
-		
 			Stage newMajorStage = new Stage();
 			newMajorStage.setTitle("Add Major");
 			GridPane gridOut = new GridPane();
@@ -914,7 +913,7 @@ public class AdminView
 			});
 			btnAddCourse.setOnAction(eac->{
 				try {
-					if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+					if(lstCourses.getSelectionModel().getSelectedItem() == null)
 					{
 						throw new IllegalArgumentException();
 					}
