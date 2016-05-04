@@ -273,4 +273,8 @@ public class Student implements User, Serializable
 				returnCourse.add(c);
 		return returnCourse.toArray(new Course[returnCourse.size()]);
 	}
+	public String toString()
+	{
+		return getLastName() + ", " + getFirstName() + " " + getId();
+	}
 }

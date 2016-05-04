@@ -24,6 +24,8 @@ import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.ReportEventObject;
+import eventHandlers.ReportListener;
 import eventHandlers.SAINEventObject;
 import eventHandlers.SAINListener;
 import eventHandlers.SearchEventObject;
@@ -280,7 +282,7 @@ public class SAINController
 				Major tempMajor = null;
 				if(MajorBag.getMajor(ev.getMajor()) != null)
 					tempMajor = MajorBag.getMajor(ev.getMajor());
-				else if (ev.getMajor() != "")
+				else if (ev.getMajor() != null && !ev.getMajor().equals("") && !ev.getMajor().equals("Undeclared"))
 					ev.setInputValid(false);
 				try {
 					if(Double.parseDouble(ev.getGpa()) <= 4.0 && Double.parseDouble(ev.getGpa()) >= 0)
@@ -328,6 +330,13 @@ public class SAINController
 			public void back(BackEventObject ev)
 			{
 				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
+			}
+		});
+		staffView.setListenerReport(new ReportListener(){
+			@Override
+			public void report(ReportEventObject ev)
+			{
+				studentView.studentStart(ev.getUser(), ev.getStudent(), MajorBag.getMajors(), courses.getCourses());
 			}
 		});
 		/***********************New Account Listeners*****************************************/
@@ -501,6 +510,7 @@ public class SAINController
 				}
 			}
 		});
+		
 		adminView.setListenerCourseAdd(new AddCourseListener(){
 			@Override
 			public void add(AddCourseEventObject ev) 
@@ -557,7 +567,7 @@ public class SAINController
 			@Override
 			public void edit(EditEventObject ev)
 			{
-				if(!(ev.getStudent().getPassword().equals("") || ev.getStudent().getPassword() == null))//If password field is blank, then leave password alone
+				if(!(ev.getStudent().getPassword() == null || ev.getStudent().getPassword().equals("")))//If password field is blank, then leave password alone
 				{
 					if(ev.getStudent().getPassword().equals(ev.getStudent().getPassword().toLowerCase()) || ev.getStudent().getPassword().equals(ev.getStudent().getPassword().toUpperCase()) || ev.getStudent().getPassword().length() < 8 || ev.getStudent().getPassword().length() > 32 || !ev.getStudent().getPassword().matches(".*\\d.*"))
 					{
@@ -572,10 +582,10 @@ public class SAINController
 				{
 					ev.getStudent().setPassword(((Student) users.getUser(ev.getStudent().getId()).getUser()).getPassword()); 
 				}
-				if(ev.getStudent().getFirstName().equals("") || ev.getStudent().getFirstName() == null) {
+				if(ev.getStudent().getFirstName() == null || ev.getStudent().getFirstName().equals("")) {
 					ev.setErrorMessage("First Name cannot be left blank");
 				}
-				if(ev.getStudent().getLastName().equals("") || ev.getStudent().getLastName() == null) {
+				if( ev.getStudent().getLastName() == null || ev.getStudent().getLastName().equals("")) {
 					ev.setErrorMessage("Last Name cannot be left blank");
 				}
 				if(ev.getStudent().getZipCode() < 0 || ev.getStudent().getZipCode() > 99999) {
@@ -593,18 +603,18 @@ public class SAINController
 				if(!ev.getStudent().getDateEnrolled().isAfter(LocalDate.parse("1959-12-01"))) {
 					ev.setErrorMessage("Date of enrollment cannot be prior to college founding.");
 				}
-				if(users.getUser(ev.getStudent().getUsername()) != null) {
+				if(users.getUser(ev.getStudent().getUsername()) != null && users.getUser(ev.getStudent().getUsername()).getId() != ev.getStudent().getId()) {
 					ev.setErrorMessage("Username is already in use.  Please choose another username.");
 				}
-				if(ev.getStudent().getUsername().equals("") || ev.getStudent().getUsername() == null) {
+				if(ev.getStudent().getUsername() == null || ev.getStudent().getUsername().equals("")) {
 					ev.setErrorMessage("Username cannot be left blank");
 				}
 				if(ev.getErrorMessage().length() == 0) {
-					if(ev.getStudent().getMajor() == null) {
-						users.removeUser(ev.getStudent().getId());
-						users.addUser(ev.getStudent());
-						saveData();
-					}
+					users.removeUser(ev.getStudent().getId());
+					users.addUser(ev.getStudent());
+					ev.setValid(true);
+					saveData();
+					
 				}
 			}
 		});

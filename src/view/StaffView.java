@@ -1,6 +1,7 @@
 package view;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 import eventHandlers.AdminEditEventObject;
 import eventHandlers.AdminEditListener;
@@ -10,6 +11,9 @@ import eventHandlers.LogoutEventObject;
 import eventHandlers.LogoutListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.ReportEventObject;
+import eventHandlers.ReportListener;
+import eventHandlers.SAINListener;
 import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
 import javafx.geometry.Pos;
@@ -23,6 +27,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
@@ -42,6 +47,7 @@ public class StaffView
 	SearchListener listenerSearch;
 	AdminEditListener listenerAdmin;
 	EditListener listenerEdit;
+	ReportListener listenerReport;
 	public StaffView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -173,7 +179,7 @@ public class StaffView
 		}
 		Label lblStudents = new Label("Results : ");
 		grid.add(lblStudents,  0, 11);
-		ListView<String> lstStudents = new ListView<String>();
+		ListView<Student> lstStudents = new ListView<Student>();
 		grid.add(lstStudents, 0, 12);
 		lstStudents.setMaxHeight(300);
 		lstStudents.setMaxWidth(600);
@@ -207,7 +213,7 @@ public class StaffView
 					else
 					{
 						for(int i = 0; i < ev.getStudentResults().length; i++)
-							lstStudents.getItems().add(ev.getStudentResults()[i].getLastName() + ", " + ev.getStudentResults()[i].getFirstName() + " " + ev.getStudentResults()[i].getId());
+							lstStudents.getItems().add(ev.getStudentResults()[i]);
 					}
 				}
 				else
@@ -218,8 +224,24 @@ public class StaffView
 			}
 		});
 		cmbMajor.setOnAction(e->{
-			if(cmbMajor.getValue().getName() == null) {
+			if(cmbMajor.getValue() == null) {
 				cmbMajor.setValue(new Major());
+			}
+		});
+		lstStudents.setOnMouseClicked(e->{
+			if(lstStudents.getSelectionModel().getSelectedItem() != null) {
+				Student tempStudent = lstStudents.getSelectionModel().getSelectedItem();
+				txtID.setText(Integer.toString(tempStudent.getId()));
+				txtFirstName.setText(tempStudent.getFirstName());
+				txtLastName.setText(tempStudent.getLastName());
+				txtAddress.setText(tempStudent.getAddress());
+				txtCity.setText(tempStudent.getCity());
+				txtZipCode.setText(Integer.toString(tempStudent.getZipCode()));
+				txtState.setText(tempStudent.getState());
+				txtGPA.setText(Double.toString(tempStudent.getGpa()));
+				txtSSN.setText(tempStudent.getSocialSecNum());
+				cmbMajor.setValue(tempStudent.getMajor());
+				txtUsername.setText(tempStudent.getUsername());
 			}
 		});
 		btnEdit.setOnAction(e->{
@@ -235,7 +257,17 @@ public class StaffView
 			}
 		});
 		btnSelect.setOnAction(e->{
-			
+			if(lstStudents.getSelectionModel().getSelectedItem() != null) {
+				ReportEventObject ev = new ReportEventObject(btnSelect, user, lstStudents.getSelectionModel().getSelectedItem());
+				if(listenerReport != null) {
+					listenerReport.report(ev);
+				}
+					
+			} else {
+				Alert alert = new Alert(AlertType.ERROR, "Error!  No student selected!.\nPlease select a student then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+				
 		});
 		btnClear.setOnAction(e->{
 			txtID.clear();
@@ -379,17 +411,27 @@ public class StaffView
 		grid.add(lblBirthDate,  0, 11);
 		DatePicker dtpBirthDate = new DatePicker();
 		grid.add(dtpBirthDate,  1, 11);
+		Label lblUsername = new Label("Username : ");
+		grid.add(lblUsername,  0, 12);
+		TextField txtUsername = new TextField();
+		grid.add(txtUsername,  1, 12);
 		Label lblMajor = new Label("Major : ");
-		grid.add(lblMajor,  0, 12);
+		grid.add(lblMajor,  0, 13);
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
-		grid.add(cmbMajor,  1, 12);
-		for(int i = 0; i < majors.length; i++)
+		grid.add(cmbMajor,  1, 13);
+		for(int i = 0; i < majors.length; i++) {
 			cmbMajor.getItems().add(majors[i]);
+		}
+		if(cmbMajor.getItems().size() == 0)
+		{
+			cmbMajor.getItems().add(new Major());
+			cmbMajor.setValue(new Major());
+		}
 		Label lblPassword = new Label("Password : ");
-		grid.add(lblPassword, 0, 13);
+		grid.add(lblPassword, 0, 14);
 		PasswordField txtPassword = new PasswordField();
 		txtPassword.setPromptText("Leave this field blank to leave the password unchanged.");
-		grid.add(txtPassword, 1, 13);
+		grid.add(txtPassword, 1, 14);
 		grid.setAlignment(Pos.CENTER);
 		txtFirstName.setText(student.getFirstName());
 		txtLastName.setText(student.getLastName());
@@ -401,6 +443,7 @@ public class StaffView
 		dtpBirthDate.setValue(student.getDateOfBirth());
 		dtpDateEnrolled.setValue(student.getDateEnrolled());
 		txtCampus.setText(student.getCampus());
+		txtUsername.setText(student.getUsername());
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Student Data");
 		Button btnClear = new Button("Clear");
@@ -412,7 +455,7 @@ public class StaffView
 		btnEdit.setOnAction(e->{
 			try
 			{
-				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), cmbMajor.getValue()));
+				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), cmbMajor.getValue(), txtUsername.getText(), txtPassword.getText()));
 				if(listenerEdit != null)
 					listenerEdit.edit(ev);
 				if(!ev.isValid()) {
@@ -422,8 +465,13 @@ public class StaffView
 			}
 			catch(Exception ie)
 			{
-				Alert alert = new Alert(AlertType.ERROR, "Error, zip code must be an integer.", ButtonType.OK);
+				Alert alert = new Alert(AlertType.ERROR, "Error, an exception occurred.  Please contact the developer for assistance.", ButtonType.OK);
 				alert.showAndWait();
+			}
+		});
+		cmbMajor.setOnAction(e->{
+			if(cmbMajor.getValue() == null) {
+				cmbMajor.setValue(new Major());
 			}
 		});
 		btnClear.setOnAction(e->{
@@ -438,15 +486,22 @@ public class StaffView
 			dtpBirthDate.setValue(LocalDate.now());
 			cmbMajor.setValue(null);
 			txtPassword.clear();
-			
+			txtUsername.clear();
 		});
+		hbxButtons.setAlignment(Pos.CENTER);
+		hbxButtons.setSpacing(20);
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
+		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
+	}
+	public void setListenerReport(ReportListener listenerReport)
+	{
+		this.listenerReport = listenerReport;
 	}
 	public void setListenerPassword(PasswordListener listenerPassword) 
 	{
