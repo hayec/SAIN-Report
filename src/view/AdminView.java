@@ -408,7 +408,6 @@ public class AdminView
 		grid.add(lblID,  0, line);
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, line);
-		//txtID.setText(Integer.toString(student.getId()));
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, ++line);
 		TextField txtFirstName = new TextField();
@@ -512,7 +511,7 @@ public class AdminView
 				}
 				else
 				{
-					Alert alert = new Alert(AlertType.INFORMATION, "Account successfully created. ID# : " + ev.getId(), ButtonType.OK);
+					Alert alert = new Alert(AlertType.INFORMATION, "Account successfully created. ID# : " + parseId(Integer.parseInt(ev.getId())), ButtonType.OK);
 					alert.showAndWait();
 					adminView(user, majors, courses);
 				}
@@ -1021,7 +1020,7 @@ public class AdminView
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, 0);
-		txtID.setText(Integer.toString(user.getId()));
+		txtID.setText(parseId(user.getId()));
 		txtID.setEditable(false);
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, 1);
@@ -1135,5 +1134,15 @@ public class AdminView
 	}
 	public void setListenerStudentSearch(BackListener listenerStudentSearch) {
 		this.listenerStudentSearch = listenerStudentSearch;
+	}
+	public String parseId(int id)
+	{
+		String returnString = Integer.toString(id);
+		if(returnString.length() < 8){
+			for(int i = 0; i < returnString.length() - 8; i++) {
+				returnString = "0" + returnString;
+			}
+		}
+		return returnString;
 	}
 }

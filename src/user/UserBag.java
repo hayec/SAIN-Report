@@ -218,5 +218,16 @@ public class UserBag
 			returnStudent = studentResults.toArray(new Student[studentResults.size()]);
 		return returnStudent;
 	}
+	public Student[] getStudents()
+	{
+		ArrayList<Student> returnStudents = new ArrayList<Student>();
+		for(User u : users)
+		{
+			if(u.isStudent()) {
+				returnStudents.add((Student) u);//Safe to cast User to Student, because boolean value is hard coded in Student Class 
+			}
+		}
+		return returnStudents.toArray(new Student[returnStudents.size()]);
+	}
 	
 }

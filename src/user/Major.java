@@ -459,4 +459,16 @@ public class Major implements Serializable
 		return name;
 		}
 	}
+	public boolean equals(Major m)
+	{
+		if(m.getName().equals(getName())) {//All majors have a unique name, this is used as the unique identifier
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	public void setCoursesReq(Course[] reqCourses) {
+		this.reqCourses = reqCourses;
+	}
 }

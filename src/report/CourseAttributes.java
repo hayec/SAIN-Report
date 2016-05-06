@@ -130,4 +130,57 @@ public class CourseAttributes implements Serializable
 	{
 		this.philosophy = philosophy;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (amerHis ? 1231 : 1237);
+		result = prime * result + (business ? 1231 : 1237);
+		result = prime * result + (communications ? 1231 : 1237);
+		result = prime * result + (english ? 1231 : 1237);
+		result = prime * result + (history ? 1231 : 1237);
+		result = prime * result + (humanities ? 1231 : 1237);
+		result = prime * result + (labScience ? 1231 : 1237);
+		result = prime * result + (language ? 1231 : 1237);
+		result = prime * result + (math ? 1231 : 1237);
+		result = prime * result + (philosophy ? 1231 : 1237);
+		result = prime * result + (physEd ? 1231 : 1237);
+		result = prime * result + (socScience ? 1231 : 1237);
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CourseAttributes other = (CourseAttributes) obj;
+		if (amerHis != other.amerHis)
+			return false;
+		if (business != other.business)
+			return false;
+		if (communications != other.communications)
+			return false;
+		if (english != other.english)
+			return false;
+		if (history != other.history)
+			return false;
+		if (humanities != other.humanities)
+			return false;
+		if (labScience != other.labScience)
+			return false;
+		if (language != other.language)
+			return false;
+		if (math != other.math)
+			return false;
+		if (philosophy != other.philosophy)
+			return false;
+		if (physEd != other.physEd)
+			return false;
+		if (socScience != other.socScience)
+			return false;
+		return true;
+	}
 }

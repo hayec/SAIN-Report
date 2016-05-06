@@ -57,6 +57,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SAINController
 {
@@ -622,6 +623,15 @@ public class SAINController
 			@Override
 			public void delete(DeleteMajorEventObject ev) {
 				MajorBag.removeMajor(ev.getTarget().getName());
+				for(Student s : users.getStudents())//Set all students with deleted major as declared major to undeclared majors
+				{
+					if(s.getMajor().equals(ev.getTarget())) {
+						users.removeUser(s.getId());
+						Student temp = s.clone();
+						temp.setMajor(new Major());
+						users.addUser(temp);
+					}
+				}
 				saveData();
 				ev.setMajors(MajorBag.getMajors());
 			}
@@ -630,6 +640,47 @@ public class SAINController
 			@Override
 			public void delete(DeleteCourseEventObject ev) {
 				courses.removeCourse(ev.getTarget().getCourseCode());
+				for(Course c : courses.getCourses()) {
+					Course courseTemp = c.clone();
+					for(String s : c.getPrerequisites()) {//Loop through and remove all prereqs which correspond to course being removed
+						if(s.equals(ev.getTarget().getCourseCode())) {
+							ArrayList<String> tempPre = (ArrayList<String>) Arrays.asList(courseTemp.getPrerequisites());//Create temporary arraylist to hold course prereqs
+							tempPre.remove(s);//Remove offending course
+							courseTemp.setPrerequisites(tempPre.toArray(new String[tempPre.size()]));//Reset prereqs
+						}
+					}
+					for(String s : c.getCorequisites()) {//Loop through and remove all coreqs which correspond to course being removed
+						if(s.equals(ev.getTarget().getCourseCode())) {
+							ArrayList<String> tempCo = (ArrayList<String>) Arrays.asList(courseTemp.getCorequisites());//Create temporary arraylist to hold course coreqs
+							tempCo.remove(s);//Remove offending course
+							courseTemp.setCorequisites(tempCo.toArray(new String[tempCo.size()]));//Reset coreqs
+						}
+					}
+					if(!courseTemp.equals(courseTemp)){//Only change if modifications were made
+						courses.removeCourse(c.getCourseCode());
+						courses.addCourse(courseTemp);
+					}
+				}
+				for(Major m : MajorBag.getMajors()) {
+					for(Course c : m.getReqCourses()) {
+						if(c.getCourseCode().equals(ev.getTarget().getCourseCode()))
+						{
+							ArrayList<Course> tempCourse = (ArrayList<Course>) Arrays.asList(m.getReqCourses());//Create temporary arrayList
+							tempCourse.remove(c);//Remove offending course
+							m.setCoursesReq(tempCourse.toArray(new Course[tempCourse.size()]));//Reset major requirements
+						}
+					}
+				}
+				for(Student s : users.getStudents())
+				{
+					for(Course c : s.getCourseWork()) {
+						if(c.getCourseCode().equals(ev.getTarget().getCourseCode())) {
+							s.removeCourse(c);//Remove nonexistant course from record
+							users.removeUser(s.getId());//Remove old student from model
+							users.addUser(s);//Update model
+						}
+					}
+				}				
 				saveData();
 				ev.setCourses(courses.getCourses());
 			}

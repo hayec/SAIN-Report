@@ -231,7 +231,7 @@ public class StaffView
 		lstStudents.setOnMouseClicked(e->{
 			if(lstStudents.getSelectionModel().getSelectedItem() != null) {
 				Student tempStudent = lstStudents.getSelectionModel().getSelectedItem();
-				txtID.setText(Integer.toString(tempStudent.getId()));
+				txtID.setText(parseId(tempStudent.getId()));
 				txtFirstName.setText(tempStudent.getFirstName());
 				txtLastName.setText(tempStudent.getLastName());
 				txtAddress.setText(tempStudent.getAddress());
@@ -369,7 +369,7 @@ public class StaffView
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, 0);
-		txtID.setText(Integer.toString(student.getId()));
+		txtID.setText(parseId(student.getId()));
 		txtID.setEditable(false);
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, 1);
@@ -522,5 +522,15 @@ public class StaffView
 	public void setListenerEdit(EditListener listenerEdit)
 	{
 		this.listenerEdit = listenerEdit;
+	}
+	public String parseId(int id)
+	{
+		String returnString = Integer.toString(id);
+		if(returnString.length() < 8){
+			for(int i = 0; i < returnString.length() - 8; i++) {
+				returnString = "0" + returnString;
+			}
+		}
+		return returnString;
 	}
 }
