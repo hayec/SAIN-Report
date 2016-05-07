@@ -17,6 +17,8 @@ import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.RemoveStaffEventObject;
+import eventHandlers.RemoveStaffListener;
 import eventHandlers.ReportEventObject;
 import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
@@ -68,6 +70,7 @@ public class AdminView
 	StaffEditListener listenerEdit;
 	SearchListener listenerSearch;
 	AdminEditListener listenerAdmin;
+	RemoveStaffListener listenerDelete;
 	Major[] majors;
 	Course[] courses;
 	public AdminView(Stage primaryStage)
@@ -384,7 +387,7 @@ public class AdminView
 			pane.getChildren().addAll(lblCourses, lstCourses, hbxButtons);
 			pane.setSpacing(30);
 			pane.setAlignment(Pos.CENTER);
-			Scene acctScene = new Scene(pane, 400, 650);
+			Scene acctScene = new Scene(pane, 550, 650);
 			courseStage.setScene(acctScene);
 			courseStage.showAndWait();
 		});
@@ -890,6 +893,7 @@ public class AdminView
 			}
 		});
 		btnAddThis.setOnAction(eac->{
+			//Error thrown on 898 at runtime
 			AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
 					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCourse.getItems().toArray(new String[lstCourse.getItems().size()]), 
 					lstCoursesA.getItems().toArray(new String[lstCoursesA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
@@ -1163,7 +1167,7 @@ public class AdminView
 		TextField txtID = new TextField();
 		grid.add(txtID,  1, 0);
 		txtID.setText(parseId(user.getId()));
-		txtID.setEditable(false);
+		txtID.setEditable(false);//Don't allow user to change id number
 		Label lblFirstName = new Label("First Name : ");
 		grid.add(lblFirstName,  0, 1);
 		TextField txtFirstName = new TextField();
@@ -1208,6 +1212,7 @@ public class AdminView
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Faculty Data");
 		Button btnClear = new Button("Clear");
+		Button btnDelete = new Button("Delete User");
 		HBox hbxButtons = new HBox();
 		txtFirstName.setText(user.getFirstName());
 		txtLastName.setText(user.getLastName());
@@ -1220,7 +1225,7 @@ public class AdminView
 		btnBack.setOnAction(e->{
 			adminView(admin, majors, courses);
 		});
-		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
+		hbxButtons.getChildren().addAll(btnBack, btnClear, btnEdit, btnDelete);
 		btnEdit.setOnAction(e->{
 			StaffEditEventObject ev = new StaffEditEventObject(btnEdit, txtUsername.getText(), user.getId(), txtFirstName.getText(), txtLastName.getText(), dtpBirthDate.getValue(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), txtPassword.getText(), user.isAdministrator());
 			if(listenerEdit != null)
@@ -1234,6 +1239,19 @@ public class AdminView
 			{
 				adminView(admin, majors, courses);//If valid, go back to default control panel
 			}
+		});
+		btnDelete.setOnAction(e->{
+			RemoveStaffEventObject ev = new RemoveStaffEventObject(btnDelete, user.getId());
+			if(listenerDelete != null) {
+				listenerDelete.removeStaff(ev);
+			}
+			if(ev.isValid()) {
+				adminView(admin, majors, courses);//If successful, go back to default control panel
+			} else {
+				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+				alert.showAndWait();
+			}
+			
 		});
 		btnClear.setOnAction(e->{
 			txtFirstName.clear();
@@ -1290,6 +1308,9 @@ public class AdminView
 	}
 	public void setListenerAdmin(AdminEditListener listenerAdmin) {
 		this.listenerAdmin = listenerAdmin;
+	}
+	public void setListenerDelete(RemoveStaffListener listenerDelete) {
+		this.listenerDelete = listenerDelete;
 	}
 	public String parseId(int id)
 	{

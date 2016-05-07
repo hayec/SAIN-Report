@@ -8,7 +8,7 @@ public interface User extends Serializable
 	public String getUsername();
 	public String getName();	
 	public boolean isStudent();
-	public boolean isFacutly();
+	public boolean isFaculty();
 	public boolean isAdministrator();
 	public boolean correctPassword(String password);
 	public int getId();

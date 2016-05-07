@@ -50,7 +50,7 @@ public class Administrator implements User, Serializable
 		return false;
 	}
 	@Override
-	public boolean isFacutly() 
+	public boolean isFaculty() 
 	{
 		return false;
 	}

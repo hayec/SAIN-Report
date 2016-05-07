@@ -42,7 +42,7 @@ public class Faculty implements User, Serializable
 		return false;
 	}
 	@Override
-	public boolean isFacutly() 
+	public boolean isFaculty() 
 	{
 		return true;
 	}

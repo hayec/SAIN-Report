@@ -3,6 +3,8 @@ package view;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import eventHandlers.AdminBackEventObject;
+import eventHandlers.AdminBackListener;
 import eventHandlers.AdminEditEventObject;
 import eventHandlers.AdminEditListener;
 import eventHandlers.EditEventObject;
@@ -36,6 +38,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import user.Administrator;
 import user.Major;
 import user.MajorBag;
 import user.Student;
@@ -51,6 +54,7 @@ public class StaffView
 	EditListener listenerEdit;
 	ReportListener listenerReport;
 	RemoveStudentListener listenerDelete;
+	AdminBackListener listenerBack;
 	public StaffView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -202,7 +206,9 @@ public class StaffView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		btnBack.setOnAction(e->{
-			
+			if(listenerBack != null) {
+				listenerBack.back(new AdminBackEventObject(btnBack, (Administrator) user));//Safe to cast user to Admin because button is only displayed if user is admin
+			}
 		});
 		btnSearch.setOnAction(e->{
 			lstStudents.getItems().clear();
@@ -545,6 +551,9 @@ public class StaffView
 	}
 	public void setListenerDelete(RemoveStudentListener listenerDelete) {
 		this.listenerDelete = listenerDelete;
+	}
+	public void setListenerBack(AdminBackListener listenerBack) {
+		this.listenerBack = listenerBack;
 	}
 	public String parseId(int id)
 	{

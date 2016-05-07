@@ -17,13 +17,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import report.Course;
 import report.CourseBag;
 import user.Major;
@@ -245,6 +249,12 @@ public class StudentView
 		ListView<Course> lstCoursesFailed = new ListView<Course>();
 		Label lblCourseNeed = new Label("Courses Necessary for Graduation : ");
 		ListView<Course> lstCoursesNeeded = new ListView<Course>();
+		lstCoursesNeeded.setCellFactory(new Callback<ListView<Course>, ListCell<Course>>() {
+		    @Override 
+		    public ListCell<Course> call(ListView<Course> list) {
+		        return new ColorRectCell();
+		    }
+		});
 		for(int i = 0; i < student.getPassedCourses().length; i++)
 			lstCoursesPassed.getItems().add(student.getPassedCourses()[i]);
 		for(int i = 0; i < student.getMajor().getMajorCoursesDone(student).length; i++)
@@ -259,10 +269,6 @@ public class StudentView
 				lstCoursesPassed.getItems().add(student.getCourseWork()[i]);
 			else
 				lstCoursesFailed.getItems().add(student.getCourseWork()[i]);
-		}
-		for(Course c : lstCoursesNeeded.getItems())
-		{
-			//Color code items
 		}
 		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
 		Button btnBack = new Button("Back");
@@ -315,5 +321,23 @@ public class StudentView
 	public void setListenerSAIN(SAINListener listenerSAIN)
 	{
 		this.listenerSAIN = listenerSAIN;
+	}
+	static class ColorRectCell extends ListCell<Course> {
+	    @Override 
+	    public void updateItem(Course item, boolean empty) {
+	        super.updateItem(item, empty);
+	        Rectangle rect = new Rectangle(100, 20);
+	        if (item != null) {
+	        	if(item.getPrerequisites() == null) {
+	        		rect.setFill(Color.GREEN);
+	        		setGraphic(rect);
+	        	} else {
+	        		rect.setFill(Color.RED);
+	        		setGraphic(rect);
+	        	}
+	        } else {
+	            setGraphic(null);
+	        }
+	    }
 	}
 }

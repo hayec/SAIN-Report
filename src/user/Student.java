@@ -76,7 +76,7 @@ public class Student implements User, Serializable
 		return true;
 	}
 	@Override
-	public boolean isFacutly() 
+	public boolean isFaculty() 
 	{
 		return false;
 	}

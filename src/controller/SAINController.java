@@ -4,6 +4,8 @@ import eventHandlers.AddCourseEventObject;
 import eventHandlers.AddCourseListener;
 import eventHandlers.AddMajorEventObject;
 import eventHandlers.AddMajorListener;
+import eventHandlers.AdminBackEventObject;
+import eventHandlers.AdminBackListener;
 import eventHandlers.AdminEditEventObject;
 import eventHandlers.AdminEditListener;
 import eventHandlers.BackEventObject;
@@ -26,6 +28,8 @@ import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.RemoveStaffEventObject;
+import eventHandlers.RemoveStaffListener;
 import eventHandlers.RemoveStudentEventObject;
 import eventHandlers.RemoveStudentListener;
 import eventHandlers.ReportEventObject;
@@ -51,22 +55,24 @@ import view.AdminView;
 import view.LoginView;
 import view.StaffView;
 import view.StudentView;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class SAINController
 {
+	final int USERNAME_LENGTH = 64;
 	MessageDigest md;
 	Stage primaryStage;
 	LoginView loginView;
@@ -89,6 +95,7 @@ public class SAINController
 		setAdminListeners();
 		setStaffListeners();
 		setStudentListeners();
+		setModelListeners();
 		try {
 			loadData();
 		} catch (Exception e) {
@@ -108,6 +115,10 @@ public class SAINController
 				{
 					ev.setValidPassword(false);
 					ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+				}
+				else if(ev.getUsername().length() > USERNAME_LENGTH) {
+					ev.setValidPassword(false);
+					ev.setErrorMessage("Error, username must be less than" + USERNAME_LENGTH + " characters.");
 				}
 				else
 				{
@@ -133,7 +144,7 @@ public class SAINController
 						currentUser = users.getUser(ev.getUsername());
 						if(currentUser.isStudent())
 							studentView.studentStart(currentUser, (Student) currentUser, majors.getMajors(), courses.getCourses());
-						else if(currentUser.isFacutly())
+						else if(currentUser.isFaculty())
 							staffView.start(currentUser.isAdministrator(), currentUser, majors.getMajors());
 						else
 							adminView.adminView((Administrator) currentUser.getUser(), majors.getMajors(), courses.getCourses());
@@ -207,6 +218,9 @@ public class SAINController
 				if(ev.getPassword().equals(ev.getPassword().toLowerCase()) || ev.getPassword().equals(ev.getPassword().toUpperCase()) || ev.getPassword().length() < 8 || ev.getPassword().length() > 32 || !ev.getPassword().matches(".*\\d.*"))
 				{
 					ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+				}
+				if(ev.getUsername().length() > USERNAME_LENGTH) {
+					ev.setErrorMessage("Error, username must be less than" + USERNAME_LENGTH + " characters.");
 				}
 				if(ev.getId().equals("") || ev.getId() == null) {
 					if(ev.getMajor() != null) {//If there is a declared major, then this must be a student
@@ -451,6 +465,9 @@ public class SAINController
 				} else {
 					ev.setPassword(users.getUser(ev.getId()).getPassword());//If password is blank, set password to current password
 				}
+				if(ev.getUsername().length() > USERNAME_LENGTH) {
+					ev.setErrorMessage("Error, username must be less than" + USERNAME_LENGTH + " characters.");
+				}
 				if(ev.getFirstName().equals("") || ev.getFirstName() == null) {
 					ev.setErrorMessage("First Name cannot be left blank");
 				}
@@ -565,7 +582,7 @@ public class SAINController
 					else if(user.isStudent()) {//Do not return students
 						ev.setValid(false);
 					}
-					else if(user.isAdministrator() || user.isFacutly()) {
+					else if(user.isAdministrator() || user.isFaculty()) {
 						ev.setUser(user);
 						ev.setUserValid(true);
 					}
@@ -574,8 +591,52 @@ public class SAINController
 				}
 			}
 		});
+		adminView.setListenerDelete(new RemoveStaffListener() {
+			@Override
+			public void removeStaff(RemoveStaffEventObject ev)
+			{
+				if(users.getUser(ev.getId()) == null) {
+					ev.setValid(false);
+					ev.setErrorMessage("Error, invalid ID number.");//Should not occur at runtime
+				} else {
+					if(users.getUser(ev.getId()).isStudent()) {
+						ev.setValid(false);
+						ev.setErrorMessage("Error, a student is selected.");//Should not occur at runtime
+					} else {
+						ArrayList<User> tempUsers = (ArrayList<User>) Arrays.asList(users.getUsers());
+						for(User u : Arrays.asList(users.getUsers())) {
+							if(u.isStudent()) {//Remove Students
+								tempUsers.remove(u);
+							} else if(u.isFaculty()) {//Remove faculty
+								tempUsers.remove(u);
+							} else if(u.getId() == ev.getId()) {//Remove user to be deleted
+								tempUsers.remove(u);
+							}
+						}
+						if(tempUsers.size() == 0) {
+							ev.setValid(false);
+							ev.setErrorMessage("Error, you must keep at least one administrative account at all times.");
+						} else {
+							try {
+								users.removeUser(ev.getId());
+								ev.setValid(true);
+							} catch(Exception e) {
+								ev.setValid(false);
+								ev.setErrorMessage("An unknown error occurred.  Please contact the developer for assistance.");//Should not occur at runtime
+							}
+						}
+					}
+				}
+			}
+		});
 	}
 	public void setStaffListeners() {
+		staffView.setListenerBack(new AdminBackListener(){
+			@Override
+			public void back(AdminBackEventObject ev) {
+				adminView.adminView(ev.getUser(), majors.getMajors(), courses.getCourses());
+			}
+		});
 		staffView.setListenerLogout(new LogoutListener()
 		{
 			@Override
@@ -851,7 +912,7 @@ public class SAINController
 			}
 		});
 	}
-	public void setModelListener()
+	public void setModelListeners()
 	{
 		users.setModelListener(new ModelListener(){
 			@Override
@@ -876,6 +937,19 @@ public class SAINController
 		});
 	}
 	public void loadData() throws ClassNotFoundException, IOException
+	{
+		loadBinData();
+	}
+	public void loadSqlData()
+	{
+		/*Connection conn = null;
+		try {
+			String userName = "root";
+			String password = "student";
+		}*/
+		
+	}
+	public void loadBinData() throws ClassNotFoundException, IOException
 	{
 		FileInputStream fileCourseIn;
 		FileInputStream fileUserIn;
@@ -935,6 +1009,15 @@ public class SAINController
 			loginView.newUser();
 	}
 	public boolean saveData()
+	{
+		return saveBinData();
+	}
+	public boolean saveSqlData()
+	{
+		boolean success = false;
+		return success;
+	}
+	public boolean saveBinData()
 	{
 		try 
 		{
