@@ -1,19 +1,29 @@
 package user;
 
 import java.util.ArrayList;
+import eventHandlers.ModelChangedEventObject;
+import eventHandlers.ModelListener;
 
 
 public class UserBag
 {
-	ArrayList<User> users = new ArrayList<User>();
+	private ArrayList<User> users = new ArrayList<User>();
+	private ModelListener listenerModel;
 	public void addUser(User user)
 	{
 		users.add(user);
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
 	public void addUser(User[] newUsers)
 	{
-		for(int i = 0; i < newUsers.length; i++)
+		for(int i = 0; i < newUsers.length; i++) {
 			users.add(newUsers[i]);
+		}
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
 	public User getUser(int id)
 	{
@@ -44,6 +54,9 @@ public class UserBag
 				users.remove(u);
 				break;
 			}
+		}
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
 	public User[] getUsers()
@@ -229,5 +242,18 @@ public class UserBag
 		}
 		return returnStudents.toArray(new Student[returnStudents.size()]);
 	}
-	
+	public Administrator[] getAdministrators()
+	{
+		ArrayList<Administrator> returnAdmins = new ArrayList<Administrator>();
+		for(User u : users)
+		{
+			if(u.isStudent()) {
+				returnAdmins.add((Administrator) u);//Safe to cast User to Student, because boolean value is hard coded in Student Class 
+			}
+		}
+		return returnAdmins.toArray(new Administrator[returnAdmins.size()]);
+	}
+	public void setModelListener(ModelListener listenerModel) {
+		this.listenerModel = listenerModel;
+	}
 }

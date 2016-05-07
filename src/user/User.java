@@ -21,6 +21,7 @@ public interface User extends Serializable
 	public String getState();
 	public Object getUser();
 	public LocalDate getDateOfBirth();
+	public String getPassword();
 	public int getBirthYear();
 	public void setUsername(String username);
 	public void setId(int id);

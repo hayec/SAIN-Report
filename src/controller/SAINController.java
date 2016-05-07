@@ -20,16 +20,22 @@ import eventHandlers.LoginEventObject;
 import eventHandlers.LoginListener;
 import eventHandlers.LogoutEventObject;
 import eventHandlers.LogoutListener;
+import eventHandlers.ModelChangedEventObject;
+import eventHandlers.ModelListener;
 import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.RemoveStudentEventObject;
+import eventHandlers.RemoveStudentListener;
 import eventHandlers.ReportEventObject;
 import eventHandlers.ReportListener;
 import eventHandlers.SAINEventObject;
 import eventHandlers.SAINListener;
 import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
+import eventHandlers.StaffEditEventObject;
+import eventHandlers.StaffEditListener;
 import javafx.stage.Stage;
 import report.Course;
 import report.CourseAttributes;
@@ -70,6 +76,7 @@ public class SAINController
 	User currentUser;
 	UserBag users = new UserBag();
 	CourseBag courses = new CourseBag();
+	MajorBag majors = new MajorBag();
 	public SAINController(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -78,8 +85,20 @@ public class SAINController
 		staffView = new StaffView(primaryStage);
 		adminView = new AdminView(primaryStage);
 		try{md = MessageDigest.getInstance("MD5");} catch(Exception e) {}
-		
-		/**********************Login Listeners**********************************/
+		setLoginListeners();
+		setAdminListeners();
+		setStaffListeners();
+		setStudentListeners();
+		try {
+			loadData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(!primaryStage.isShowing()) {
+			loginView.start();
+		}
+	}
+	public void setLoginListeners() {
 		loginView.setListenerAccount(new NewAccountListener()
 		{
 			@Override
@@ -96,7 +115,7 @@ public class SAINController
 					int id = generateId(false);
 					users.addUser(new Administrator(id, ev.getUsername(), new String(md.digest(ev.getPassword().getBytes())), "Default", ""));
 					currentUser = users.getUser(id);
-					adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
+					adminView.adminView((Administrator) currentUser.getUser(), majors.getMajors(), courses.getCourses());
 					saveData();
 				}
 			}
@@ -113,11 +132,11 @@ public class SAINController
 						ev.setCredentialsValid(true);
 						currentUser = users.getUser(ev.getUsername());
 						if(currentUser.isStudent())
-							studentView.studentStart(currentUser, (Student) currentUser, MajorBag.getMajors(), courses.getCourses());
+							studentView.studentStart(currentUser, (Student) currentUser, majors.getMajors(), courses.getCourses());
 						else if(currentUser.isFacutly())
-							staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
+							staffView.start(currentUser.isAdministrator(), currentUser, majors.getMajors());
 						else
-							adminView.adminView((Administrator) currentUser.getUser(), MajorBag.getMajors(), courses.getCourses());
+							adminView.adminView((Administrator) currentUser.getUser(), majors.getMajors(), courses.getCourses());
 					}
 					else
 						ev.setCredentialsValid(false);
@@ -128,25 +147,8 @@ public class SAINController
 				}
 			}
 		});
-		/**************Logout Listeners******************************************/
-		staffView.setListenerLogout(new LogoutListener()
-		{
-			@Override
-			public void logout(LogoutEventObject ev)
-			{
-				currentUser = null;
-				loginView.start();
-			}
-		});
-		studentView.setListenerLogout(new LogoutListener()
-		{
-			@Override
-			public void logout(LogoutEventObject ev)
-			{
-				currentUser = null;
-				loginView.start();
-			}
-		});
+	}
+	public void setAdminListeners() {
 		adminView.setListenerLogout(new LogoutListener()
 		{
 			@Override
@@ -156,63 +158,11 @@ public class SAINController
 				loginView.start();
 			}
 		});
-		/*********************Password Listeners*********************************/
-		staffView.setListenerPassword(new PasswordListener()
-		{
+		adminView.setListenerStudentSearch(new BackListener(){
 			@Override
-			public void changePassword(PasswordEventObject ev)
+			public void back(BackEventObject ev)
 			{
-				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
-				{
-					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
-						ev.setSuccessful(false);
-						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
-					}
-					else {
-						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
-							ev.setSuccessful(true);
-							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
-							saveData();
-						}
-						else {
-							ev.setSuccessful(false);
-							ev.setErrorMessage("Error, new passwords do not match!");
-						}
-					}
-				}
-				else {
-					ev.setSuccessful(false);
-					ev.setErrorMessage("Error, old password is incorrect!");
-				}
-			}
-		});
-		studentView.setListenerPassword(new PasswordListener()
-		{
-			@Override
-			public void changePassword(PasswordEventObject ev)
-			{
-				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
-				{
-					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
-						ev.setSuccessful(false);
-						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
-					}
-					else {
-						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
-							ev.setSuccessful(true);
-							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
-							saveData();
-						}
-						else {
-							ev.setSuccessful(false);
-							ev.setErrorMessage("Error, new passwords do not match!");
-						}
-					}
-				}
-				else {
-					ev.setSuccessful(false);
-					ev.setErrorMessage("Error, old password is incorrect!");
-				}
+				staffView.start(currentUser.isAdministrator(), currentUser, majors.getMajors());
 			}
 		});
 		adminView.setListenerPassword(new PasswordListener()
@@ -244,103 +194,6 @@ public class SAINController
 				}
 			}
 		});
-		/***************************Search Listeners*******************************************/
-		staffView.setListenerSearch(new SearchListener()
-		{
-			@Override
-			public void search(SearchEventObject ev)
-			{
-				if(!ev.getId().equals("") && ev.getId() != null) {
-					try{
-						Student[] student = new Student[1];
-						student[0] = (Student) users.getUser(Integer.parseInt(ev.getId()));
-						if(student[0] != null) {
-							ev.setStudentResults(student);
-							ev.setInputValid(true);
-							return;
-						}
-					}
-					catch(Exception e)
-					{
-						
-					}
-				}
-				if(!ev.getUsername().equals("") && ev.getUsername() != null) {
-					try{
-						Student[] student = new Student[1];
-						student[0] = (Student) users.getUser(ev.getUsername());
-						if(student[0] != null) {
-							ev.setStudentResults(student);
-							ev.setInputValid(true);
-							return;
-						}
-					}
-					catch(Exception e)
-					{
-						
-					}
-				}
-				Major tempMajor = null;
-				if(MajorBag.getMajor(ev.getMajor()) != null)
-					tempMajor = MajorBag.getMajor(ev.getMajor());
-				else if (ev.getMajor() != null && !ev.getMajor().equals("") && !ev.getMajor().equals("Undeclared"))
-					ev.setInputValid(false);
-				try {
-					if(Double.parseDouble(ev.getGpa()) <= 4.0 && Double.parseDouble(ev.getGpa()) >= 0)
-					{
-						if(ev.getZipCode().equals("") || ev.getZipCode() == null)
-						{
-							if(ev.getGpa().equals("") || ev.getGpa() == null)
-							{
-								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, -1, tempMajor, -1));
-								ev.setInputValid(true);
-							}
-							else
-							{
-								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
-								ev.setInputValid(true);
-							}
-						}
-						else if(ev.getGpa().equals("") || ev.getGpa() == null)
-						{
-							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, -1, tempMajor, -1));
-							ev.setInputValid(true);
-						}
-						else
-						{
-							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
-							ev.setInputValid(true);
-						}
-					}
-					else
-						ev.setInputValid(false);
-				}catch(Exception e){
-					ev.setInputValid(false);
-				}
-			}
-		});
-		studentView.setListenerBack(new BackListener()
-		{
-			public void back(BackEventObject ev)
-			{
-				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
-			}
-		});
-		adminView.setListenerStudentSearch(new BackListener(){
-			@Override
-			public void back(BackEventObject ev)
-			{
-				staffView.start(currentUser.isAdministrator(), currentUser, MajorBag.getMajors());
-			}
-		});
-		staffView.setListenerReport(new ReportListener(){
-			@Override
-			public void report(ReportEventObject ev)
-			{
-				studentView.studentStart(ev.getUser(), ev.getStudent(), MajorBag.getMajors(), courses.getCourses());
-			}
-		});
-		/***********************New Account Listeners*****************************************/
 		adminView.setListenerNewAccount(new CreateAccountListener(){
 			public void createAccount(CreateAccountEventObject ev)
 			{
@@ -432,10 +285,8 @@ public class SAINController
 					ev.setId(id);
 					ev.setValidAccount(true);
 				}
-				saveData();
 			}
 		});
-		/****************New Major/Course Listeners********************************************/
 		adminView.setListenerMajorAdd(new AddMajorListener(){
 			@Override
 			public void add(AddMajorEventObject ev)
@@ -443,7 +294,7 @@ public class SAINController
 				if(ev.getName().equals("") || ev.getName() == null) {
 					ev.setErrorMessage("Name cannot be left blank!");
 				}
-				if(MajorBag.getMajor(ev.getName()) != null)
+				if(majors.getMajor(ev.getName()) != null)
 				{
 					ev.setErrorMessage("Major already exists!");
 				}
@@ -486,32 +337,14 @@ public class SAINController
 					ev.setValid(false);
 				}
 				if(ev.isValid()) {
-					MajorBag.addMajor(new Major(ev.getName(), Integer.parseInt(ev.getPhysEdReq()), Integer.parseInt(ev.getHisReq()), Integer.parseInt(ev.getLabSciReq()),
+					majors.addMajor(new Major(ev.getName(), Integer.parseInt(ev.getPhysEdReq()), Integer.parseInt(ev.getHisReq()), Integer.parseInt(ev.getLabSciReq()),
 							Integer.parseInt(ev.getMathReq()), Integer.parseInt(ev.getHumReq()), Integer.parseInt(ev.getBusReq()), Integer.parseInt(ev.getEngReq()), 
 							Integer.parseInt(ev.getComReq()), Integer.parseInt(ev.getAmerHisReq()), Integer.parseInt(ev.getSocSciReq()), Integer.parseInt(ev.getLangReq()), 
 							Integer.parseInt(ev.getPhlReq()), Integer.parseInt(ev.getNumOfCreditsReq()), ev.getReqCourses()));
-					ev.setMajors(MajorBag.getMajors());
+					ev.setMajors(majors.getMajors());
 				}
 			}
 		});
-		studentView.setListenerSAIN(new SAINListener(){
-			@Override
-			public void getReport(SAINEventObject ev)
-			{
-				if(ev.getMajor().getName().equals("") || ev.getMajor().getName() == null)
-				{
-					ev.setErrorMessage("Error no major is selected.  Please select a major then try again.");
-				}
-				else
-				{
-					ev.setValid(true);
-					Student temp = ev.getStudent();//Change major if what-if analysis is selected
-					temp.setMajor(ev.getMajor());
-					studentView.studentView(ev.getUser(), temp, courses.getCourses());
-				}
-			}
-		});
-		
 		adminView.setListenerCourseAdd(new AddCourseListener(){
 			@Override
 			public void add(AddCourseEventObject ev) 
@@ -536,11 +369,345 @@ public class SAINController
 					courses.addCourse(c);
 					ev.setCourses(courses.getCourses());
 					ev.setValid(true);
-					saveData();
 				}
 			}
 		});
-		/****************Edit Listeners*******************************************************/
+		adminView.setListenerMajorDelete(new DeleteMajorListener() {
+			@Override
+			public void delete(DeleteMajorEventObject ev) {
+				majors.removeMajor(ev.getTarget().getName());
+				for(Student s : users.getStudents())//Set all students with deleted major as declared major to undeclared majors
+				{
+					if(s.getMajor().equals(ev.getTarget())) {
+						users.removeUser(s.getId());
+						Student temp = s.clone();
+						temp.setMajor(new Major());
+						users.addUser(temp);
+					}
+				}
+				ev.setMajors(majors.getMajors());
+			}
+		});
+		adminView.setListenerCourseDelete(new DeleteCourseListener() {
+			@Override
+			public void delete(DeleteCourseEventObject ev) {
+				courses.removeCourse(ev.getTarget().getCourseCode());
+				for(Course c : courses.getCourses()) {
+					Course courseTemp = c.clone();
+					for(String s : c.getPrerequisites()) {//Loop through and remove all prereqs which correspond to course being removed
+						if(s.equals(ev.getTarget().getCourseCode())) {
+							ArrayList<String> tempPre = (ArrayList<String>) Arrays.asList(courseTemp.getPrerequisites());//Create temporary arraylist to hold course prereqs
+							tempPre.remove(s);//Remove offending course
+							courseTemp.setPrerequisites(tempPre.toArray(new String[tempPre.size()]));//Reset prereqs
+						}
+					}
+					for(String s : c.getCorequisites()) {//Loop through and remove all coreqs which correspond to course being removed
+						if(s.equals(ev.getTarget().getCourseCode())) {
+							ArrayList<String> tempCo = (ArrayList<String>) Arrays.asList(courseTemp.getCorequisites());//Create temporary arraylist to hold course coreqs
+							tempCo.remove(s);//Remove offending course
+							courseTemp.setCorequisites(tempCo.toArray(new String[tempCo.size()]));//Reset coreqs
+						}
+					}
+					if(!courseTemp.equals(courseTemp)){//Only change if modifications were made
+						courses.removeCourse(c.getCourseCode());
+						courses.addCourse(courseTemp);
+					}
+				}
+				for(Major m : majors.getMajors()) {
+					for(Course c : m.getReqCourses()) {
+						if(c.getCourseCode().equals(ev.getTarget().getCourseCode()))
+						{
+							ArrayList<Course> tempCourse = (ArrayList<Course>) Arrays.asList(m.getReqCourses());//Create temporary arrayList
+							tempCourse.remove(c);//Remove offending course
+							m.setCoursesReq(tempCourse.toArray(new Course[tempCourse.size()]));//Reset major requirements
+						}
+					}
+				}
+				for(Student s : users.getStudents())
+				{
+					for(Course c : s.getCourseWork()) {
+						if(c.getCourseCode().equals(ev.getTarget().getCourseCode())) {
+							s.removeCourse(c);//Remove nonexistant course from record
+							users.removeUser(s.getId());//Remove old student from model
+							users.addUser(s);//Update model
+						}
+					}
+				}				
+				ev.setCourses(courses.getCourses());
+			}
+		});
+		adminView.setListenerEdit(new StaffEditListener(){
+			@Override
+			public void editStaff(StaffEditEventObject ev) {
+				if(!(ev.getPassword() == null || ev.getPassword().equals("")))
+				{
+					if(ev.getPassword().equals(ev.getPassword().toLowerCase()) || ev.getPassword().equals(ev.getPassword().toUpperCase()) || ev.getPassword().length() < 8 || ev.getPassword().length() > 32 || !ev.getPassword().matches(".*\\d.*"))
+					{
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
+						ev.setPassword(new String(md.digest(ev.getPassword().getBytes())));//If password is valid, set password to hashed password
+					}
+				} else {
+					ev.setPassword(users.getUser(ev.getId()).getPassword());//If password is blank, set password to current password
+				}
+				if(ev.getFirstName().equals("") || ev.getFirstName() == null) {
+					ev.setErrorMessage("First Name cannot be left blank");
+				}
+				if(ev.getLastName().equals("") || ev.getLastName() == null) {
+					ev.setErrorMessage("Last Name cannot be left blank");
+				}
+				int zipCode;
+				try {
+					zipCode = Integer.parseInt(ev.getZipCode());
+				} catch(Exception e) {
+					zipCode = -1;
+					ev.setErrorMessage("Zip code is formatted incorrectly.");
+				}
+				if(zipCode < 0 || zipCode > 99999) {
+					ev.setErrorMessage("Zip code must be a number between 00000 and 99999");
+				}
+				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
+					ev.setErrorMessage("New user must be at least 13 years old.");
+				}
+				if(!ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
+					ev.setErrorMessage("New user must not be more than 120 years old.");
+				}
+				if(users.getUser(ev.getUsername()) != null && users.getUser(ev.getUsername()).getId() != ev.getId()) {
+					ev.setErrorMessage("Username is already in use.  Please choose another username.");
+				}
+				if(ev.getUsername().equals("") || ev.getUsername() == null) {
+					ev.setErrorMessage("Username cannot be left blank");
+				}
+				if(ev.getErrorMessage().length() == 0) 
+				{
+					users.removeUser(ev.getId());
+					if(ev.isAdmin()) {
+						users.addUser(new Administrator(ev.getId(), ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocialSecNum(), ev.getUsername(), ev.getPassword()));
+					} else {
+						users.addUser(new Faculty(ev.getId(), ev.getFirstName(), ev.getLastName(), ev.getDateOfBirth(), ev.getAddress(), ev.getCity(), ev.getState(), zipCode, ev.getSocialSecNum(), ev.getUsername(), ev.getPassword()));
+					}
+				}
+			}
+		});
+		adminView.setListenerSearch(new SearchListener() {
+			@Override
+			public void search(SearchEventObject ev) 
+			{
+				if(!ev.getId().equals("") && ev.getId() != null) {
+					try{
+						User[] user = new User[1];
+						user[0] = (User) users.getUser(Integer.parseInt(ev.getId()));
+						if(user[0] != null && !user[0].isStudent()) {//If an admin or faculty user was found, then continue
+							ev.setUserResults(user);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+					catch(Exception e)
+					{
+						ev.setInputValid(false);//Should occur at runtime if id is not an integer
+					}
+				}
+				if(!ev.isInputValid()) {//Only try to find username if id was invalid
+					if(!ev.getUsername().equals("") && ev.getUsername() != null) {
+						User[] user = new User[1];
+						user[0] = (User) users.getUser(ev.getUsername());
+						if(user[0] != null && !user[0].isStudent()) {//If an admin or faculty user was found, then continue
+							ev.setUserResults(user);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+				}
+				if(!ev.isInputValid()) {//Only try to find based on other variables if username and id were invalid
+					try {
+						if(ev.getZipCode().equals("") || ev.getZipCode() == null)
+						{
+							ArrayList<User> tempReturnUsers = (ArrayList<User>) Arrays.asList(users.getUsers(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1));//Birth year left in for future expansion, it was decided to not be a useful feature
+							ArrayList<User> tempReturnUsersClone = (ArrayList<User>) tempReturnUsers.clone();//Cannot edit an arraylist while looping through it
+							for(User u : tempReturnUsers) {//Remove students from list
+								if(u.isStudent()) {
+									tempReturnUsersClone.remove(u);
+								}
+							}
+							ev.setUserResults(tempReturnUsersClone.toArray(new User[tempReturnUsersClone.size()]));
+							ev.setInputValid(true);
+						}
+						else
+						{
+							ArrayList<User> tempReturnUsers = (ArrayList<User>) Arrays.asList(users.getUsers(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1));//Birth year left in for future expansion, it was decided to not be a useful feature
+							ArrayList<User> tempReturnUsersClone = (ArrayList<User>) tempReturnUsers.clone();//Cannot edit an arraylist while looping through it
+							for(User u : tempReturnUsers) {
+								if(u.isStudent()) {
+									tempReturnUsersClone.remove(u);
+								}
+							}
+							ev.setUserResults(tempReturnUsersClone.toArray(new User[tempReturnUsersClone.size()]));
+							ev.setInputValid(true);
+						}
+					}catch(Exception e){
+						ev.setInputValid(false);//Should occur at runtime if zip code is not an int
+					}
+				}
+			}
+		});
+		adminView.setListenerAdmin(new AdminEditListener(){
+			@Override
+			public void verify(AdminEditEventObject ev) 
+			{
+				try {
+					int id = Integer.parseInt(ev.getId());
+					User user = users.getUser(id);
+					if(user == null) {//If null, then no user found
+						ev.setValid(false);
+					}
+					else if(user.isStudent()) {//Do not return students
+						ev.setValid(false);
+					}
+					else if(user.isAdministrator() || user.isFacutly()) {
+						ev.setUser(user);
+						ev.setUserValid(true);
+					}
+				} catch(Exception e) {
+					ev.setValid(false);
+				}
+			}
+		});
+	}
+	public void setStaffListeners() {
+		staffView.setListenerLogout(new LogoutListener()
+		{
+			@Override
+			public void logout(LogoutEventObject ev)
+			{
+				currentUser = null;
+				loginView.start();
+			}
+		});
+		staffView.setListenerPassword(new PasswordListener()
+		{
+			@Override
+			public void changePassword(PasswordEventObject ev)
+			{
+				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
+				{
+					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
+						ev.setSuccessful(false);
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
+						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							ev.setSuccessful(true);
+							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
+							saveData();
+						}
+						else {
+							ev.setSuccessful(false);
+							ev.setErrorMessage("Error, new passwords do not match!");
+						}
+					}
+				}
+				else {
+					ev.setSuccessful(false);
+					ev.setErrorMessage("Error, old password is incorrect!");
+				}
+			}
+		});
+		staffView.setListenerSearch(new SearchListener()
+		{
+			@Override
+			public void search(SearchEventObject ev)
+			{
+				if(!ev.getId().equals("") && ev.getId() != null) {
+					try{
+						Student[] student = new Student[1];
+						student[0] = (Student) users.getUser(Integer.parseInt(ev.getId()));
+						if(student[0] != null) {
+							ev.setStudentResults(student);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+					catch(Exception e)
+					{
+						
+					}
+				}
+				if(!ev.getUsername().equals("") && ev.getUsername() != null) {
+					try{
+						Student[] student = new Student[1];
+						student[0] = (Student) users.getUser(ev.getUsername());
+						if(student[0] != null) {
+							ev.setStudentResults(student);
+							ev.setInputValid(true);
+							return;
+						}
+					}
+					catch(Exception e)
+					{
+						
+					}
+				}
+				Major tempMajor = null;
+				if(majors.getMajor(ev.getMajor()) != null)
+					tempMajor = majors.getMajor(ev.getMajor());
+				else if (ev.getMajor() != null && !ev.getMajor().equals("") && !ev.getMajor().equals("Undeclared"))
+					ev.setInputValid(false);
+				try {
+					if(Double.parseDouble(ev.getGpa()) <= 4.0 && Double.parseDouble(ev.getGpa()) >= 0)
+					{
+						if(ev.getZipCode().equals("") || ev.getZipCode() == null)
+						{
+							if(ev.getGpa().equals("") || ev.getGpa() == null)
+							{
+								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, -1, tempMajor, -1));
+								ev.setInputValid(true);
+							}
+							else
+							{
+								ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), -1, ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
+								ev.setInputValid(true);
+							}
+						}
+						else if(ev.getGpa().equals("") || ev.getGpa() == null)
+						{
+							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, -1, tempMajor, -1));
+							ev.setInputValid(true);
+						}
+						else
+						{
+							ev.setStudentResults(users.getStudents(ev.getFirstName(), ev.getLastName(), ev.getSocSecNum(), ev.getAddress(), ev.getCity(), Integer.parseInt(ev.getZipCode()), ev.getState(), -1, Double.parseDouble(ev.getGpa()), tempMajor, -1));
+							ev.setInputValid(true);
+						}
+					}
+					else
+						ev.setInputValid(false);
+				}catch(Exception e){
+					ev.setInputValid(false);
+				}
+			}
+		});
+		staffView.setListenerReport(new ReportListener(){
+			@Override
+			public void report(ReportEventObject ev)
+			{
+				studentView.studentStart(ev.getUser(), ev.getStudent(), majors.getMajors(), courses.getCourses());
+			}
+		});
+		staffView.setListenerDelete(new RemoveStudentListener(){
+			@Override
+			public void removeStudent(RemoveStudentEventObject ev)
+			{
+				try{
+					users.removeUser(ev.getId());
+					ev.setValid(true);
+				} catch(Exception e) {
+					ev.setErrorMessage("Error, student doesn't exist.");
+					ev.setValid(false);
+				}
+			}
+		});
 		staffView.setListenerAdmin(new AdminEditListener()
 		{
 			@Override
@@ -619,80 +786,94 @@ public class SAINController
 				}
 			}
 		});
-		adminView.setListenerMajorDelete(new DeleteMajorListener() {
-			@Override
-			public void delete(DeleteMajorEventObject ev) {
-				MajorBag.removeMajor(ev.getTarget().getName());
-				for(Student s : users.getStudents())//Set all students with deleted major as declared major to undeclared majors
-				{
-					if(s.getMajor().equals(ev.getTarget())) {
-						users.removeUser(s.getId());
-						Student temp = s.clone();
-						temp.setMajor(new Major());
-						users.addUser(temp);
-					}
-				}
-				saveData();
-				ev.setMajors(MajorBag.getMajors());
-			}
-		});
-		adminView.setListenerCourseDelete(new DeleteCourseListener() {
-			@Override
-			public void delete(DeleteCourseEventObject ev) {
-				courses.removeCourse(ev.getTarget().getCourseCode());
-				for(Course c : courses.getCourses()) {
-					Course courseTemp = c.clone();
-					for(String s : c.getPrerequisites()) {//Loop through and remove all prereqs which correspond to course being removed
-						if(s.equals(ev.getTarget().getCourseCode())) {
-							ArrayList<String> tempPre = (ArrayList<String>) Arrays.asList(courseTemp.getPrerequisites());//Create temporary arraylist to hold course prereqs
-							tempPre.remove(s);//Remove offending course
-							courseTemp.setPrerequisites(tempPre.toArray(new String[tempPre.size()]));//Reset prereqs
-						}
-					}
-					for(String s : c.getCorequisites()) {//Loop through and remove all coreqs which correspond to course being removed
-						if(s.equals(ev.getTarget().getCourseCode())) {
-							ArrayList<String> tempCo = (ArrayList<String>) Arrays.asList(courseTemp.getCorequisites());//Create temporary arraylist to hold course coreqs
-							tempCo.remove(s);//Remove offending course
-							courseTemp.setCorequisites(tempCo.toArray(new String[tempCo.size()]));//Reset coreqs
-						}
-					}
-					if(!courseTemp.equals(courseTemp)){//Only change if modifications were made
-						courses.removeCourse(c.getCourseCode());
-						courses.addCourse(courseTemp);
-					}
-				}
-				for(Major m : MajorBag.getMajors()) {
-					for(Course c : m.getReqCourses()) {
-						if(c.getCourseCode().equals(ev.getTarget().getCourseCode()))
-						{
-							ArrayList<Course> tempCourse = (ArrayList<Course>) Arrays.asList(m.getReqCourses());//Create temporary arrayList
-							tempCourse.remove(c);//Remove offending course
-							m.setCoursesReq(tempCourse.toArray(new Course[tempCourse.size()]));//Reset major requirements
-						}
-					}
-				}
-				for(Student s : users.getStudents())
-				{
-					for(Course c : s.getCourseWork()) {
-						if(c.getCourseCode().equals(ev.getTarget().getCourseCode())) {
-							s.removeCourse(c);//Remove nonexistant course from record
-							users.removeUser(s.getId());//Remove old student from model
-							users.addUser(s);//Update model
-						}
-					}
-				}				
-				saveData();
-				ev.setCourses(courses.getCourses());
-			}
-		});
-		try {
-			loadData();
-		} catch (Exception e)
+	}
+	public void setStudentListeners() {
+		studentView.setListenerLogout(new LogoutListener()
 		{
-			e.printStackTrace();
-		}
-		if(!primaryStage.isShowing())
-			loginView.start();
+			@Override
+			public void logout(LogoutEventObject ev)
+			{
+				currentUser = null;
+				loginView.start();
+			}
+		});
+		studentView.setListenerPassword(new PasswordListener()
+		{
+			@Override
+			public void changePassword(PasswordEventObject ev)
+			{
+				if(currentUser.correctPassword(new String(md.digest(ev.getOldPassword().getBytes()))))
+				{
+					if(ev.getNewPassword().equals(ev.getNewPassword().toLowerCase()) || ev.getNewPassword().equals(ev.getNewPassword().toUpperCase()) || ev.getNewPassword().length() < 8 || ev.getNewPassword().length() > 32 || !ev.getNewPassword().matches(".*\\d.*")) {
+						ev.setSuccessful(false);
+						ev.setErrorMessage("Error, password must be between 8 and 32 characters long, and must\n contain a lowercase letter, an uppercase letter, and a number.");
+					}
+					else {
+						if(ev.getNewPassword().equals(ev.getNewPasswordConf())) {
+							ev.setSuccessful(true);
+							currentUser.setPassword(new String(md.digest(ev.getNewPassword().getBytes())));
+							saveData();
+						}
+						else {
+							ev.setSuccessful(false);
+							ev.setErrorMessage("Error, new passwords do not match!");
+						}
+					}
+				}
+				else {
+					ev.setSuccessful(false);
+					ev.setErrorMessage("Error, old password is incorrect!");
+				}
+			}
+		});
+		studentView.setListenerBack(new BackListener()
+		{
+			public void back(BackEventObject ev)
+			{
+				staffView.start(currentUser.isAdministrator(), currentUser, majors.getMajors());
+			}
+		});
+		studentView.setListenerSAIN(new SAINListener(){
+			@Override
+			public void getReport(SAINEventObject ev)
+			{
+				if(ev.getMajor().getName().equals("") || ev.getMajor().getName() == null)
+				{
+					ev.setErrorMessage("Error no major is selected.  Please select a major then try again.");
+				}
+				else
+				{
+					ev.setValid(true);
+					Student temp = ev.getStudent();//Change major if what-if analysis is selected
+					temp.setMajor(ev.getMajor());
+					studentView.studentView(ev.getUser(), temp, courses.getCourses());
+				}
+			}
+		});
+	}
+	public void setModelListener()
+	{
+		users.setModelListener(new ModelListener(){
+			@Override
+			public void modelChanged(ModelChangedEventObject ev)
+			{
+				saveData();
+			}
+		});
+		courses.setModelListener(new ModelListener(){
+			@Override
+			public void modelChanged(ModelChangedEventObject ev)
+			{
+				saveData();
+			}
+		});
+		majors.setModelListener(new ModelListener(){
+			@Override
+			public void modelChanged(ModelChangedEventObject ev)
+			{
+				saveData();
+			}
+		});
 	}
 	public void loadData() throws ClassNotFoundException, IOException
 	{
@@ -742,7 +923,7 @@ public class SAINController
 			while(loop)
 			{
 				try {
-				MajorBag.addMajor((Major) objMajorIn.readObject());
+				majors.addMajor((Major) objMajorIn.readObject());
 				} catch(Exception e) {
 					loop = false;
 				}
@@ -772,7 +953,7 @@ public class SAINController
 			for(User u : users.getUsers()) {
 				userOut.writeObject(u);
 			}
-			for(Major m : MajorBag.getMajors()) {
+			for(Major m : majors.getMajors()) {
 				majorOut.writeObject(m);
 			}		
 			courseOut.close();

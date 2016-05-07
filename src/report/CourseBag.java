@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import eventHandlers.ModelChangedEventObject;
+import eventHandlers.ModelListener;
 import user.User;
 
 public class CourseBag implements Serializable 
 {
+	private ModelListener listenerModel;
 	private ArrayList<Course> courses = new ArrayList<Course>();
 	public CourseBag() {}
 	public CourseBag(Course[] newCourses)
@@ -20,11 +23,18 @@ public class CourseBag implements Serializable
 	public void addCourse(Course course)
 	{
 		courses.add(course);
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
 	public void addCourse(Course[] newCourses)
 	{
-		for(int i = 0; i < newCourses.length; i++)
+		for(int i = 0; i < newCourses.length; i++) {
 			courses.add(newCourses[i]);
+		}
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
 	public Course getCourse(String courseCode)
 	{
@@ -44,6 +54,9 @@ public class CourseBag implements Serializable
 			{
 				courses.remove(c);
 			}
+		}
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
 	public Course[] getCourses()
@@ -243,5 +256,8 @@ public class CourseBag implements Serializable
 		}
 		returnCourse = courseResults.toArray(new Course[courseResults.size()]);
 		return returnCourse;
+	}
+	public void setModelListener(ModelListener listenerModel) {
+		this.listenerModel = listenerModel;
 	}
 }

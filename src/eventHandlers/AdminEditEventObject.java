@@ -2,11 +2,14 @@ package eventHandlers;
 
 import java.util.EventObject;
 import user.Student;
+import user.User;
 
 public class AdminEditEventObject extends EventObject 
 {
 	private String id;
 	private Student student;
+	private User user;
+	private boolean userValid = false;
 	private boolean valid = false;
 	private String errorMessage = new String();
 	public AdminEditEventObject(Object source, String id)
@@ -39,5 +42,17 @@ public class AdminEditEventObject extends EventObject
 	}
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	public boolean isUserValid() {
+		return userValid;
+	}
+	public void setUserValid(boolean userValid) {
+		this.userValid = userValid;
 	}
 }

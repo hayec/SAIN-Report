@@ -2,22 +2,30 @@ package user;
 
 import java.util.ArrayList;
 
+import eventHandlers.ModelChangedEventObject;
+import eventHandlers.ModelListener;
 import report.Course;
 
 public class MajorBag 
 {
-	public static ArrayList<Major> majors = new ArrayList<Major>();
-	public static void addMajor(Major major)
+	private ArrayList<Major> majors = new ArrayList<Major>();
+	private ModelListener listenerModel; 
+	public void addMajor(Major major)
 	{
 		majors.add(major);
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
-	public static void addMajor(Major[] newMajors)
+	public void addMajor(Major[] newMajors)
 	{
 		for(int i = 0; i < newMajors.length; i++)
 			majors.add(newMajors[i]);
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
-	
-	public static Major getMajor(String major)
+	public Major getMajor(String major)
 	{
 		Major returnMajor = null;
 		for(Major m : majors)
@@ -30,7 +38,7 @@ public class MajorBag
 		}
 		return returnMajor;
 	}
-	public static void removeMajor(String major)
+	public void removeMajor(String major)
 	{
 		for(Major m : majors)
 		{
@@ -39,16 +47,23 @@ public class MajorBag
 				majors.remove(m);
 			}
 		}
+		if(listenerModel != null) {
+			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		}
 	}
-	public static Major[] getMajors()
+	public Major[] getMajors()
 	{
 		return majors.toArray(new Major[majors.size()]);
 	}
-	public static String[] getMajorNames()
+	public String[] getMajorNames()
 	{
 		ArrayList<String> majorNames = new ArrayList<String>();
 		for(Major m : majors)
 			majorNames.add(m.getName());
 		return majorNames.toArray(new String[majorNames.size()]);
+	}
+	public void setModelListener(ModelListener listenerModel)
+	{
+		this.listenerModel = listenerModel;
 	}
 }

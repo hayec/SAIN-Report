@@ -1,10 +1,8 @@
 package eventHandlers;
 
-import java.time.LocalDate;
 import java.util.EventObject;
-
-import user.Major;
 import user.Student;
+import user.User;
 
 public class SearchEventObject extends EventObject 
 {
@@ -20,7 +18,9 @@ public class SearchEventObject extends EventObject
 	private String gpa;
 	private String username;
 	private Student[] studentResults;
+	private User[] userResults;
 	private boolean inputValid = false;
+	private String errorMessage = new String();
 	public SearchEventObject(Object source)
 	{
 		super(source);
@@ -38,6 +38,19 @@ public class SearchEventObject extends EventObject
 		this.socSecNum = socSecNum;
 		this.major = major;
 		this.gpa = gpa;
+		this.username = username;
+	}
+	public SearchEventObject(Object source, String id, String firstName, String lastName, String address, String city, String state, String zipCode, String socSecNum, String username)
+	{
+		super(source);
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.city = city;
+		this.state = state;
+		this.zipCode = zipCode;
+		this.socSecNum = socSecNum;
 		this.username = username;
 	}
 	public String getUsername()
@@ -96,10 +109,19 @@ public class SearchEventObject extends EventObject
 	{
 		return studentResults;
 	}
+	public User[] getUserResults() {
+		return userResults;
+	}
+	public void setUserResults(User[] userResults) {
+		this.userResults = userResults;
+	}
 	public void setStudentResults(Student[] studentResults) {
 		this.studentResults = studentResults;
 	}
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 }
-
-/*String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear, int gpa, Major major, int yearEnrolled
-*/

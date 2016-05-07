@@ -11,6 +11,8 @@ import eventHandlers.LogoutEventObject;
 import eventHandlers.LogoutListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.RemoveStudentEventObject;
+import eventHandlers.RemoveStudentListener;
 import eventHandlers.ReportEventObject;
 import eventHandlers.ReportListener;
 import eventHandlers.SAINListener;
@@ -48,6 +50,7 @@ public class StaffView
 	AdminEditListener listenerAdmin;
 	EditListener listenerEdit;
 	ReportListener listenerReport;
+	RemoveStudentListener listenerDelete;
 	public StaffView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -188,15 +191,19 @@ public class StaffView
 		Button btnSelect = new Button("Select Student");
 		Button btnClear = new Button("Clear");
 		Button btnEdit = new Button("Edit Student Data");
+		Button btnBack = new Button("Back");
 		HBox hbxButtons = new HBox();
 		if(admin)
-			hbxButtons.getChildren().addAll(btnClear, btnSearch, btnSelect, btnEdit);
+			hbxButtons.getChildren().addAll(btnBack, btnClear, btnSearch, btnSelect, btnEdit);
 		else
 			hbxButtons.getChildren().addAll(btnClear, btnSearch, btnSelect);
 		if(!admin)//Don't allow faculty to edit student data
 			btnEdit.setVisible(false);
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
+		btnBack.setOnAction(e->{
+			
+		});
 		btnSearch.setOnAction(e->{
 			lstStudents.getItems().clear();
 			SearchEventObject ev = new SearchEventObject(btnSearch, txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), cmbMajor.getValue().getName(), txtGPA.getText(), txtUsername.getText());
@@ -447,11 +454,12 @@ public class StaffView
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Student Data");
 		Button btnClear = new Button("Clear");
+		Button btnDelete = new Button("Delete Student");
 		HBox hbxButtons = new HBox();
 		btnBack.setOnAction(e->{
 			start(true, user, majors);
 		});
-		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
+		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear, btnDelete);
 		btnEdit.setOnAction(e->{
 			try
 			{
@@ -488,6 +496,18 @@ public class StaffView
 			txtPassword.clear();
 			txtUsername.clear();
 		});
+		btnDelete.setOnAction(e->{
+			RemoveStudentEventObject ev = new RemoveStudentEventObject(btnDelete, student.getId());
+			if(listenerDelete != null) {
+				listenerDelete.removeStudent(ev);
+			}
+			if(!ev.isValid()) {
+				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+				alert.showAndWait();
+			} else {
+				start(true, user, majors);
+			}
+		});
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		VBox pane = new VBox();
@@ -522,6 +542,9 @@ public class StaffView
 	public void setListenerEdit(EditListener listenerEdit)
 	{
 		this.listenerEdit = listenerEdit;
+	}
+	public void setListenerDelete(RemoveStudentListener listenerDelete) {
+		this.listenerDelete = listenerDelete;
 	}
 	public String parseId(int id)
 	{

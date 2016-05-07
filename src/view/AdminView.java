@@ -17,9 +17,15 @@ import eventHandlers.NewAccountEventObject;
 import eventHandlers.NewAccountListener;
 import eventHandlers.PasswordEventObject;
 import eventHandlers.PasswordListener;
+import eventHandlers.ReportEventObject;
+import eventHandlers.SearchEventObject;
 import eventHandlers.SearchListener;
+import eventHandlers.StaffEditEventObject;
+import eventHandlers.StaffEditListener;
 import eventHandlers.DeleteCourseEventObject;
 import eventHandlers.AddMajorListener;
+import eventHandlers.AdminEditEventObject;
+import eventHandlers.AdminEditListener;
 import eventHandlers.AddCourseEventObject;
 import eventHandlers.AddCourseListener;
 import eventHandlers.AddMajorEventObject;
@@ -59,6 +65,9 @@ public class AdminView
 	DeleteMajorListener listenerMajorDelete;
 	DeleteCourseListener listenerCourseDelete;
 	BackListener listenerStudentSearch;
+	StaffEditListener listenerEdit;
+	SearchListener listenerSearch;
+	AdminEditListener listenerAdmin;
 	Major[] majors;
 	Course[] courses;
 	public AdminView(Stage primaryStage)
@@ -173,7 +182,140 @@ public class AdminView
 		});
 		btnSearchAdmin.setOnAction(e->
 		{
-			
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			HBox hbxAccount = new HBox();
+			hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);//Use logout functionality from parent
+			hbxAccount.setAlignment(Pos.TOP_RIGHT);
+			Label lblID = new Label("ID # : ");
+			grid.add(lblID,  0, 0);
+			TextField txtID = new TextField();
+			grid.add(txtID,  1, 0);
+			Label lblFirstName = new Label("First Name : ");
+			grid.add(lblFirstName,  0, 1);
+			TextField txtFirstName = new TextField();
+			grid.add(txtFirstName,  1, 1);
+			Label lblLastName = new Label("Last Name : ");
+			grid.add(lblLastName,  0, 2);
+			TextField txtLastName = new TextField();
+			grid.add(txtLastName,  1, 2);
+			Label lblAddress = new Label("Address : ");
+			grid.add(lblAddress,  0, 3);
+			TextField txtAddress = new TextField();
+			grid.add(txtAddress,  1, 3);
+			Label lblCity = new Label("City : ");
+			grid.add(lblCity,  0, 4);
+			TextField txtCity = new TextField();
+			grid.add(txtCity,  1, 4);
+			Label lblZipCode = new Label("Zip Code : ");
+			grid.add(lblZipCode,  0, 5);
+			TextField txtZipCode = new TextField();
+			grid.add(txtZipCode,  1, 5);
+			Label lblState = new Label("State : ");
+			grid.add(lblState,  0, 6);
+			TextField txtState = new TextField();
+			grid.add(txtState,  1, 6);
+			Label lblSSN = new Label("Social Security # : ");
+			grid.add(lblSSN,  0, 7);
+			TextField txtSSN = new TextField();
+			grid.add(txtSSN,  1, 7);
+			Label lblUsername = new Label("Username : ");
+			grid.add(lblUsername,  0, 8);
+			TextField txtUsername = new TextField();
+			grid.add(txtUsername,  1, 8);
+			Label lblUsers = new Label("Results : ");
+			grid.add(lblUsers,  0, 9);
+			ListView<User> lstUsers = new ListView<User>();
+			grid.add(lstUsers, 0, 10);
+			lstUsers.setMaxHeight(300);
+			lstUsers.setMaxWidth(600);
+			grid.setAlignment(Pos.CENTER);
+			Button btnSearch = new Button("Search");
+			Button btnClear = new Button("Clear");
+			Button btnEdit = new Button("Edit User Data");
+			Button btnBack = new Button("Back");
+			HBox hbxButtons = new HBox();
+			hbxButtons.getChildren().addAll(btnBack, btnClear, btnSearch, btnEdit);
+			hbxButtons.setAlignment(Pos.CENTER);
+			hbxButtons.setSpacing(20);
+			btnBack.setOnAction(ea->{
+				
+			});
+			btnSearch.setOnAction(ea->{
+				lstUsers.getItems().clear();
+				SearchEventObject ev = new SearchEventObject(btnSearch, txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), txtUsername.getText());
+				if(listenerSearch != null)
+				{
+					listenerSearch.search(ev);
+					if(ev.isInputValid())
+					{
+						if(ev.getUserResults().length == 0)
+						{
+							Alert alert = new Alert(AlertType.INFORMATION, "No users were found with the specified search terms.", ButtonType.OK);
+							alert.showAndWait();
+						}
+						else
+						{
+							for(int i = 0; i < ev.getUserResults().length; i++)
+							{
+								lstUsers.getItems().add(ev.getUserResults()[i]);
+							}
+						}
+					}
+					else
+					{
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage() , ButtonType.OK);
+						alert.showAndWait();
+					}
+				}
+			});
+			lstUsers.setOnMouseClicked(ea->{
+				if(lstUsers.getSelectionModel().getSelectedItem() != null) {
+					User tempUser = lstUsers.getSelectionModel().getSelectedItem();
+					txtID.setText(parseId(tempUser.getId()));
+					txtFirstName.setText(tempUser.getFirstName());
+					txtLastName.setText(tempUser.getLastName());
+					txtAddress.setText(tempUser.getAddress());
+					txtCity.setText(tempUser.getCity());
+					txtZipCode.setText(Integer.toString(tempUser.getZipCode()));
+					txtState.setText(tempUser.getState());
+					txtSSN.setText(tempUser.getSocialSecNum());
+					txtUsername.setText(tempUser.getUsername());
+				}
+			});
+			btnEdit.setOnAction(ea->{
+				AdminEditEventObject ev = new AdminEditEventObject(btnEdit, txtID.getText());
+				if(listenerAdmin != null)
+					listenerAdmin.verify(ev);
+				if(ev.isUserValid())
+					editFacultyView(ev.getUser(), user);
+				else
+				{
+					Alert alert = new Alert(AlertType.ERROR, "Error!  Invalid ID detected!  Please enter a valid ID, then try again.", ButtonType.OK);
+					alert.showAndWait();
+				}
+			});
+			btnClear.setOnAction(ea->{
+				txtID.clear();
+				txtFirstName.clear();
+				txtLastName.clear();
+				txtAddress.clear();
+				txtCity.clear();
+				txtZipCode.clear();
+				txtState.clear();
+				txtSSN.clear();
+				lstUsers.getItems().clear();
+			});
+			VBox pane = new VBox();
+			pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+			pane.setAlignment(Pos.CENTER);
+			pane.setSpacing(20);
+			Scene scene = new Scene(pane, 800, 1100);
+			Stage editStage = new Stage();
+			editStage.setScene(scene);
+			editStage.setTitle("Edit User Data");
+			editStage.show();
 		});
 		btnSearchStudents.setOnAction(e->
 		{
@@ -458,8 +600,8 @@ public class AdminView
 			grid.add(lblMajor,  0, ++line);	
 			grid.add(cmbMajor,  1, line);
 		}
-		for(int i = 0; i < MajorBag.getMajors().length; i++)
-			cmbMajor.getItems().add(MajorBag.getMajors()[i]);
+		for(int i = 0; i < majors.length; i++)
+			cmbMajor.getItems().add(majors[i]);
 		if(cmbMajor.getItems().size() == 0)
 		{
 			cmbMajor.getItems().add(new Major());
@@ -1050,14 +1192,18 @@ public class AdminView
 		grid.add(lblSSN,  0, 8);
 		TextField txtSSN = new TextField();
 		grid.add(txtSSN,  1, 8);
+		Label lblUsername = new Label("Username : ");
+		grid.add(lblUsername,  0, 9);
+		TextField txtUsername = new TextField();
+		grid.add(txtUsername,  1, 9);
 		Label lblBirthDate = new Label("Birth Date : ");
-		grid.add(lblBirthDate,  0, 11);
+		grid.add(lblBirthDate,  0, 10);
 		DatePicker dtpBirthDate = new DatePicker();
-		grid.add(dtpBirthDate,  1, 11);
+		grid.add(dtpBirthDate,  1, 10);
 		Label lblPassword = new Label("Password : ");
-		grid.add(lblPassword, 0, 13);
+		grid.add(lblPassword, 0, 11);
 		PasswordField txtPassword = new PasswordField();
-		grid.add(txtPassword, 1, 13);
+		grid.add(txtPassword, 1, 11);
 		grid.setAlignment(Pos.CENTER);
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Faculty Data");
@@ -1076,19 +1222,18 @@ public class AdminView
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnEdit, btnClear);
 		btnEdit.setOnAction(e->{
-		/*	try
+			StaffEditEventObject ev = new StaffEditEventObject(btnEdit, txtUsername.getText(), user.getId(), txtFirstName.getText(), txtLastName.getText(), dtpBirthDate.getValue(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), txtPassword.getText(), user.isAdministrator());
+			if(listenerEdit != null)
+				listenerEdit.editStaff(ev);
+			if(!ev.isValid())
 			{
-				if(Integer.parseInt(txtZipCode.getText()) > 99999 || Integer.parseInt(txtZipCode.getText()) < 0)
-					throw new IllegalArgumentException();
-				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), MajorBag.getMajor(cmbMajor.getValue())));
-				if(listenerEdit != null)
-					listenerEdit.edit(ev);
-			}
-			catch(IllegalArgumentException ie)
-			{
-				Alert alert = new Alert(AlertType.ERROR, "Error, zip code is invalid.", ButtonType.OK);
+				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 				alert.showAndWait();
-			}*/
+			}
+			else
+			{
+				adminView(admin, majors, courses);//If valid, go back to default control panel
+			}
 		});
 		btnClear.setOnAction(e->{
 			txtFirstName.clear();
@@ -1099,6 +1244,8 @@ public class AdminView
 			txtState.clear();
 			txtSSN.clear();
 			dtpBirthDate.setValue(LocalDate.now());
+			txtPassword.clear();
+			txtUsername.clear();
 		});
 		VBox pane = new VBox();
 		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
@@ -1134,6 +1281,15 @@ public class AdminView
 	}
 	public void setListenerStudentSearch(BackListener listenerStudentSearch) {
 		this.listenerStudentSearch = listenerStudentSearch;
+	}
+	public void setListenerEdit(StaffEditListener listenerEdit) {
+		this.listenerEdit = listenerEdit;
+	}
+	public void setListenerSearch(SearchListener listenerSearch) {
+		this.listenerSearch = listenerSearch;
+	}
+	public void setListenerAdmin(AdminEditListener listenerAdmin) {
+		this.listenerAdmin = listenerAdmin;
 	}
 	public String parseId(int id)
 	{
