@@ -1,5 +1,6 @@
 package view;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -58,6 +59,7 @@ public class StaffView
 	RemoveStudentListener listenerDelete;
 	AdminBackListener listenerBack;
 	Course[] courses;
+	private DecimalFormat format = new DecimalFormat("#.00");
 	public StaffView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -161,8 +163,9 @@ public class StaffView
 					}
 					else
 					{
-						for(int i = 0; i < ev.getStudentResults().length; i++)
+						for(int i = 0; i < ev.getStudentResults().length; i++) {
 							lstStudents.getItems().add(ev.getStudentResults()[i]);
+						}
 					}
 				}
 				else
@@ -187,7 +190,11 @@ public class StaffView
 				txtCity.setText(tempStudent.getCity());
 				txtZipCode.setText(Integer.toString(tempStudent.getZipCode()));
 				txtState.setText(tempStudent.getState());
-				txtGPA.setText(Double.toString(tempStudent.getGpa()));
+				if(tempStudent.getGpa() >= 0 && tempStudent.getGpa() <= 4) {
+					txtGPA.setText(format.format(tempStudent.getGpa()));//Only display GPA if it is set
+				} else {
+					txtGPA.setText("");//Otherwise set to blank
+				}
 				txtSSN.setText(tempStudent.getSocialSecNum());
 				cmbMajor.setValue(tempStudent.getMajor());
 				txtUsername.setText(tempStudent.getUsername());

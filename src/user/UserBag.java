@@ -11,15 +11,19 @@ public class UserBag
 	private ModelListener listenerModel;
 	public void addUser(User user)
 	{
-		users.add(user);
-		if(listenerModel != null) {
-			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+		if(user != null) {
+			users.add(user);
+			if(listenerModel != null) {
+				listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
+			}
 		}
 	}
 	public void addUser(User[] newUsers)
 	{
 		for(int i = 0; i < newUsers.length; i++) {
-			users.add(newUsers[i]);
+			if(newUsers[i] != null) {
+				users.add(newUsers[i]);
+			}
 		}
 		if(listenerModel != null) {
 			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
@@ -30,8 +34,10 @@ public class UserBag
 		User returnUser = null;
 		for(User u : users)
 		{
-			if(u.getId() == id)
+			if(u.getId() == id) {
 				returnUser = u;
+				break;
+			}
 		}
 		return returnUser;
 	}
@@ -40,8 +46,10 @@ public class UserBag
 		User returnUser = null;
 		for(User u : users)
 		{
-			if(u.getUsername().equals(username))
+			if(u.getUsername().equals(username)) {
 				returnUser = u;
+				break;
+			}
 		}
 		return returnUser;
 	}
@@ -136,7 +144,7 @@ public class UserBag
 		ArrayList<Student> tempStudent = new ArrayList<Student>();
 		for(User u : users)
 			if(u.isStudent())
-				studentResults.add((Student) u.getUser());	
+				studentResults.add((Student) u);	
 		if(!firstName.equals("") && !firstName.equals(null))
 			for(Student u : studentResults)
 				if(!u.getFirstName().equals(firstName))

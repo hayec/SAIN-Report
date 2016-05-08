@@ -43,12 +43,14 @@ public class StudentView
 	BackListener listenerBack;
 	SAINListener listenerSAIN;
 	Major[] majorCache;
+	Major studentMajor;
 	public StudentView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
 	}
 	public void studentStart(User user, Student student, Major[] majors, Course[] allCourses)
 	{
+		studentMajor = student.getMajor();//Save so it can be reset after What-If Analysis
 		majorCache = majors;
 		Label lblCurrentMajor = new Label("Your currently declared major is : " + student.getMajor());
 		Label lblMajor = new Label("Please select a major to continue : ");
@@ -60,7 +62,7 @@ public class StudentView
 		hbxInput.getChildren().addAll(lblMajor, cmbMajor);
 		hbxInput.setAlignment(Pos.CENTER);
 		hbxInput.setSpacing(15);
-		Button btnContinue = new Button("Continue");
+		Button btnContinue = new Button("Continue(What-If Analysis)");
 		btnContinue.setOnAction(e->{
 			SAINEventObject ev = new SAINEventObject(btnContinue, cmbMajor.getSelectionModel().getSelectedItem(), user, student);
 			if(listenerSAIN != null) {
@@ -125,13 +127,13 @@ public class StudentView
 			lstCoursesFailed.getItems().add(student.getFailedCourses()[i]);
 		for(int i = 0; i < student.getMajor().getCoursesReq(student).length; i++)
 			lstCoursesNeeded.getItems().add(student.getMajor().getCoursesReq(student)[i]);
-		for(int i = 0; i < student.getCourseWork().length; i++)
+		/*for(int i = 0; i < student.getCourseWork().length; i++)
 		{
 			if(student.getCourseWork()[i].isSuccessful())
 				lstCoursesPassed.getItems().add(student.getCourseWork()[i]);
 			else
 				lstCoursesFailed.getItems().add(student.getCourseWork()[i]);
-		}
+		}*/
 		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
 		Button btnBack = new Button("Back");
 		btnBack.setOnAction(e->
@@ -161,6 +163,7 @@ public class StudentView
 		grid.add(lstCoursesNeeded, 3, 4);
 		grid.add(lblSemestersNeeded, 0, 5);
 		grid.add(btnBack, 0, 6);
+		grid.setAlignment(Pos.CENTER);
 		VBox pane = new VBox();
 		pane.getChildren().addAll(logoutHBox(user), grid);
 		pane.setAlignment(Pos.CENTER);

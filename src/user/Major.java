@@ -70,7 +70,7 @@ public class Major implements Serializable
 		{
 			for(int j = 0; j < reqCourses.length; j++)
 			{
-				if(reqCourses[j].equals(studentCourses.get(i)))//Make equals method
+				if(reqCourses[j].getCourseCode().equals(studentCourses.get(i).getCourseCode()))//Make equals method
 					returnCourse.add(studentCourses.get(i));
 			}
 		}
@@ -181,7 +181,7 @@ public class Major implements Serializable
 				if(c.getPrerequisites() != null)
 					for(int i = 0; i < c.getPrerequisites().length; i++) {
 						try{
-							if(!student.courseWork.getCourse(c.getPrerequisites()[i]).isSuccessful()) {
+							if(!student.getCourseBag().getCourse(c.getPrerequisites()[i]).isSuccessful()) {
 								temp.add(courses.getCourse(c.getPrerequisites()[i]));
 							}
 						}catch(Exception e) {

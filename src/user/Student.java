@@ -23,7 +23,7 @@ public class Student implements User, Serializable
 	private String campus;
 	private Major major;
 	private String password;//Note that this is NOT the plain text, rather it is the 128-bit MD5 hash
-	public CourseBag courseWork = new CourseBag();
+	private CourseBag courseWork = new CourseBag();
 	public Student(int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, int zipCode, String state, String campus, Major major)
 	{
 		this.id = id;
@@ -54,6 +54,9 @@ public class Student implements User, Serializable
 		this.campus = campus;
 		this.username = username;
 		this.password = password;
+	}
+	public CourseBag getCourseBag() {
+		return courseWork;
 	}
 	public Student clone()
 	{
@@ -134,8 +137,9 @@ public class Student implements User, Serializable
 	public double getGpa() 
 	{
 		double gpa = 0;
-		for(Course c : courseWork.getCourses())
+		for(Course c : courseWork.getCourses()) {
 			gpa += c.getCourseGrade() * c.getCredits();
+		}
 		gpa /= numOfCredits();
 		return gpa;
 	}
@@ -258,7 +262,11 @@ public class Student implements User, Serializable
 	{
 		int credits = 0;
 		for(Course c : courseWork.getCourses())
-			credits += c.getCredits();
+		{
+			if(c.isSuccessful()) {
+				credits += c.getCredits();
+			}
+		}
 		return credits;
 	}
 	public Course[] getPassedCourses()

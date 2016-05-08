@@ -461,7 +461,11 @@ public class SAINController
 								tempPre.add(tempPre1.get(i));
 							}
 							tempPre.remove(s);//Remove offending course
-							courseTemp.setPrerequisites(tempPre.toArray(new String[tempPre.size()]));//Reset prereqs
+							if(tempPre.size() == 0) {
+								courseTemp.setPrerequisites(new String[0]);//Set to String[0] instead of null if no prereqs are left
+							} else {
+								courseTemp.setPrerequisites(tempPre.toArray(new String[tempPre.size()]));//Reset prereqs
+							}
 						}
 					}
 					for(String s : c.getCorequisites()) {//Loop through and remove all coreqs which correspond to course being removed
@@ -472,7 +476,11 @@ public class SAINController
 								tempCo.add(tempCo1.get(i));
 							}
 							tempCo.remove(s);//Remove offending course
-							courseTemp.setCorequisites(tempCo.toArray(new String[tempCo.size()]));//Reset coreqs
+							if(tempCo.size() == 0) {
+								courseTemp.setCorequisites(new String[0]);//Set to String[0] instead of null if no coreqs are left
+							} else {
+								courseTemp.setCorequisites(tempCo.toArray(new String[tempCo.size()]));//Reset coreqs
+							}	
 						}
 					}
 					if(!courseTemp.equals(courseTemp)){//Only change if modifications were made
@@ -900,7 +908,7 @@ public class SAINController
 				}
 				else
 				{
-					ev.setPassword(((Student) users.getUser(ev.getId()).getUser()).getPassword()); 
+					ev.setPassword(users.getUser(ev.getId()).getPassword()); 
 				}
 				if(ev.getFirstName() == null || ev.getFirstName().equals("")) {
 					ev.setErrorMessage("First Name cannot be left blank");

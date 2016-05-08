@@ -80,30 +80,37 @@ public class Course implements Serializable
 			return "D";
 		case 0:
 			return "F";
-		default:
-			return "F";//Necessary to prevent exception, should never occur at runtime
 		}
+		return "F";//Necessary to prevent exception, should never occur at runtime
 	}
 	public void setCourseGrade(String grade) {
 		switch(grade) {
 		case "A":
 			courseGrade = 4.0;
+			break;
 		case "B+":
 			courseGrade = 3.5;
+			break;
 		case "B":
 			courseGrade = 3.0;
+			break;
 		case "C+":
 			courseGrade = 2.5;
+			break;
 		case "C":
 			courseGrade = 2.0;
+			break;
 		case "D+":
 			courseGrade = 1.5;
+			break;
 		case "D":
 			courseGrade = 1.0;
+			break;
 		case "F":
 			courseGrade = 0.0;
-		default:
-			courseGrade = 4.0;//Necessary to prevent exception, should never occur at runtime
+			break;
+		default :
+			courseGrade = 4.0;
 		}
 	}
 	public String getCourseCode() 
@@ -211,12 +218,42 @@ public class Course implements Serializable
 	}
 	public String toString()
 	{
-		return courseCode + " " + courseTitle + " " + credits + " credits";
+		if(courseCode != null) {
+			return courseCode + " " + courseTitle + " " + credits + " credits";
+		}
+		else {
+			if(CAttributes.isAmerHis()) {
+				return "American History Elective";
+			} else if (CAttributes.isBusiness()) {
+				return "Business Elective";
+			} else if (CAttributes.isCommunications()) {
+				return "Communications Elective";
+			} else if (CAttributes.isEnglish())  {
+				return "English Elective";
+			} else if (CAttributes.isHistory()) {
+				return "History Elective";
+			} else if (CAttributes.isHumanities()) {
+				return "Humanities Elective";
+			} else if (CAttributes.isLabScience()) {
+				return "Lab Science Elective";
+			} else if (CAttributes.isLanguage()) {
+				return "Language Elective";
+			} else if (CAttributes.isMath()) {
+				return "Mathematics Elective";
+			} else if (CAttributes.isPhilosophy()) {
+				return "Philsophy Elective";
+			} else if (CAttributes.isPhysEd()) {
+				return "Physical Education Elective";
+			} else if (CAttributes.isSocScience()) {
+				return "Social Science Elective";
+			} else {
+				return "Unrestricted Elective";//Should not occur at runtime
+			}
+		}
 	}
 	public Course[] prerequisitesSatisfied(Course[] course, CourseBag courses)
 	{
 		ArrayList<Course> courseResults = new ArrayList<Course>();
-		//tempCourse = (ArrayList<Course>) courseResults.clone();
 		boolean loop = true;
 		boolean subLoop = false;
 		for(int i = 0; i < prerequisites.length; i++)
