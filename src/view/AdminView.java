@@ -81,71 +81,6 @@ public class AdminView
 	{
 		majors = majorsIn;
 		courses = coursesIn;
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
 		Button btnSearchStudents = new Button("Search Students");
 		Button btnSearchAdmin = new Button("Search Staff");
 		Button btnCreateAccount = new Button("Create Account");
@@ -185,12 +120,10 @@ public class AdminView
 		});
 		btnSearchAdmin.setOnAction(e->
 		{
+			Stage editStage = new Stage();
 			GridPane grid = new GridPane();
 			grid.setHgap(10);
 			grid.setVgap(10);
-			HBox hbxAccount = new HBox();
-			hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);//Use logout functionality from parent
-			hbxAccount.setAlignment(Pos.TOP_RIGHT);
 			Label lblID = new Label("ID # : ");
 			grid.add(lblID,  0, 0);
 			TextField txtID = new TextField();
@@ -243,7 +176,7 @@ public class AdminView
 			hbxButtons.setAlignment(Pos.CENTER);
 			hbxButtons.setSpacing(20);
 			btnBack.setOnAction(ea->{
-				
+				editStage.close();
 			});
 			btnSearch.setOnAction(ea->{
 				lstUsers.getItems().clear();
@@ -289,10 +222,13 @@ public class AdminView
 			});
 			btnEdit.setOnAction(ea->{
 				AdminEditEventObject ev = new AdminEditEventObject(btnEdit, txtID.getText());
-				if(listenerAdmin != null)
+				if(listenerAdmin != null) {
 					listenerAdmin.verify(ev);
-				if(ev.isUserValid())
+				}
+				if(ev.isUserValid()) {
 					editFacultyView(ev.getUser(), user);
+					editStage.close();
+				}
 				else
 				{
 					Alert alert = new Alert(AlertType.ERROR, "Error!  Invalid ID detected!  Please enter a valid ID, then try again.", ButtonType.OK);
@@ -309,13 +245,13 @@ public class AdminView
 				txtState.clear();
 				txtSSN.clear();
 				lstUsers.getItems().clear();
+				txtUsername.clear();
 			});
 			VBox pane = new VBox();
-			pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+			pane.getChildren().addAll(logoutHBox(user), grid, hbxButtons);
 			pane.setAlignment(Pos.CENTER);
 			pane.setSpacing(20);
 			Scene scene = new Scene(pane, 800, 1100);
-			Stage editStage = new Stage();
 			editStage.setScene(scene);
 			editStage.setTitle("Edit User Data");
 			editStage.show();
@@ -345,15 +281,21 @@ public class AdminView
 			});
 			btnDelete.setOnAction(ea->{
 				try {
-				DeleteCourseEventObject ev = new DeleteCourseEventObject(btnDelete, lstCourses.getSelectionModel().getSelectedItem());
-				if(listenerCourseDelete != null) {
-					listenerCourseDelete.delete(ev);
-					lstCourses.getItems().remove(lstCourses.getSelectionModel().getSelectedIndex());
-					courses = ev.getCourses();
-				}
-				}catch(Exception ex){
-					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
-					alert.showAndWait();
+					DeleteCourseEventObject ev = new DeleteCourseEventObject(btnDelete, lstCourses.getSelectionModel().getSelectedItem());
+					if(listenerCourseDelete != null) {
+						Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the course and all students, majors, and courses who are associated.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);//Ensure that user wants to delete course
+						alert.showAndWait().ifPresent(response -> {
+						     if (response == ButtonType.NO) { 
+						    	 return;
+						     }
+						});
+						listenerCourseDelete.delete(ev);
+						lstCourses.getItems().remove(lstCourses.getSelectionModel().getSelectedIndex());
+						courses = ev.getCourses();
+					}
+				} catch(Exception ex){
+					Alert alert2 = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+					alert2.showAndWait();
 				}
 			});
 			btnAdd.setOnAction(ea->{
@@ -410,15 +352,21 @@ public class AdminView
 			});
 			btnDelete.setOnAction(ea->{
 				try {
-				DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
-				if(listenerMajorDelete != null) {
-					listenerMajorDelete.delete(ev);
-					lstMajors.getItems().remove(lstMajors.getSelectionModel().getSelectedIndex());
-					majors = ev.getMajors();					
-				}
+					DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
+					if(listenerMajorDelete != null) {
+						Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the major and all students who are associated.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);//Ensure that user wants to delete major
+						alert.showAndWait().ifPresent(response -> {
+						     if (response == ButtonType.NO) { 
+						    	 return;
+						     }
+						});
+						listenerMajorDelete.delete(ev);
+						lstMajors.getItems().remove(lstMajors.getSelectionModel().getSelectedIndex());
+						majors = ev.getMajors();					
+					}
 				} catch(Exception ex) {
-					Alert alert = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
-					alert.showAndWait();
+					Alert alert2 = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
+					alert2.showAndWait();
 				}
 			});
 			btnAdd.setOnAction(ea->{
@@ -444,7 +392,7 @@ public class AdminView
 				}	
 			});
 			HBox hbxButtons = new HBox();
-			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnAdd);
+			hbxButtons.getChildren().addAll(btnCancel, btnDelete, btnEdit, btnAdd);
 			hbxButtons.setAlignment(Pos.CENTER);
 			hbxButtons.setSpacing(20);
 			VBox pane = new VBox();
@@ -457,14 +405,11 @@ public class AdminView
 		});
 		HBox hbxButtons = new HBox();
 		VBox pane = new VBox();
-		HBox hbxLogout = new HBox();
 		hbxButtons.getChildren().addAll(btnSearchStudents, btnSearchAdmin, btnCreateAccount, btnManageMajors, btnManageCourses);
-		hbxLogout.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		pane.getChildren().addAll(hbxLogout, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(user), hbxButtons);
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
-		hbxLogout.setAlignment(Pos.TOP_RIGHT);
-		hbxLogout.setSpacing(20);
+		
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(50);
 		Scene scene = new Scene(pane, 1000, 200);
@@ -480,75 +425,6 @@ public class AdminView
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			//grid.setPadding(new Insets(20, 150, 10, 10));
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblID = new Label("ID # : ");
 		grid.add(lblID,  0, line);
 		TextField txtID = new TextField();
@@ -589,6 +465,7 @@ public class AdminView
 		}
 		Label lblDateEnrolled = new Label("Date Enrolled : ");
 		DatePicker dtpDateEnrolled = new DatePicker();
+		dtpDateEnrolled.setValue(LocalDate.now());//Set to now to prevent nullpointerexception
 		if(student) {
 			grid.add(lblDateEnrolled,  0, ++line);
 			grid.add(dtpDateEnrolled,  1, line);
@@ -597,6 +474,7 @@ public class AdminView
 		grid.add(lblBirthDate,  0, ++line);
 		DatePicker dtpBirthDate = new DatePicker();
 		grid.add(dtpBirthDate,  1, line);
+		dtpBirthDate.setValue(LocalDate.now());//Set to now to prevent nullpointerexception
 		Label lblMajor = new Label("Major : ");
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
 		if(student) {
@@ -605,11 +483,8 @@ public class AdminView
 		}
 		for(int i = 0; i < majors.length; i++)
 			cmbMajor.getItems().add(majors[i]);
-		if(cmbMajor.getItems().size() == 0)
-		{
-			cmbMajor.getItems().add(new Major());
-			cmbMajor.setValue(new Major());
-		}
+		cmbMajor.getItems().add(new Major());
+		cmbMajor.setValue(new Major());
 		Label lblUsername = new Label("Username : ");
 		grid.add(lblUsername,  0, ++line);
 		TextField txtUsername = new TextField();
@@ -619,6 +494,29 @@ public class AdminView
 		PasswordField txtPassword = new PasswordField();
 		grid.add(txtPassword, 1, line);
 		grid.setAlignment(Pos.CENTER);
+		for(int i = 0; i < grid.getChildren().size(); i++) {
+			try {
+				if((TextField) grid.getChildren().get(i) != null) {//If selected control is a textfield
+					((TextField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a textField
+			}
+			try {
+				if((PasswordField) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((PasswordField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+			try {
+				if((ComboBox) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((ComboBox) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+		}
 		Button btnBack = new Button("Cancel");
 		Button btnCreate;
 		if(student) {
@@ -663,7 +561,9 @@ public class AdminView
 			}
 			catch(Exception ex)
 			{
-				
+				Alert alert = new Alert(AlertType.ERROR, ex.getMessage(), ButtonType.OK);
+				alert.showAndWait();
+				ex.printStackTrace();
 			}
 		});
 		btnClear.setOnAction(e->{
@@ -682,7 +582,8 @@ public class AdminView
 			txtPassword.clear();
 		});
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+		grid.setAlignment(Pos.CENTER);
+		pane.getChildren().addAll(logoutHBox(user), grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
@@ -847,7 +748,14 @@ public class AdminView
 				{
 					throw new IllegalArgumentException();
 				}
-				lstCoursesReq.getItems().add(lstCourse.getSelectionModel().getSelectedItem());
+				else if(lstCoursesReq.getItems().contains(lstCourse.getSelectionModel().getSelectedItem())) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, course already required as a prerequisite.", ButtonType.OK);
+					alert.showAndWait();
+				} else {
+					lstCoursesReq.getItems().add(lstCourse.getSelectionModel().getSelectedItem());
+					lstCoursesReq.setSelectionModel(null);
+					lstCourse.setSelectionModel(null);
+				}
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -861,6 +769,8 @@ public class AdminView
 					throw new IllegalArgumentException();
 				}
 				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+				lstCoursesReq.setSelectionModel(null);
+				lstCourse.setSelectionModel(null);
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -873,7 +783,14 @@ public class AdminView
 				{
 					throw new IllegalArgumentException();
 				}
-			lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
+				else if(lstCoursesReqA.getItems().contains(lstCoursesA.getSelectionModel().getSelectedItem())) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, course already required as a corequisite.", ButtonType.OK);
+					alert.showAndWait();
+				} else {
+					lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
+					lstCoursesReqA.setSelectionModel(null);
+					lstCoursesA.setSelectionModel(null);
+				}
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -887,6 +804,8 @@ public class AdminView
 					throw new IllegalArgumentException();
 				}
 				lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
+				lstCoursesReqA.setSelectionModel(null);
+				lstCoursesA.setSelectionModel(null);
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -1011,7 +930,12 @@ public class AdminView
 			hbxCourses.setAlignment(Pos.CENTER);
 			hbxCourses.setSpacing(30);
 			Button btnCancelThis = new Button("Cancel");
-			Button btnAddThis = new Button("Add Major");
+			Button btnAddThis;
+			if(edit) {
+				btnAddThis = new Button("Edit Major");
+			} else {
+				btnAddThis = new Button("Add Major");
+			}
 			HBox hbxButtons = new HBox();
 			hbxButtons.getChildren().addAll(btnCancelThis, btnAddThis);
 			hbxButtons.setAlignment(Pos.CENTER);
@@ -1044,7 +968,7 @@ public class AdminView
 				AddMajorEventObject evm = new AddMajorEventObject(btnAddThis, txtName.getText(), txtMinGPA.getText(), 
 				txtNumOfCredits.getText(), txtPhysEd.getText(), txtHis.getText(), txtLabSci.getText(), txtMath.getText(), 
 				txtHum.getText(), txtBus.getText(), txtEng.getText(), txtCom.getText(), txtAmerHis.getText(), txtSocSci.getText(),
-				txtLang.getText(), txtPhl.getText(), lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()]));
+				txtLang.getText(), txtPhl.getText(), lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()]), edit);
 				if(listenerMajorAdd != null){
 					listenerMajorAdd.add(evm);
 				}
@@ -1062,7 +986,14 @@ public class AdminView
 					{
 						throw new IllegalArgumentException();
 					}
-					lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+					else if(lstCoursesReq.getItems().contains(lstCourses.getSelectionModel().getSelectedItem())) {
+						Alert alert = new Alert(AlertType.ERROR, "Error, course already required for the major.", ButtonType.OK);
+						alert.showAndWait();
+					} else {
+						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+						lstCoursesReq.setSelectionModel(null);
+						lstCourses.setSelectionModel(null);
+					}
 				} catch(Exception ex) {
 					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 					alert.showAndWait();
@@ -1076,6 +1007,8 @@ public class AdminView
 						throw new IllegalArgumentException();
 					}
 					lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+					lstCoursesReq.setSelectionModel(null);
+					lstCourses.setSelectionModel(null);
 				} catch(Exception ex) {
 					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 					alert.showAndWait();
@@ -1085,7 +1018,11 @@ public class AdminView
 			pane.getChildren().addAll(lblRequirements, gridOut, hbxCourses, hbxButtons);
 			Scene scene = new Scene(pane, 1280, 1080);
 			newMajorStage.setScene(scene);
-			newMajorStage.setTitle("New Major");
+			if(!edit) {
+				newMajorStage.setTitle("New Major");
+			} else {
+				newMajorStage.setTitle("Edit Major");
+			}
 			newMajorStage.showAndWait();	
 	}
 	public void editFacultyView(User user, Administrator admin)
@@ -1093,75 +1030,6 @@ public class AdminView
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		Label lblLogoutName = new Label("You are currently signed in as " + admin.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			//grid.setPadding(new Insets(20, 150, 10, 10));
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0);
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblID = new Label("ID # : ");
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
@@ -1241,17 +1109,21 @@ public class AdminView
 			}
 		});
 		btnDelete.setOnAction(e->{
-			RemoveStaffEventObject ev = new RemoveStaffEventObject(btnDelete, user.getId());
-			if(listenerDelete != null) {
-				listenerDelete.removeStaff(ev);
-			}
-			if(ev.isValid()) {
-				adminView(admin, majors, courses);//If successful, go back to default control panel
-			} else {
-				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-				alert.showAndWait();
-			}
-			
+			Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the user.  Are you sure you want to continue?", ButtonType.YES, ButtonType.NO);
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.YES) {
+			    	 RemoveStaffEventObject ev = new RemoveStaffEventObject(btnDelete, user.getId());
+					if(listenerDelete != null) {
+						listenerDelete.removeStaff(ev);
+					}
+					if(ev.isValid()) {
+						adminView(admin, majors, courses);//If successful, go back to default control panel
+					} else {
+						Alert alert2 = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+						alert2.showAndWait();
+					}
+			     }
+			 });			
 		});
 		btnClear.setOnAction(e->{
 			txtFirstName.clear();
@@ -1266,12 +1138,84 @@ public class AdminView
 			txtUsername.clear();
 		});
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(admin), grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Edit Faculty Data");			
 		primaryStage.show();
+	}
+	public HBox logoutHBox(User user) {
+		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
+		Hyperlink hplChangePass = new Hyperlink("Change Password");
+		hplChangePass.setOnAction(e->
+		{
+			Stage passStage = new Stage();
+			passStage.setTitle("Change Password");
+			GridPane gridOut = new GridPane();
+			gridOut.setHgap(10);
+			gridOut.setVgap(10);
+			PasswordField oldPassword = new PasswordField();
+			oldPassword.setPromptText("Old Password");
+			PasswordField newPassword = new PasswordField();
+			newPassword.setPromptText("New Password");
+			PasswordField newPasswordConf = new PasswordField();
+			newPasswordConf.setPromptText("Confim New Password");
+			gridOut.add(new Label("Old Password: "), 0, 0);
+			gridOut.add(oldPassword, 1, 0); 
+			gridOut.add(new Label("New Password: "), 0, 1);
+			gridOut.add(newPassword, 1, 1);
+			gridOut.add(new Label("Confirm New Password: "), 0, 2);
+			gridOut.add(newPasswordConf, 1, 2);
+			gridOut.setAlignment(Pos.CENTER);
+			Button btnCancel = new Button("Cancel");
+			btnCancel.setOnAction(ea->
+			{
+				passStage.close();
+			});
+			Button btnChange = new Button("Change Password");
+			btnChange.setOnAction(ea->
+			{
+				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
+				if(listenerPassword != null)
+				{
+					listenerPassword.changePassword(ev);
+					if(ev.isSuccessful())
+					{
+						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
+						alert.showAndWait();
+						passStage.close();
+					}
+					else
+					{
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+						alert.showAndWait();
+					}
+				}
+			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);	
+			passStage.setScene(passScene);
+			passStage.showAndWait();
+		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxLogout = new HBox();
+		hbxLogout.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxLogout.setAlignment(Pos.TOP_RIGHT);
+		hbxLogout.setSpacing(20);
+		return hbxLogout;
 	}
 	public void setListenerPassword(PasswordListener listenerPassword) 
 	{
@@ -1315,8 +1259,9 @@ public class AdminView
 	public String parseId(int id)
 	{
 		String returnString = Integer.toString(id);
-		if(returnString.length() < 8){
-			for(int i = 0; i < returnString.length() - 8; i++) {
+		int index = returnString.length();
+		if(index < 8){
+			for(int i = 0; i < 8 - index; i++) {
 				returnString = "0" + returnString;
 			}
 		}

@@ -50,74 +50,6 @@ public class StudentView
 	public void studentStart(User user, Student student, Major[] majors, Course[] allCourses)
 	{
 		majorCache = majors;
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblCurrentMajor = new Label("Your currently declared major is : " + student.getMajor());
 		Label lblMajor = new Label("Please select a major to continue : ");
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
@@ -130,13 +62,7 @@ public class StudentView
 		hbxInput.setSpacing(15);
 		Button btnContinue = new Button("Continue");
 		btnContinue.setOnAction(e->{
-			Student tempStudent = student.clone();
-			tempStudent.setMajor(cmbMajor.getValue());
-			studentView(user, tempStudent, allCourses);
-		});
-		Button btnViewSAIN = new Button("View SAIN Report");
-		btnViewSAIN.setOnAction(e->{
-			SAINEventObject ev = new SAINEventObject(btnViewSAIN, cmbMajor.getSelectionModel().getSelectedItem(), user, student);
+			SAINEventObject ev = new SAINEventObject(btnContinue, cmbMajor.getSelectionModel().getSelectedItem(), user, student);
 			if(listenerSAIN != null) {
 				listenerSAIN.getReport(ev);
 				if(!ev.isValid())
@@ -145,6 +71,10 @@ public class StudentView
 					alert.showAndWait();
 				}
 			}
+		});
+		Button btnViewSAIN = new Button("View SAIN Report");
+		btnViewSAIN.setOnAction(e->{
+			studentView(user, student, allCourses);
 		});
 		HBox hbxButtons = new HBox();
 		if(!user.isStudent())
@@ -161,7 +91,7 @@ public class StudentView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(15);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, lblCurrentMajor, hbxInput, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(user), lblCurrentMajor, hbxInput, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(15);
 		Scene scene = new Scene(pane, 400, 400);
@@ -170,74 +100,6 @@ public class StudentView
 	}
 	public void studentView(User user, Student student, Course[] allCourses)
 	{
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblSelectedMajor = new Label("Currently Selected Major is : " + student.getMajor());
 		Label lblNumOfCredits = new Label("Number of Credits Attempted : " + student.numOfCredits());
 		Label lblNumOfCreditsPass = new Label("Number of Credits Successfully Completed : " + student.numOfCreditsPassed());
@@ -300,11 +162,83 @@ public class StudentView
 		grid.add(lblSemestersNeeded, 0, 5);
 		grid.add(btnBack, 0, 6);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, grid);
+		pane.getChildren().addAll(logoutHBox(user), grid);
 		pane.setAlignment(Pos.CENTER);
 		Scene scene = new Scene(pane, 1920, 1080);
 		primaryStage.setScene(scene);
 		primaryStage.show();			
+	}
+	public HBox logoutHBox(User user) {
+		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
+		Hyperlink hplChangePass = new Hyperlink("Change Password");
+		hplChangePass.setOnAction(e->
+		{
+			Stage passStage = new Stage();
+			passStage.setTitle("Change Password");
+			GridPane gridOut = new GridPane();
+			gridOut.setHgap(10);
+			gridOut.setVgap(10);
+			PasswordField oldPassword = new PasswordField();
+			oldPassword.setPromptText("Old Password");
+			PasswordField newPassword = new PasswordField();
+			newPassword.setPromptText("New Password");
+			PasswordField newPasswordConf = new PasswordField();
+			newPasswordConf.setPromptText("Confim New Password");
+			gridOut.add(new Label("Old Password: "), 0, 0);
+			gridOut.add(oldPassword, 1, 0); 
+			gridOut.add(new Label("New Password: "), 0, 1);
+			gridOut.add(newPassword, 1, 1);
+			gridOut.add(new Label("Confirm New Password: "), 0, 2);
+			gridOut.add(newPasswordConf, 1, 2);
+			gridOut.setAlignment(Pos.CENTER);
+			Button btnCancel = new Button("Cancel");
+			btnCancel.setOnAction(ea->
+			{
+				passStage.close();
+			});
+			Button btnChange = new Button("Change Password");
+			btnChange.setOnAction(ea->
+			{
+				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
+				if(listenerPassword != null)
+				{
+					listenerPassword.changePassword(ev);
+					if(ev.isSuccessful())
+					{
+						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
+						alert.showAndWait();
+						passStage.close();
+					}
+					else
+					{
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+						alert.showAndWait();
+					}
+				}
+			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);	
+			passStage.setScene(passScene);
+			passStage.showAndWait();
+		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxLogout = new HBox();
+		hbxLogout.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxLogout.setAlignment(Pos.TOP_RIGHT);
+		hbxLogout.setSpacing(20);
+		return hbxLogout;
 	}
 	public void setListenerPassword(PasswordListener listenerPassword) 
 	{

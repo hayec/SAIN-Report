@@ -25,6 +25,13 @@ public class CourseDownloadToCourse {
 				FileInputStream fileIn = new FileInputStream(f);
 				ObjectInputStream objIn = new ObjectInputStream(fileIn);
 				CourseDownload tempCourse = (CourseDownload) objIn.readObject();
+				ArrayList<String> attr = new ArrayList<String>();
+				for(String s : tempCourse.getAttributes()) {//Remove null attributes which cause errors
+					if(s != null) {
+						attr.add(s);
+					}
+				}
+				tempCourse.setAttributes(attr.toArray(new String[attr.size()]));
 				Course tempCourseNew = new Course(tempCourse.courseCode, tempCourse.getTitle(), tempCourse.getDescription(), tempCourse.isAmmerman(), tempCourse.isGrant(), tempCourse.isEastern(), tempCourse.getPrerequisites(), tempCourse.getCorequisites(), tempCourse.getCredits());
 				for(int i = 0; i < tempCourse.getAttributes().length; i++)
 				{

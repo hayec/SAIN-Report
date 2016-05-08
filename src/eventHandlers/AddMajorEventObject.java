@@ -25,9 +25,10 @@ public class AddMajorEventObject extends EventObject
 	private Course[] reqCourses;
 	private String errorMessage = new String();
 	private Major[] majors;
+	private boolean edit;
 	public AddMajorEventObject(Object source, String name, String minGPA, String numOfCreditsReq, String physEdReq, String hisReq,
 			String labSciReq, String mathReq, String humReq, String busReq, String engReq, String comReq,
-			String amerHisReq, String socSciReq, String langReq, String phlReq, Course[] reqCourses) {
+			String amerHisReq, String socSciReq, String langReq, String phlReq, Course[] reqCourses, boolean edit) {
 		super(source);
 		this.name = name;
 		this.minGPA = minGPA;
@@ -44,6 +45,58 @@ public class AddMajorEventObject extends EventObject
 		this.socSciReq = socSciReq;
 		this.langReq = langReq;
 		this.phlReq = phlReq;
+		this.reqCourses = reqCourses;
+		this.edit = edit;
+	}
+	public boolean isEdit() {
+		return edit;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setMinGPA(String minGPA) {
+		this.minGPA = minGPA;
+	}
+	public void setNumOfCreditsReq(String numOfCreditsReq) {
+		this.numOfCreditsReq = numOfCreditsReq;
+	}
+	public void setPhysEdReq(String physEdReq) {
+		this.physEdReq = physEdReq;
+	}
+	public void setHisReq(String hisReq) {
+		this.hisReq = hisReq;
+	}
+	public void setLabSciReq(String labSciReq) {
+		this.labSciReq = labSciReq;
+	}
+	public void setMathReq(String mathReq) {
+		this.mathReq = mathReq;
+	}
+	public void setHumReq(String humReq) {
+		this.humReq = humReq;
+	}
+	public void setBusReq(String busReq) {
+		this.busReq = busReq;
+	}
+	public void setEngReq(String engReq) {
+		this.engReq = engReq;
+	}
+	public void setComReq(String comReq) {
+		this.comReq = comReq;
+	}
+	public void setAmerHisReq(String amerHisReq) {
+		this.amerHisReq = amerHisReq;
+	}
+	public void setSocSciReq(String socSciReq) {
+		this.socSciReq = socSciReq;
+	}
+	public void setLangReq(String langReq) {
+		this.langReq = langReq;
+	}
+	public void setPhlReq(String phlReq) {
+		this.phlReq = phlReq;
+	}
+	public void setReqCourses(Course[] reqCourses) {
 		this.reqCourses = reqCourses;
 	}
 	public Major[] getMajors() {

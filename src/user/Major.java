@@ -28,7 +28,7 @@ public class Major implements Serializable
 	int langReq;
 	int phlReq;
 	Course[] reqCourses;
-	public Major(String name, int physEdReq, int hisReq, int labSciReq, int mathReq, int humReq, int busReq, int engReq, int comReq, int amerHisReq, int socSciReq, int langReq, int phlReq, int numOfCreditsReq, Course[] reqCourses)
+	public Major(String name, int physEdReq, int hisReq, int labSciReq, int mathReq, int humReq, int busReq, int engReq, int comReq, int amerHisReq, int socSciReq, int langReq, int phlReq, int numOfCreditsReq, double minGPA, Course[] reqCourses)
 	{
 		this.name = name;
 		this.physEdReq = physEdReq;
@@ -44,6 +44,7 @@ public class Major implements Serializable
 		this.langReq = langReq;
 		this.phlReq = phlReq;
 		this.numOfCreditsReq = numOfCreditsReq;
+		this.minGPA = minGPA;
 		this.reqCourses = reqCourses;
 	}
 	public Major() {

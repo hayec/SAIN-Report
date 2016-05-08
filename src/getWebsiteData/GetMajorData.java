@@ -48,7 +48,22 @@ public class GetMajorData
 		int numOfCredits;
 		for(File f : files)
 		{
-			
+			line = "";
+			physEdReq = 0;
+			hisReq = 0;
+			labSciReq = 0;
+			mathReq = 0;
+			humReq = 0;
+			busReq = 0;
+			engReq = 0;
+			comReq = 0;
+			amerHisReq = 0;
+			socSciReq = 0;
+			langReq = 0;
+			phlReq = 0;
+			temp = "";
+			name = "";
+			courses = new ArrayList<String>();
 			try
 			{
 				fileIn = new Scanner(f);
@@ -192,10 +207,18 @@ public class GetMajorData
 		        numOfCredits = (int) Math.floor(Double.parseDouble(lineTemp.substring(lineTemp.indexOf("</td>") - 4, lineTemp.indexOf("</td>"))));
 		        //Need to remove doubling
 		        System.out.println(name);
-		        Course[] reqCourses = new Course[courses.size()];
-	        	for(String c : courses)
-	        		reqCourses[courses.indexOf(c)] = getCourse(c);
-	        	Major tempMajor = new Major(name, physEdReq, hisReq, labSciReq, mathReq, humReq, busReq, engReq, comReq, amerHisReq, socSciReq, langReq, phlReq, numOfCredits, reqCourses);
+		        ArrayList<Course> reqCourses = new ArrayList<Course>();
+	        	for(String c : courses) {
+	        		try {
+	        			if(getCourse(c) != null) {
+	        				if(reqCourses.indexOf(getCourse(c)) < 0) {
+	        					reqCourses.add(getCourse(c));
+	        				}
+	        			}
+	        		} catch(Exception e)//Allow to continue even if a bad course is found
+	        		{}
+	        	}
+	        	Major tempMajor = new Major(name, physEdReq, hisReq, labSciReq, mathReq, humReq, busReq, engReq, comReq, amerHisReq, socSciReq, langReq, phlReq, numOfCredits, 2.0, reqCourses.toArray(new Course[reqCourses.size()]));//No gpa data is given, so default 2.0
 				objOut.writeObject(tempMajor);
 			}
 			catch(Exception e)

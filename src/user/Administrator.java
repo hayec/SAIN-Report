@@ -165,4 +165,7 @@ public class Administrator implements User, Serializable
 	{
 		this.username = username;
 	}
+	public String toString() {
+		return lastName + ", " + firstName + " " +  Integer.toString(id);
+	}
 }

@@ -64,75 +64,6 @@ public class StaffView
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			//grid.setPadding(new Insets(20, 150, 10, 10));
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblID = new Label("ID # : ");
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
@@ -177,13 +108,11 @@ public class StaffView
 		grid.add(lblMajor,  0, 10);
 		ComboBox<Major> cmbMajor = new ComboBox<Major>();
 		grid.add(cmbMajor,  1, 10);
-		for(int i = 0; i < majors.length; i++)
+		for(int i = 0; i < majors.length; i++) {
 			cmbMajor.getItems().add(majors[i]);
-		if(cmbMajor.getItems().size() == 0)
-		{
-			cmbMajor.getItems().add(new Major());
-			cmbMajor.setValue(new Major());
 		}
+		cmbMajor.getItems().add(new Major());
+		cmbMajor.setValue(new Major());
 		Label lblStudents = new Label("Results : ");
 		grid.add(lblStudents,  0, 11);
 		ListView<Student> lstStudents = new ListView<Student>();
@@ -274,13 +203,11 @@ public class StaffView
 				ReportEventObject ev = new ReportEventObject(btnSelect, user, lstStudents.getSelectionModel().getSelectedItem());
 				if(listenerReport != null) {
 					listenerReport.report(ev);
-				}
-					
+				}	
 			} else {
 				Alert alert = new Alert(AlertType.ERROR, "Error!  No student selected!.\nPlease select a student then try again.", ButtonType.OK);
 				alert.showAndWait();
 			}
-				
 		});
 		btnClear.setOnAction(e->{
 			txtID.clear();
@@ -296,7 +223,7 @@ public class StaffView
 			lstStudents.getItems().clear();
 		});
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(user), grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
@@ -309,75 +236,6 @@ public class StaffView
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
-		Hyperlink hplChangePass = new Hyperlink("Change Password");
-		hplChangePass.setOnAction(e->
-		{
-			Stage passStage = new Stage();
-			passStage.setTitle("Change Password");
-			GridPane gridOut = new GridPane();
-			gridOut.setHgap(10);
-			gridOut.setVgap(10);
-			//grid.setPadding(new Insets(20, 150, 10, 10));
-			PasswordField oldPassword = new PasswordField();
-			oldPassword.setPromptText("Old Password");
-			PasswordField newPassword = new PasswordField();
-			newPassword.setPromptText("New Password");
-			PasswordField newPasswordConf = new PasswordField();
-			newPasswordConf.setPromptText("Confim New Password");
-			gridOut.add(new Label("Old Password: "), 0, 0);
-			gridOut.add(oldPassword, 1, 0); 
-			gridOut.add(new Label("New Password: "), 0, 1);
-			gridOut.add(newPassword, 1, 1);
-			gridOut.add(new Label("Confirm New Password: "), 0, 2);
-			gridOut.add(newPasswordConf, 1, 2);
-			gridOut.setAlignment(Pos.CENTER);
-			Button btnCancel = new Button("Cancel");
-			btnCancel.setOnAction(ea->
-			{
-				passStage.close();
-			});
-			Button btnChange = new Button("Change Password");
-			btnChange.setOnAction(ea->
-			{
-				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
-				if(listenerPassword != null)
-				{
-					listenerPassword.changePassword(ev);
-					if(ev.isSuccessful())
-					{
-						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
-						alert.showAndWait();
-						passStage.close();
-					}
-					else
-					{
-						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-						alert.showAndWait();
-					}
-				}
-			});
-			HBox hbxPassButtons = new HBox();
-			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
-			hbxPassButtons.setSpacing(20);
-			hbxPassButtons.setAlignment(Pos.CENTER);
-			VBox passPane = new VBox();
-			passPane.getChildren().addAll(gridOut, hbxPassButtons);
-			passPane.setSpacing(20);
-			passPane.setAlignment(Pos.CENTER);
-			Scene passScene = new Scene(passPane, 550, 300);	
-			passStage.setScene(passScene);
-			passStage.showAndWait();
-		});
-		Hyperlink hplLogout = new Hyperlink("Logout");
-		hplLogout.setOnAction(e->{
-			LogoutEventObject ev = new LogoutEventObject(hplLogout);
-			if(listenerLogout != null)
-				listenerLogout.logout(ev);
-		});
-		HBox hbxAccount = new HBox();
-		hbxAccount.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
-		hbxAccount.setAlignment(Pos.TOP_RIGHT);
 		Label lblID = new Label("ID # : ");
 		grid.add(lblID,  0, 0);
 		TextField txtID = new TextField();
@@ -476,6 +334,9 @@ public class StaffView
 					Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
 					alert.showAndWait();
 				}
+				else {
+					start(true, user, majors);//If valid, go back to student view
+				}
 			}
 			catch(Exception ie)
 			{
@@ -503,13 +364,19 @@ public class StaffView
 			txtUsername.clear();
 		});
 		btnDelete.setOnAction(e->{
+			Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the student.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.NO) { 
+			    	 return;
+			     }
+			});
 			RemoveStudentEventObject ev = new RemoveStudentEventObject(btnDelete, student.getId());
 			if(listenerDelete != null) {
 				listenerDelete.removeStudent(ev);
 			}
 			if(!ev.isValid()) {
-				Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
-				alert.showAndWait();
+				Alert alert2 = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+				alert2.showAndWait();
 			} else {
 				start(true, user, majors);
 			}
@@ -517,13 +384,85 @@ public class StaffView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(hbxAccount, grid, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(user), grid, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
+	}
+	public HBox logoutHBox(User user) {
+		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
+		Hyperlink hplChangePass = new Hyperlink("Change Password");
+		hplChangePass.setOnAction(e->
+		{
+			Stage passStage = new Stage();
+			passStage.setTitle("Change Password");
+			GridPane gridOut = new GridPane();
+			gridOut.setHgap(10);
+			gridOut.setVgap(10);
+			PasswordField oldPassword = new PasswordField();
+			oldPassword.setPromptText("Old Password");
+			PasswordField newPassword = new PasswordField();
+			newPassword.setPromptText("New Password");
+			PasswordField newPasswordConf = new PasswordField();
+			newPasswordConf.setPromptText("Confim New Password");
+			gridOut.add(new Label("Old Password: "), 0, 0);
+			gridOut.add(oldPassword, 1, 0); 
+			gridOut.add(new Label("New Password: "), 0, 1);
+			gridOut.add(newPassword, 1, 1);
+			gridOut.add(new Label("Confirm New Password: "), 0, 2);
+			gridOut.add(newPasswordConf, 1, 2);
+			gridOut.setAlignment(Pos.CENTER);
+			Button btnCancel = new Button("Cancel");
+			btnCancel.setOnAction(ea->
+			{
+				passStage.close();
+			});
+			Button btnChange = new Button("Change Password");
+			btnChange.setOnAction(ea->
+			{
+				PasswordEventObject ev = new PasswordEventObject(btnChange, oldPassword.getText(), newPassword.getText(), newPasswordConf.getText());
+				if(listenerPassword != null)
+				{
+					listenerPassword.changePassword(ev);
+					if(ev.isSuccessful())
+					{
+						Alert alert = new Alert(AlertType.INFORMATION, "Password Successfully Changed.", ButtonType.OK);
+						alert.showAndWait();
+						passStage.close();
+					}
+					else
+					{
+						Alert alert = new Alert(AlertType.ERROR, ev.getErrorMessage(), ButtonType.OK);
+						alert.showAndWait();
+					}
+				}
+			});
+			HBox hbxPassButtons = new HBox();
+			hbxPassButtons.getChildren().addAll(btnCancel, btnChange);
+			hbxPassButtons.setSpacing(20);
+			hbxPassButtons.setAlignment(Pos.CENTER);
+			VBox passPane = new VBox();
+			passPane.getChildren().addAll(gridOut, hbxPassButtons);
+			passPane.setSpacing(20);
+			passPane.setAlignment(Pos.CENTER);
+			Scene passScene = new Scene(passPane, 550, 300);	
+			passStage.setScene(passScene);
+			passStage.showAndWait();
+		});
+		Hyperlink hplLogout = new Hyperlink("Logout");
+		hplLogout.setOnAction(e->{
+			LogoutEventObject ev = new LogoutEventObject(hplLogout);
+			if(listenerLogout != null)
+				listenerLogout.logout(ev);
+		});
+		HBox hbxLogout = new HBox();
+		hbxLogout.getChildren().addAll(lblLogoutName, hplChangePass, hplLogout);
+		hbxLogout.setAlignment(Pos.TOP_RIGHT);
+		hbxLogout.setSpacing(20);
+		return hbxLogout;
 	}
 	public void setListenerReport(ReportListener listenerReport)
 	{

@@ -83,6 +83,7 @@ public class SAINController
 	UserBag users = new UserBag();
 	CourseBag courses = new CourseBag();
 	MajorBag majors = new MajorBag();
+	private boolean loading;
 	public SAINController(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
@@ -308,9 +309,45 @@ public class SAINController
 				if(ev.getName().equals("") || ev.getName() == null) {
 					ev.setErrorMessage("Name cannot be left blank!");
 				}
-				if(majors.getMajor(ev.getName()) != null)
+				if(majors.getMajor(ev.getName()) != null && !ev.isEdit())
 				{
 					ev.setErrorMessage("Major already exists!");
+				}
+				if(ev.getAmerHisReq().equals("")) {
+					ev.setAmerHisReq("0");
+				}
+				if(ev.getBusReq().equals("")) {
+					ev.setBusReq("0");
+				}
+				if(ev.getComReq().equals("")) {
+					ev.setComReq("0");
+				}
+				if(ev.getEngReq().equals("")) {
+					ev.setEngReq("0");
+				}
+				if(ev.getHisReq().equals("")) {
+					ev.setHisReq("0");
+				}
+				if(ev.getHumReq().equals("")) {
+					ev.setHumReq("0");
+				}
+				if(ev.getLabSciReq().equals("")) {
+					ev.setLabSciReq("0");
+				}
+				if(ev.getLangReq().equals("")) {
+					ev.setLangReq("0");
+				}
+				if(ev.getMathReq().equals("")) {
+					ev.setMathReq("0");
+				}
+				if(ev.getPhlReq().equals("")) {
+					ev.setPhlReq("0");
+				}
+				if(ev.getSocSciReq().equals("")) {
+					ev.setSocSciReq("0");
+				}
+				if(ev.getMinGPA().equals("")) {
+					ev.setMinGPA("0");
 				}
 				try {
 					if(Integer.parseInt(ev.getAmerHisReq()) < 0 || Integer.parseInt(ev.getBusReq()) < 0 || Integer.parseInt(ev.getComReq()) < 0
@@ -351,10 +388,13 @@ public class SAINController
 					ev.setValid(false);
 				}
 				if(ev.isValid()) {
+					if(ev.isEdit() && majors.getMajor(ev.getName()) != null) {//If user is editing a major, then delete it before adding the edited major
+						majors.removeMajor(ev.getName());
+					}
 					majors.addMajor(new Major(ev.getName(), Integer.parseInt(ev.getPhysEdReq()), Integer.parseInt(ev.getHisReq()), Integer.parseInt(ev.getLabSciReq()),
 							Integer.parseInt(ev.getMathReq()), Integer.parseInt(ev.getHumReq()), Integer.parseInt(ev.getBusReq()), Integer.parseInt(ev.getEngReq()), 
 							Integer.parseInt(ev.getComReq()), Integer.parseInt(ev.getAmerHisReq()), Integer.parseInt(ev.getSocSciReq()), Integer.parseInt(ev.getLangReq()), 
-							Integer.parseInt(ev.getPhlReq()), Integer.parseInt(ev.getNumOfCreditsReq()), ev.getReqCourses()));
+							Integer.parseInt(ev.getPhlReq()), Integer.parseInt(ev.getNumOfCreditsReq()), Double.parseDouble(ev.getMinGPA()), ev.getReqCourses()));
 					ev.setMajors(majors.getMajors());
 				}
 			}
@@ -484,11 +524,15 @@ public class SAINController
 				if(zipCode < 0 || zipCode > 99999) {
 					ev.setErrorMessage("Zip code must be a number between 00000 and 99999");
 				}
-				if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
-					ev.setErrorMessage("New user must be at least 13 years old.");
-				}
-				if(!ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
-					ev.setErrorMessage("New user must not be more than 120 years old.");
+				if(ev.getDateOfBirth() == null) {
+					ev.setErrorMessage("Please choose a birth date for the user.");
+				} else {
+					if(ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(13))) {
+						ev.setErrorMessage("New user must be at least 13 years old.");
+					}
+					if(!ev.getDateOfBirth().isAfter(LocalDate.now().minusYears(120))) {
+						ev.setErrorMessage("New user must not be more than 120 years old.");
+					}
 				}
 				if(users.getUser(ev.getUsername()) != null && users.getUser(ev.getUsername()).getId() != ev.getId()) {
 					ev.setErrorMessage("Username is already in use.  Please choose another username.");
@@ -942,15 +986,34 @@ public class SAINController
 	}
 	public void loadSqlData()
 	{
-		/*Connection conn = null;
+		Connection conn = null;
 		try {
-			String userName = "root";
-			String password = "student";
-		}*/
+			String userName = "SAINReport";
+			String password = "";
+			String url = "jdbc:mysql://localhost/SAINReport";
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			conn = DriverManager.getConnection(url, userName, password);
+			
+			Statement stmt = conn.createStatement();
+			ResultSet rset;
+			stmt.executeQuery("SELECT ");
+		} catch(Exception e) {
+			
+		} finally {
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch(Exception e)
+				{
+					
+				}
+			}
+		}
 		
 	}
 	public void loadBinData() throws ClassNotFoundException, IOException
 	{
+		loading = true;
 		FileInputStream fileCourseIn;
 		FileInputStream fileUserIn;
 		FileInputStream fileMajorIn;
@@ -1007,10 +1070,14 @@ public class SAINController
 			fileMajorIn = null;
 		if(fileUserIn == null)
 			loginView.newUser();
+		loading = false;
 	}
 	public boolean saveData()
 	{
-		return saveBinData();
+		if(!loading)
+			return saveBinData();
+		else 
+			return false;
 	}
 	public boolean saveSqlData()
 	{
