@@ -30,6 +30,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
@@ -38,6 +39,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import report.Course;
 import user.Administrator;
 import user.Major;
 import user.MajorBag;
@@ -55,9 +57,14 @@ public class StaffView
 	ReportListener listenerReport;
 	RemoveStudentListener listenerDelete;
 	AdminBackListener listenerBack;
+	Course[] courses;
 	public StaffView(Stage primaryStage)
 	{
 		this.primaryStage = primaryStage;
+	}
+	public void start(boolean admin, User user, Major[] majors, Course[] courses) {
+		this.courses = courses;
+		start(admin, user, majors);
 	}
 	public void start(boolean admin, User user, Major[] majors)
 	{
@@ -230,9 +237,33 @@ public class StaffView
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
+		for(int i = 0; i < grid.getChildren().size(); i++) {
+			try {
+				if((TextField) grid.getChildren().get(i) != null) {//If selected control is a textfield
+					((TextField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a textField
+			}
+			try {
+				if((PasswordField) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((PasswordField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+			try {
+				if((ComboBox) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((ComboBox) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+		}
 	}
 	public void adminEdit(User user, Student student, Major[] majors)
 	{
+		MultipleSelectionModel<Course> defaultSelect;
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -293,11 +324,8 @@ public class StaffView
 		for(int i = 0; i < majors.length; i++) {
 			cmbMajor.getItems().add(majors[i]);
 		}
-		if(cmbMajor.getItems().size() == 0)
-		{
-			cmbMajor.getItems().add(new Major());
-			cmbMajor.setValue(new Major());
-		}
+		cmbMajor.getItems().add(new Major());
+		cmbMajor.setValue(new Major());
 		Label lblPassword = new Label("Password : ");
 		grid.add(lblPassword, 0, 14);
 		PasswordField txtPassword = new PasswordField();
@@ -315,6 +343,35 @@ public class StaffView
 		dtpDateEnrolled.setValue(student.getDateEnrolled());
 		txtCampus.setText(student.getCampus());
 		txtUsername.setText(student.getUsername());
+		cmbMajor.setValue(student.getMajor());
+		Label lblCourses = new Label("Courses");
+		ListView<Course> lstCourses = new ListView<Course>();
+		defaultSelect = lstCourses.getSelectionModel();
+		for(Course c : courses) {
+			lstCourses.getItems().add(c);
+		}
+		Label lblRightArrow = new Label("-->");
+		Button btnAddCourse = new Button("Add Course");
+		Label lblLeftArrow = new Label("<--");
+		Button btnRemoveCourse = new Button("Remove Course");
+		Label lblCoursesReq = new Label("Courses Required");
+		ListView<Course> lstCoursesReq = new ListView<Course>();
+		for(Course c : student.getCourseWork()) {
+			lstCoursesReq.getItems().add(c);
+		}
+		lstCourses.setMaxHeight(200);
+		lstCoursesReq.setMaxHeight(200);
+		VBox vbxCourseButtons = new VBox();
+		vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
+		vbxCourseButtons.setAlignment(Pos.CENTER);
+		VBox vbxCourses = new VBox();
+		vbxCourses.getChildren().addAll(lblCourses, lstCourses);
+		VBox vbxCoursesReq = new VBox();
+		vbxCoursesReq.getChildren().addAll(lblCoursesReq, lstCoursesReq);
+		HBox hbxCourses = new HBox();
+		hbxCourses.getChildren().addAll(vbxCourses, vbxCourseButtons, vbxCoursesReq);
+		hbxCourses.setAlignment(Pos.CENTER);
+		hbxCourses.setSpacing(30);
 		Button btnBack = new Button("Cancel");
 		Button btnEdit = new Button("Edit Student Data");
 		Button btnClear = new Button("Clear");
@@ -327,7 +384,12 @@ public class StaffView
 		btnEdit.setOnAction(e->{
 			try
 			{
-				EditEventObject ev = new EditEventObject(btnEdit, new Student(Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), Integer.parseInt(txtZipCode.getText()), txtState.getText(), txtCampus.getText(), cmbMajor.getValue(), txtUsername.getText(), txtPassword.getText()));
+				EditEventObject ev;
+				if(lstCoursesReq.getItems().size() == 0) {
+					ev = new EditEventObject(btnEdit, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), txtZipCode.getText(), txtState.getText(), txtCampus.getText(), cmbMajor.getValue(), txtUsername.getText(), txtPassword.getText(), new Course[0]);
+				} else {
+					ev = new EditEventObject(btnEdit, Integer.parseInt(txtID.getText()), txtFirstName.getText(), txtLastName.getText(), dtpDateEnrolled.getValue(), dtpBirthDate.getValue(), txtSSN.getText(), txtAddress.getText(), txtCity.getText(), txtZipCode.getText(), txtState.getText(), txtCampus.getText(), cmbMajor.getValue(), txtUsername.getText(), txtPassword.getText(), lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()]));
+				}
 				if(listenerEdit != null)
 					listenerEdit.edit(ev);
 				if(!ev.isValid()) {
@@ -363,6 +425,40 @@ public class StaffView
 			txtPassword.clear();
 			txtUsername.clear();
 		});
+		btnAddCourse.setOnAction(eac->{
+			try {
+				if(lstCourses.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+				else if(lstCoursesReq.getItems().contains(lstCourses.getSelectionModel().getSelectedItem())) {
+					Alert alert = new Alert(AlertType.ERROR, "Error, course already taken by student.", ButtonType.OK);
+					alert.showAndWait();
+				} else {
+					lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
+					lstCoursesReq.setSelectionModel(defaultSelect);
+					lstCourses.setSelectionModel(defaultSelect);
+				}
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
+		btnRemoveCourse.setOnAction(eac->{
+			try 
+			{
+				if(lstCoursesReq.getSelectionModel().getSelectedItem() == null)
+				{
+					throw new IllegalArgumentException();
+				}
+				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+				lstCoursesReq.setSelectionModel(defaultSelect);
+				lstCourses.setSelectionModel(defaultSelect);
+			} catch(Exception ex) {
+				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
+				alert.showAndWait();
+			}
+		});
 		btnDelete.setOnAction(e->{
 			Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the student.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);
 			alert.showAndWait().ifPresent(response -> {
@@ -384,13 +480,36 @@ public class StaffView
 		hbxButtons.setAlignment(Pos.CENTER);
 		hbxButtons.setSpacing(20);
 		VBox pane = new VBox();
-		pane.getChildren().addAll(logoutHBox(user), grid, hbxButtons);
+		pane.getChildren().addAll(logoutHBox(user), grid, hbxCourses, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(20);
 		Scene scene = new Scene(pane, 800, 1100);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("SAIN Report");
 		primaryStage.show();
+		for(int i = 0; i < grid.getChildren().size(); i++) {
+			try {
+				if((TextField) grid.getChildren().get(i) != null) {//If selected control is a textfield
+					((TextField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a textField
+			}
+			try {
+				if((PasswordField) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((PasswordField) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+			try {
+				if((ComboBox) grid.getChildren().get(i) != null) {//If selected control is a passwordField
+					((ComboBox) grid.getChildren().get(i)).setMaxWidth(250);
+				}
+			} catch(Exception e) {
+				//Control is not a passwordField
+			}
+		}
 	}
 	public HBox logoutHBox(User user) {
 		Label lblLogoutName = new Label("You are currently signed in as " + user.getName() + " : ");
@@ -497,8 +616,9 @@ public class StaffView
 	public String parseId(int id)
 	{
 		String returnString = Integer.toString(id);
-		if(returnString.length() < 8){
-			for(int i = 0; i < returnString.length() - 8; i++) {
+		int index = returnString.length();
+		if(index < 8){
+			for(int i = 0; i < 8 - index; i++) {
 				returnString = "0" + returnString;
 			}
 		}

@@ -43,7 +43,9 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
@@ -265,10 +267,12 @@ public class AdminView
 		});
 		btnManageCourses.setOnAction(e->
 		{
+			MultipleSelectionModel<Course> courseSelect;
 			Stage courseStage = new Stage();
 			courseStage.setTitle("Manage Courses");
 			Label lblCourses = new Label("Courses : ");
 			ListView<Course> lstCourses = new ListView<Course>();
+			courseSelect = lstCourses.getSelectionModel();
 			for(Course c : courses) {
 				lstCourses.getItems().add(c);
 			}	
@@ -281,19 +285,24 @@ public class AdminView
 			});
 			btnDelete.setOnAction(ea->{
 				try {
+					if(lstCourses.getSelectionModel().getSelectedItem().equals(courseSelect)) {
+						throw new Exception();
+					}
 					DeleteCourseEventObject ev = new DeleteCourseEventObject(btnDelete, lstCourses.getSelectionModel().getSelectedItem());
 					if(listenerCourseDelete != null) {
 						Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the course and all students, majors, and courses who are associated.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);//Ensure that user wants to delete course
 						alert.showAndWait().ifPresent(response -> {
 						     if (response == ButtonType.NO) { 
-						    	 return;
+						    	 throw new IllegalArgumentException();
 						     }
 						});
 						listenerCourseDelete.delete(ev);
 						lstCourses.getItems().remove(lstCourses.getSelectionModel().getSelectedIndex());
 						courses = ev.getCourses();
 					}
+				} catch(IllegalArgumentException ex) {
 				} catch(Exception ex){
+					ex.printStackTrace();
 					Alert alert2 = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 					alert2.showAndWait();
 				}
@@ -312,6 +321,7 @@ public class AdminView
 				}
 				catch(Exception ex)
 				{
+					ex.printStackTrace();
 					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 					alert.showAndWait();
 				}
@@ -335,10 +345,12 @@ public class AdminView
 		});
 		btnManageMajors.setOnAction(e->
 		{
+			MultipleSelectionModel<Major> majorSelect;
 			Stage majorStage = new Stage();
 			majorStage.setTitle("Manage Majors");
 			Label lblMajors = new Label("Majors");
 			ListView<Major> lstMajors = new ListView<Major>();
+			majorSelect = lstMajors.getSelectionModel();
 			for(Major m : majors) {
 				lstMajors.getItems().add(m);
 			}	
@@ -352,19 +364,24 @@ public class AdminView
 			});
 			btnDelete.setOnAction(ea->{
 				try {
+					if(lstMajors.getSelectionModel().equals(majorSelect)) {
+						throw new Exception();
+					}
 					DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
 					if(listenerMajorDelete != null) {
 						Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the major and all students who are associated.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);//Ensure that user wants to delete major
 						alert.showAndWait().ifPresent(response -> {
 						     if (response == ButtonType.NO) { 
-						    	 return;
+						    	 throw new IllegalArgumentException();
 						     }
 						});
 						listenerMajorDelete.delete(ev);
 						lstMajors.getItems().remove(lstMajors.getSelectionModel().getSelectedIndex());
 						majors = ev.getMajors();					
 					}
+				} catch(IllegalArgumentException ex) {
 				} catch(Exception ex) {
+					ex.printStackTrace();
 					Alert alert2 = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
 					alert2.showAndWait();
 				}
@@ -383,6 +400,7 @@ public class AdminView
 				}
 				catch(Exception ex)
 				{
+					ex.printStackTrace();
 					Alert alert = new Alert(AlertType.ERROR, "Error, no major selected!\nPlease select a major then try again.", ButtonType.OK);
 					alert.showAndWait();
 				}
@@ -561,9 +579,9 @@ public class AdminView
 			}
 			catch(Exception ex)
 			{
+				ex.printStackTrace();
 				Alert alert = new Alert(AlertType.ERROR, ex.getMessage(), ButtonType.OK);
 				alert.showAndWait();
-				ex.printStackTrace();
 			}
 		});
 		btnClear.setOnAction(e->{
@@ -593,6 +611,7 @@ public class AdminView
 	}
 	public void addCourseView(boolean edit, Course course)
 	{
+		MultipleSelectionModel<Course> defaultSelect;
 		Stage newCourseStage = new Stage();
 		if(!edit)
 		{
@@ -661,12 +680,11 @@ public class AdminView
 		for(Course c : courses) {
 			lstCourse.getItems().add(c);
 		}	
-		
 		Label lblRightArrow = new Label("-->");
 		Button btnAddCourse = new Button("Add Course");
 		Label lblLeftArrow = new Label("<--");
 		Button btnRemoveCourse = new Button("Remove Course");
-		Label lblCoursesReq = new Label("Corequisite Courses");
+		Label lblCoursesReq = new Label("Prerequisite Courses");
 		ListView<Course> lstCoursesReq = new ListView<Course>();
 		VBox vbxCourseButtons = new VBox();
 		vbxCourseButtons.getChildren().addAll(lblRightArrow, btnAddCourse, lblLeftArrow, btnRemoveCourse);
@@ -680,6 +698,7 @@ public class AdminView
 		hbxCourses.setSpacing(30);
 		Label lblCoursesA = new Label("Courses");
 		ListView<Course> lstCoursesA = new ListView<Course>();
+		defaultSelect = lstCoursesA.getSelectionModel();
 		for(Course c : courses) {
 			lstCoursesA.getItems().add(c);
 		}	
@@ -687,7 +706,7 @@ public class AdminView
 		Button btnAddCourseA = new Button("Add Course");
 		Label lblLeftArrowA = new Label("<--");
 		Button btnRemoveCourseA = new Button("Remove Course");
-		Label lblCoursesReqA = new Label("Prerequisite Courses");
+		Label lblCoursesReqA = new Label("Corequisite Courses");
 		ListView<Course> lstCoursesReqA = new ListView<Course>();
 		VBox vbxCourseButtonsA = new VBox();
 		vbxCourseButtonsA.getChildren().addAll(lblRightArrowA, btnAddCourseA, lblLeftArrowA, btnRemoveCourseA);
@@ -732,11 +751,11 @@ public class AdminView
 			chkPhl.setSelected(course.CAttributes.isPhilosophy());
 			for(String s : course.getPrerequisites())
 			{
-				lstCoursesReq.getItems().add(Arrays.asList(courses).get(Arrays.asList(courses).indexOf(s)));
+				lstCoursesReq.getItems().add(getCourse(s));
 			}
 			for(String s : course.getCorequisites())
 			{
-				lstCoursesReqA.getItems().add(Arrays.asList(courses).get(Arrays.asList(courses).indexOf(s)));
+				lstCoursesReqA.getItems().add(getCourse(s));
 			}
 		}
 		btnCancelThis.setOnAction(eac->{
@@ -753,8 +772,8 @@ public class AdminView
 					alert.showAndWait();
 				} else {
 					lstCoursesReq.getItems().add(lstCourse.getSelectionModel().getSelectedItem());
-					lstCoursesReq.setSelectionModel(null);
-					lstCourse.setSelectionModel(null);
+					lstCoursesReq.setSelectionModel(defaultSelect);
+					lstCourse.setSelectionModel(defaultSelect);
 				}
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
@@ -769,8 +788,8 @@ public class AdminView
 					throw new IllegalArgumentException();
 				}
 				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
-				lstCoursesReq.setSelectionModel(null);
-				lstCourse.setSelectionModel(null);
+				lstCoursesReq.setSelectionModel(defaultSelect);
+				lstCourse.setSelectionModel(defaultSelect);
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -788,8 +807,8 @@ public class AdminView
 					alert.showAndWait();
 				} else {
 					lstCoursesReqA.getItems().add(lstCoursesA.getSelectionModel().getSelectedItem());
-					lstCoursesReqA.setSelectionModel(null);
-					lstCoursesA.setSelectionModel(null);
+					lstCoursesReqA.setSelectionModel(defaultSelect);
+					lstCoursesA.setSelectionModel(defaultSelect);
 				}
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
@@ -804,8 +823,8 @@ public class AdminView
 					throw new IllegalArgumentException();
 				}
 				lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
-				lstCoursesReqA.setSelectionModel(null);
-				lstCoursesA.setSelectionModel(null);
+				lstCoursesReqA.setSelectionModel(defaultSelect);
+				lstCoursesA.setSelectionModel(defaultSelect);
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();
@@ -814,8 +833,8 @@ public class AdminView
 		btnAddThis.setOnAction(eac->{
 			//Error thrown on 898 at runtime
 			AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
-					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCourse.getItems().toArray(new String[lstCourse.getItems().size()]), 
-					lstCoursesA.getItems().toArray(new String[lstCoursesA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
+					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCoursesReq.getItems().toArray(new String[lstCoursesReq.getItems().size()]), 
+					lstCoursesReqA.getItems().toArray(new String[lstCoursesReqA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
 					chkLabScience.isSelected(), chkMath.isSelected(), chkHum.isSelected(), chkBus.isSelected(), chkEng.isSelected(), chkCom.isSelected(), 
 					chkAmerHis.isSelected(), chkSocSci.isSelected(), chkLang.isSelected(), chkPhl.isSelected());
 			if(listenerCourseAdd != null) {
@@ -837,6 +856,7 @@ public class AdminView
 	}
 	public void addMajorView(boolean edit, Major major)
 	{
+			MultipleSelectionModel<Course> defaultSelect;
 			Stage newMajorStage = new Stage();
 			newMajorStage.setTitle("Add Major");
 			GridPane gridOut = new GridPane();
@@ -907,6 +927,7 @@ public class AdminView
 			gridOut.add(txtPhl, 1, 14);
 			Label lblCourses = new Label("Courses");
 			ListView<Course> lstCourses = new ListView<Course>();
+			defaultSelect = lstCourses.getSelectionModel();
 			for(Course c : courses) {
 				lstCourses.getItems().add(c);
 			}				
@@ -991,8 +1012,8 @@ public class AdminView
 						alert.showAndWait();
 					} else {
 						lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
-						lstCoursesReq.setSelectionModel(null);
-						lstCourses.setSelectionModel(null);
+						lstCoursesReq.setSelectionModel(defaultSelect);
+						lstCourses.setSelectionModel(defaultSelect);
 					}
 				} catch(Exception ex) {
 					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
@@ -1007,8 +1028,8 @@ public class AdminView
 						throw new IllegalArgumentException();
 					}
 					lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
-					lstCoursesReq.setSelectionModel(null);
-					lstCourses.setSelectionModel(null);
+					lstCoursesReq.setSelectionModel(defaultSelect);
+					lstCourses.setSelectionModel(defaultSelect);
 				} catch(Exception ex) {
 					Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 					alert.showAndWait();
@@ -1075,6 +1096,7 @@ public class AdminView
 		Label lblPassword = new Label("Password : ");
 		grid.add(lblPassword, 0, 11);
 		PasswordField txtPassword = new PasswordField();
+		txtPassword.setPromptText("Leave this field blank to leave the password unchanged.");
 		grid.add(txtPassword, 1, 11);
 		grid.setAlignment(Pos.CENTER);
 		Button btnBack = new Button("Cancel");
@@ -1089,11 +1111,14 @@ public class AdminView
 		txtZipCode.setText(Integer.toString(user.getZipCode()));
 		txtState.setText(user.getState());
 		txtSSN.setText(user.getSocialSecNum());
+		txtUsername.setText(user.getUsername());
 		dtpBirthDate.setValue(user.getDateOfBirth());
 		btnBack.setOnAction(e->{
 			adminView(admin, majors, courses);
 		});
 		hbxButtons.getChildren().addAll(btnBack, btnClear, btnEdit, btnDelete);
+		hbxButtons.setAlignment(Pos.CENTER);
+		hbxButtons.setSpacing(20);
 		btnEdit.setOnAction(e->{
 			StaffEditEventObject ev = new StaffEditEventObject(btnEdit, txtUsername.getText(), user.getId(), txtFirstName.getText(), txtLastName.getText(), dtpBirthDate.getValue(), txtAddress.getText(), txtCity.getText(), txtState.getText(), txtZipCode.getText(), txtSSN.getText(), txtPassword.getText(), user.isAdministrator());
 			if(listenerEdit != null)
@@ -1256,7 +1281,7 @@ public class AdminView
 	public void setListenerDelete(RemoveStaffListener listenerDelete) {
 		this.listenerDelete = listenerDelete;
 	}
-	public String parseId(int id)
+	private String parseId(int id)
 	{
 		String returnString = Integer.toString(id);
 		int index = returnString.length();
@@ -1266,5 +1291,15 @@ public class AdminView
 			}
 		}
 		return returnString;
+	}
+	private Course getCourse(String courseCode)
+	{
+		Course returnCourse = null;
+		for(Course c : courses)
+		{
+			if(c.getCourseCode().equals(courseCode))
+				returnCourse = c;
+		}
+		return returnCourse;
 	}
 }

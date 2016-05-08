@@ -124,4 +124,37 @@ public class SearchEventObject extends EventObject
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+	public void setSocSecNum(String socSecNum) {
+		this.socSecNum = socSecNum;
+	}
+	public void setMajor(String major) {
+		this.major = major;
+	}
+	public void setGpa(String gpa) {
+		this.gpa = gpa;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 }

@@ -154,4 +154,7 @@ public class Faculty implements User, Serializable
 	{
 		this.password = password;
 	}
+	public String toString() {
+		return lastName + ", " + firstName + " " +  Integer.toString(id);//Don't need to parse 0's because all id #'s begin with 8 or 9
+	}
 }

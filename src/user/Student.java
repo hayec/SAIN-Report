@@ -49,6 +49,7 @@ public class Student implements User, Serializable
 		this.major = major;
 		this.address = address;
 		this.city = city;
+		this.state = state;
 		this.zipCode = zipCode;
 		this.campus = campus;
 		this.username = username;
@@ -65,6 +66,9 @@ public class Student implements User, Serializable
 	public void removeCourse(Course course)
 	{
 		courseWork.removeCourse(course.getCourseCode());
+	}
+	public void setCourseWork(Course[] courseWork) {
+		this.courseWork = new CourseBag(courseWork);
 	}
 	public Course[] getCourseWork()
 	{
@@ -275,6 +279,17 @@ public class Student implements User, Serializable
 	}
 	public String toString()
 	{
-		return getLastName() + ", " + getFirstName() + " " + getId();
+		return getLastName() + ", " + getFirstName() + " " + parseId(getId());
+	}
+	public String parseId(int id)
+	{
+		String returnString = Integer.toString(id);
+		int index = returnString.length();
+		if(index < 8){
+			for(int i = 0; i < 8 - index; i++) {
+				returnString = "0" + returnString;
+			}
+		}
+		return returnString;
 	}
 }

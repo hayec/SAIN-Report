@@ -40,7 +40,7 @@ public class MajorBag
 	}
 	public void removeMajor(String major)
 	{
-		for(Major m : majors)
+		for(Major m : (ArrayList<Major>) majors.clone())
 		{
 			if(m.getName().equals(major))
 			{

@@ -61,6 +61,7 @@ public class CreateAccountEventObject extends EventObject
 		this.state = state;
 		this.socSecNum = socSecNum;
 		this.dateOfBirth = dateOfBirth;
+		this.admin = admin;
 	}
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage += "\n" + errorMessage;

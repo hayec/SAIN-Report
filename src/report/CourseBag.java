@@ -48,7 +48,7 @@ public class CourseBag implements Serializable
 	}
 	public void removeCourse(String courseCode)
 	{
-		for(Course c : courses)
+		for(Course c : (ArrayList<Course>) courses.clone())
 		{
 			if(c.getCourseCode().equals(courseCode))
 			{

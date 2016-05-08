@@ -48,7 +48,6 @@ public class GetMajorData
 		int numOfCredits;
 		for(File f : files)
 		{
-			line = "";
 			physEdReq = 0;
 			hisReq = 0;
 			labSciReq = 0;
@@ -61,6 +60,8 @@ public class GetMajorData
 			socSciReq = 0;
 			langReq = 0;
 			phlReq = 0;
+			numOfCredits = 0;
+			line = "";
 			temp = "";
 			name = "";
 			courses = new ArrayList<String>();
@@ -208,7 +209,7 @@ public class GetMajorData
 		        //Need to remove doubling
 		        System.out.println(name);
 		        ArrayList<Course> reqCourses = new ArrayList<Course>();
-	        	for(String c : courses) {
+		        for(String c : courses) {
 	        		try {
 	        			if(getCourse(c) != null) {
 	        				if(reqCourses.indexOf(getCourse(c)) < 0) {
@@ -218,7 +219,7 @@ public class GetMajorData
 	        		} catch(Exception e)//Allow to continue even if a bad course is found
 	        		{}
 	        	}
-	        	Major tempMajor = new Major(name, physEdReq, hisReq, labSciReq, mathReq, humReq, busReq, engReq, comReq, amerHisReq, socSciReq, langReq, phlReq, numOfCredits, 2.0, reqCourses.toArray(new Course[reqCourses.size()]));//No gpa data is given, so default 2.0
+	        	Major tempMajor = new Major(name, physEdReq, hisReq, labSciReq, mathReq, humReq, busReq, engReq, comReq, amerHisReq, socSciReq, langReq, phlReq, numOfCredits, 2.0, reqCourses.toArray(new Course[reqCourses.size()]));//Default GPA is 2.0 because data is not available on website
 				objOut.writeObject(tempMajor);
 			}
 			catch(Exception e)

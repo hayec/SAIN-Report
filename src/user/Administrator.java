@@ -166,6 +166,6 @@ public class Administrator implements User, Serializable
 		this.username = username;
 	}
 	public String toString() {
-		return lastName + ", " + firstName + " " +  Integer.toString(id);
+		return lastName + ", " + firstName + " " +  Integer.toString(id);//Don't need to parse 0's because all id #'s begin with 8 or 9
 	}
 }

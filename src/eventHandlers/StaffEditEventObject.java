@@ -16,7 +16,7 @@ public class StaffEditEventObject extends EventObject
 	private String zipCode;
 	private String socialSecNum;
 	private String password;
-	private String errorMessage;
+	private String errorMessage = new String();
 	private boolean valid;
 	private boolean admin;
 	public StaffEditEventObject(Object source, String username, int id, String firstName, String lastName,
