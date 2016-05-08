@@ -94,7 +94,7 @@ public class StudentView
 		pane.getChildren().addAll(logoutHBox(user), lblCurrentMajor, hbxInput, hbxButtons);
 		pane.setAlignment(Pos.CENTER);
 		pane.setSpacing(15);
-		Scene scene = new Scene(pane, 400, 400);
+		Scene scene = new Scene(pane, 1200, 400);
 		primaryStage.setScene(scene);
 		
 	}
@@ -111,12 +111,12 @@ public class StudentView
 		ListView<Course> lstCoursesFailed = new ListView<Course>();
 		Label lblCourseNeed = new Label("Courses Necessary for Graduation : ");
 		ListView<Course> lstCoursesNeeded = new ListView<Course>();
-		lstCoursesNeeded.setCellFactory(new Callback<ListView<Course>, ListCell<Course>>() {
+		/*lstCoursesNeeded.setCellFactory(new Callback<ListView<Course>, ListCell<Course>>() {
 		    @Override 
 		    public ListCell<Course> call(ListView<Course> list) {
 		        return new ColorRectCell();
 		    }
-		});
+		});*/
 		for(int i = 0; i < student.getPassedCourses().length; i++)
 			lstCoursesPassed.getItems().add(student.getPassedCourses()[i]);
 		for(int i = 0; i < student.getMajor().getMajorCoursesDone(student).length; i++)

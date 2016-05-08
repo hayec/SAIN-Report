@@ -435,10 +435,36 @@ public class StaffView
 					Alert alert = new Alert(AlertType.ERROR, "Error, course already taken by student.", ButtonType.OK);
 					alert.showAndWait();
 				} else {
+					Stage gradeStage = new Stage();
+					Label lblGrade = new Label("Please choose the course grade : ");
+					ComboBox<String> cmbGrade = new ComboBox<String>();
+					String[] grades = {"A", "B+", "B", "C+", "C", "D+", "D", "F"};
+					cmbGrade.getItems().addAll(grades);
+					cmbGrade.setValue("A");//Default to A
+					Button btnOk = new Button("Continue");
+					btnOk.setOnAction(e->{
+						Course tempCourse = lstCourses.getSelectionModel().getSelectedItem();
+						tempCourse.setCourseGrade(cmbGrade.getValue());
+						gradeStage.close();
+					});
+					gradeStage.setOnCloseRequest(e->{
+						throw new IllegalArgumentException();
+					});
+					HBox gradePane = new HBox();
+					gradePane.getChildren().addAll(lblGrade, cmbGrade, btnOk);
+					gradePane.setAlignment(Pos.CENTER);
+					gradePane.setSpacing(20);
+					Scene gradeScene = new Scene(gradePane, 500, 100);
+					gradeStage.setTitle("Choose a course grade");
+					gradeStage.setScene(gradeScene);
+					gradeStage.showAndWait();
 					lstCoursesReq.getItems().add(lstCourses.getSelectionModel().getSelectedItem());
 					lstCoursesReq.setSelectionModel(defaultSelect);
 					lstCourses.setSelectionModel(defaultSelect);
 				}
+			} catch(IllegalArgumentException ex) {
+				Alert alert = new Alert(AlertType.ERROR, "You must select a course grade.", ButtonType.OK);
+				alert.showAndWait();
 			} catch(Exception ex) {
 				Alert alert = new Alert(AlertType.ERROR, "Error, no course selected!\nPlease select a course then try again.", ButtonType.OK);
 				alert.showAndWait();

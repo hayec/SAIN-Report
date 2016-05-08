@@ -64,24 +64,46 @@ public class Course implements Serializable
 	public String getLetterGrade()
 	{
 		switch((int) courseGrade * 10) {//Multiply courseGrade by 10 to make int then convert to int because switch is incompatible with double
-		case 1: courseGrade = 40;
+		case 40:
 			return "A";
-		case 2: courseGrade = 35;
+		case 35:
 			return "B+";
-		case 3: courseGrade = 30;
+		case 30:
 			return "B";
-		case 4: courseGrade = 25;
+		case 25:
 			return "C+";
-		case 5: courseGrade = 20;
+		case 20:
 			return "C";
-		case 6: courseGrade = 15;
+		case 15:
 			return "D+";
-		case 7: courseGrade = 10;
+		case 10:
 			return "D";
-		case 8: courseGrade = 0;
+		case 0:
 			return "F";
 		default:
 			return "F";//Necessary to prevent exception, should never occur at runtime
+		}
+	}
+	public void setCourseGrade(String grade) {
+		switch(grade) {
+		case "A":
+			courseGrade = 4.0;
+		case "B+":
+			courseGrade = 3.5;
+		case "B":
+			courseGrade = 3.0;
+		case "C+":
+			courseGrade = 2.5;
+		case "C":
+			courseGrade = 2.0;
+		case "D+":
+			courseGrade = 1.5;
+		case "D":
+			courseGrade = 1.0;
+		case "F":
+			courseGrade = 0.0;
+		default:
+			courseGrade = 4.0;//Necessary to prevent exception, should never occur at runtime
 		}
 	}
 	public String getCourseCode() 

@@ -78,15 +78,16 @@ public class Major implements Serializable
 	}
 	public Course[] getMajorCoursesReq(ArrayList<Course> studentCourses)
 	{
+		ArrayList<Course> reqCoursesTemp = new ArrayList<Course>(Arrays.asList(reqCourses));
 		for(int i = 0; i < studentCourses.size(); i++)
 		{
 			for(int j = 0; j < reqCourses.length; j++)
 			{
 				if(reqCourses[j].equals(studentCourses.get(i)))//Make equals method
-					studentCourses.remove(i);
+					reqCoursesTemp.remove(j);
 			}
 		}
-		return studentCourses.toArray(new Course[studentCourses.size()]);
+		return reqCoursesTemp.toArray(new Course[reqCoursesTemp.size()]);
 	}
 	public Course[] getMajorCoursesReq(Student student)
 	{
@@ -135,7 +136,7 @@ public class Major implements Serializable
 	public Course[] getCoursesReq(Student student)
 	{
 		Course[] majReqs = getMajorCoursesReq(new ArrayList<Course>(Arrays.asList(student.getCourseWork())));
-		Course[] genReqs = getMajorCoursesReq(new ArrayList<Course>(Arrays.asList(student.getCourseWork())));
+		Course[] genReqs = getGenEdsReq(student);
 		Course[] results = new Course[majReqs.length + genReqs.length];
 		for(int i = 0; i < majReqs.length; i++)
 			results[i] = majReqs[i];
@@ -178,9 +179,15 @@ public class Major implements Serializable
 			for(Course c : prerequisites)
 			{
 				if(c.getPrerequisites() != null)
-					for(int i = 0; i < c.getPrerequisites().length; i++)
-						if(!student.courseWork.getCourse(c.getPrerequisites()[i]).isSuccessful())
-							temp.add(courses.getCourse(c.getPrerequisites()[i]));
+					for(int i = 0; i < c.getPrerequisites().length; i++) {
+						try{
+							if(!student.courseWork.getCourse(c.getPrerequisites()[i]).isSuccessful()) {
+								temp.add(courses.getCourse(c.getPrerequisites()[i]));
+							}
+						}catch(Exception e) {
+							
+						}
+					}
 			}
 			if(temp.size() > 0)
 			{
