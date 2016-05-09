@@ -55,6 +55,9 @@ import view.AdminView;
 import view.LoginView;
 import view.StaffView;
 import view.StudentView;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -66,6 +69,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -409,6 +414,12 @@ public class SAINController
 			public void add(AddCourseEventObject ev) 
 			{
 				int credits = 0;
+				if(ev.getCourseCode() == null || ev.getCourseCode().equals("")) {
+					ev.setErrorMessage("Course code cannot be left blank");
+				}
+				if(ev.getCourseTitle() == null || ev.getCourseTitle().equals("")) {
+					ev.setErrorMessage("Course title cannot be left blank");
+				}
 				try {
 					if(Integer.parseInt(ev.getCredits()) < 0) {
 						ev.setErrorMessage("Number of credits must be positive.");
@@ -705,12 +716,12 @@ public class SAINController
 						} else {
 							try {
 								users.removeUser(ev.getId());
+								ev.setValid(true);
 								if(ev.getId() == currentUser.getId()) {//If current user was deleted, then logout
 									currentUser = null;
 									loginView.start();
 									return;
 								}
-								ev.setValid(true);
 							} catch(Exception e) {
 								ev.setValid(false);
 								ev.setErrorMessage("An unknown error occurred.  Please contact the developer for assistance.");//Should not occur at runtime
@@ -1042,7 +1053,8 @@ public class SAINController
 	}
 	public void loadData() throws ClassNotFoundException, IOException
 	{
-		loadBinData();
+		//loadBinData();
+		loadSqlData();
 	}
 	public void loadSqlData()
 	{
@@ -1053,12 +1065,39 @@ public class SAINController
 			String url = "jdbc:mysql://localhost/SAINReport";
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conn = DriverManager.getConnection(url, userName, password);
-			
 			Statement stmt = conn.createStatement();
 			ResultSet rset;
-			stmt.executeQuery("SELECT ");
+			byte[] buffer;
+			ObjectInputStream objectIn = null;
+			rset = stmt.executeQuery("SELECT * from courses");
+			while(rset.next()) {
+				buffer = rset.getBytes("serialObj");
+				if (buffer != null) {
+					objectIn = new ObjectInputStream(new ByteArrayInputStream(buffer));
+					courses.addCourse((Course) objectIn.readObject());
+				}
+				objectIn.close();
+			}
+			rset = stmt.executeQuery("SELECT * from majors");
+			while(rset.next()) {
+				buffer = rset.getBytes("serialObj");
+				if (buffer != null) {
+					objectIn = new ObjectInputStream(new ByteArrayInputStream(buffer));
+					majors.addMajor((Major) objectIn.readObject());
+				}
+				objectIn.close();
+			}
+			rset = stmt.executeQuery("SELECT * from users");
+			while(rset.next()) {
+				buffer = rset.getBytes("serialObj");
+				if (buffer != null) {
+					objectIn = new ObjectInputStream(new ByteArrayInputStream(buffer));
+					users.addUser((User) objectIn.readObject());
+				}
+				objectIn.close();
+			}
 		} catch(Exception e) {
-			
+			e.printStackTrace();
 		} finally {
 			if(conn != null) {
 				try {
@@ -1069,7 +1108,6 @@ public class SAINController
 				}
 			}
 		}
-		
 	}
 	public void loadBinData() throws ClassNotFoundException, IOException
 	{
@@ -1138,13 +1176,78 @@ public class SAINController
 	public boolean saveData()
 	{
 		if(!loading)
-			return saveBinData();
+		{
+			return saveBinData() && saveSqlData();
+		}
 		else 
 			return false;
 	}
 	public boolean saveSqlData()
 	{
-		boolean success = false;
+		boolean success = true;
+		Connection conn = null;
+		try {
+			String userName = "SAINReport";
+			String password = "";
+			String url = "jdbc:mysql://localhost/SAINReport";
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			conn = DriverManager.getConnection(url, userName, password);
+			Statement stmt = conn.createStatement();
+			PreparedStatement ps = null;
+			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+			stmt.executeUpdate("drop table if exists courses");
+			stmt.executeUpdate("CREATE TABLE `courses` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,  `serialObj` longblob,  PRIMARY KEY (`id`))");
+			for(Course c : courses.getCourses()) {
+				objOut.writeObject(c);
+				objOut.flush();
+				objOut.close();
+			    byteOut.close();
+			    byte[] data = byteOut.toByteArray();
+				String str = "INSERT INTO courses (serialObj) VALUES(?);";
+				ps = conn.prepareStatement(str);
+				ps.setObject(1, data);
+				ps.executeUpdate();
+			}
+			stmt.executeUpdate("drop table if exists majors");
+			stmt.executeUpdate("CREATE TABLE `majors` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,  `serialObj` longblob,  PRIMARY KEY (`id`))");
+			for(Major m : majors.getMajors()) {
+				objOut.writeObject(m);
+				objOut.flush();
+				objOut.close();
+			    byteOut.close();
+			    byte[] data = byteOut.toByteArray();
+				String str = "INSERT INTO majors (serialObj) VALUES(?);";
+				ps = conn.prepareStatement(str);
+				ps.setObject(1, data);
+				ps.executeUpdate();
+			}
+			stmt.executeUpdate("drop table if exists users");
+			stmt.executeUpdate("CREATE TABLE `users` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,  `serialObj` longblob,  PRIMARY KEY (`id`))");
+			for(User u : users.getUsers()) {
+				objOut.writeObject(u);
+				objOut.flush();
+				objOut.close();
+			    byteOut.close();
+			    byte[] data = byteOut.toByteArray();
+				String str = "INSERT INTO users (serialObj) VALUES(?);";
+				ps = conn.prepareStatement(str);
+				ps.setObject(1, data);
+				ps.executeUpdate();
+			}
+		} catch(Exception e) {
+			success = false;
+			e.printStackTrace();
+		} finally {
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch(Exception e)
+				{
+					
+				}
+			}
+		}
 		return success;
 	}
 	public boolean saveBinData()

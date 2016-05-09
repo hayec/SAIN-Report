@@ -484,7 +484,7 @@ public class StaffView
 				{
 					throw new IllegalArgumentException();
 				}
-				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedIndex());
 				lstCoursesReq.setSelectionModel(defaultSelect);
 				lstCourses.setSelectionModel(defaultSelect);
 			} catch(Exception ex) {

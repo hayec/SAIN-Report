@@ -1,6 +1,7 @@
 package view;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import eventHandlers.BackEventObject;
@@ -364,9 +365,6 @@ public class AdminView
 			});
 			btnDelete.setOnAction(ea->{
 				try {
-					if(lstMajors.getSelectionModel().equals(majorSelect)) {
-						throw new Exception();
-					}
 					DeleteMajorEventObject ev = new DeleteMajorEventObject(btnDelete, lstMajors.getSelectionModel().getSelectedItem());
 					if(listenerMajorDelete != null) {
 						Alert alert = new Alert(AlertType.CONFIRMATION, "This will permanently delete the major and all students who are associated.\nAre you sure you want to continue?", ButtonType.YES, ButtonType.NO);//Ensure that user wants to delete major
@@ -787,7 +785,7 @@ public class AdminView
 				{
 					throw new IllegalArgumentException();
 				}
-				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedItem());
+				lstCoursesReq.getItems().remove(lstCoursesReq.getSelectionModel().getSelectedIndex());
 				lstCoursesReq.setSelectionModel(defaultSelect);
 				lstCourse.setSelectionModel(defaultSelect);
 			} catch(Exception ex) {
@@ -822,7 +820,7 @@ public class AdminView
 				{
 					throw new IllegalArgumentException();
 				}
-				lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedItem());
+				lstCoursesReqA.getItems().remove(lstCoursesReqA.getSelectionModel().getSelectedIndex());
 				lstCoursesReqA.setSelectionModel(defaultSelect);
 				lstCoursesA.setSelectionModel(defaultSelect);
 			} catch(Exception ex) {
@@ -832,9 +830,17 @@ public class AdminView
 		});
 		btnAddThis.setOnAction(eac->{
 			//Error thrown on 898 at runtime
+			ArrayList<String> tempReq = new ArrayList<String>();
+			for(Course c : lstCoursesReq.getItems().toArray(new Course[lstCoursesReq.getItems().size()])) {
+				tempReq.add(c.getCourseCode());
+			}
+			ArrayList<String> tempReqA = new ArrayList<String>();
+			for(Course c : lstCoursesReqA.getItems().toArray(new Course[lstCoursesReqA.getItems().size()])) {
+				tempReqA.add(c.getCourseCode());
+			}
 			AddCourseEventObject ev = new AddCourseEventObject(btnAddThis, txtCourseCode.getText(), txtCourseTitle.getText(), txtCourseDescription.getText(),
-					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), lstCoursesReq.getItems().toArray(new String[lstCoursesReq.getItems().size()]), 
-					lstCoursesReqA.getItems().toArray(new String[lstCoursesReqA.getItems().size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
+					chkAmmerman.isSelected(), chkGrant.isSelected(), chkEastern.isSelected(), tempReq.toArray(new String[tempReq.size()]), 
+					tempReqA.toArray(new String[tempReqA.size()]), txtCredits.getText(), chkPhysEd.isSelected(), chkHistory.isSelected(), 
 					chkLabScience.isSelected(), chkMath.isSelected(), chkHum.isSelected(), chkBus.isSelected(), chkEng.isSelected(), chkCom.isSelected(), 
 					chkAmerHis.isSelected(), chkSocSci.isSelected(), chkLang.isSelected(), chkPhl.isSelected());
 			if(listenerCourseAdd != null) {

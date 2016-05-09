@@ -113,39 +113,25 @@ public class StudentView
 		ListView<Course> lstCoursesFailed = new ListView<Course>();
 		Label lblCourseNeed = new Label("Courses Necessary for Graduation : ");
 		ListView<Course> lstCoursesNeeded = new ListView<Course>();
-		/*lstCoursesNeeded.setCellFactory(new Callback<ListView<Course>, ListCell<Course>>() {
-		    @Override 
-		    public ListCell<Course> call(ListView<Course> list) {
-		        return new ColorRectCell();
-		    }
-		});*/
-		for(int i = 0; i < student.getPassedCourses().length; i++)
+		for(int i = 0; i < student.getPassedCourses().length; i++) {
 			lstCoursesPassed.getItems().add(student.getPassedCourses()[i]);
-		for(int i = 0; i < student.getMajor().getMajorCoursesDone(student).length; i++)
+		}
+		for(int i = 0; i < student.getMajor().getMajorCoursesDone(student).length; i++) {
 			lstMajorCoursesPassed.getItems().add(student.getMajor().getMajorCoursesDone(student)[i]);
-		for(int i = 0; i < student.getFailedCourses().length; i++)
+		}
+		for(int i = 0; i < student.getFailedCourses().length; i++) {
 			lstCoursesFailed.getItems().add(student.getFailedCourses()[i]);
-		for(int i = 0; i < student.getMajor().getCoursesReq(student).length; i++)
+		}
+		for(int i = 0; i < student.getMajor().getCoursesReq(student).length; i++) {
+			if(student.getMajor().getCoursesReq(student)[i].toString() != null && !student.getMajor().getCoursesReq(student)[i].equals("null"))
 			lstCoursesNeeded.getItems().add(student.getMajor().getCoursesReq(student)[i]);
-		/*for(int i = 0; i < student.getCourseWork().length; i++)
-		{
-			if(student.getCourseWork()[i].isSuccessful())
-				lstCoursesPassed.getItems().add(student.getCourseWork()[i]);
-			else
-				lstCoursesFailed.getItems().add(student.getCourseWork()[i]);
-		}*/
+		}
 		Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
 		Button btnBack = new Button("Back");
 		btnBack.setOnAction(e->
 		{
-			if(user.isStudent())
-				studentStart(user, student, majorCache, allCourses);
-			else
-			{
-				BackEventObject ev = new BackEventObject(btnBack);
-				if(listenerBack != null)
-					listenerBack.back(ev);
-			}
+			student.setMajor(studentMajor);
+			studentStart(user, student, majorCache, allCourses);
 		});
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
