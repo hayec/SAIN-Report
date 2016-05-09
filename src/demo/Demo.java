@@ -11,9 +11,6 @@ import javafx.stage.Stage;
  * *****************************************************************************************************************
  */
 public class Demo extends Application {
-	public static void main(String[] args) {
-	//Needed to export jar file
-	}
 	@Override
 	public void start(Stage primaryStage) {
 		SAINController controller = new SAINController(primaryStage);

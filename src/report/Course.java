@@ -55,7 +55,20 @@ public class Course implements Serializable {
         CAttributes = new CourseAttributes();
     }
     public Course clone() {
-        return new Course(courseCode, courseTitle, courseDescription, ammerman, grant, eastern, prerequisites, corequisites, credits, complete, courseGrade, transferCourse);
+    	Course c = new Course(courseCode, courseTitle, courseDescription, ammerman, grant, eastern, prerequisites, corequisites, credits, complete, courseGrade, transferCourse); 
+        c.CAttributes.setAmerHis(CAttributes.isAmerHis());
+        c.CAttributes.setBusiness(CAttributes.isBusiness());
+        c.CAttributes.setCommunications(CAttributes.isCommunications());
+        c.CAttributes.setEnglish(CAttributes.isEnglish());
+        c.CAttributes.setHistory(CAttributes.isHistory());
+        c.CAttributes.setHumanities(CAttributes.isHumanities());
+        c.CAttributes.setLabScience(CAttributes.isLabScience());
+        c.CAttributes.setLanguage(CAttributes.isLanguage());
+        c.CAttributes.setMath(CAttributes.isMath());
+        c.CAttributes.setPhilosophy(CAttributes.isPhilosophy());
+        c.CAttributes.setPhysEd(CAttributes.isPhysEd());
+        c.CAttributes.setSocScience(CAttributes.isSocScience());
+        return c;
     }
     public String getLetterGrade() {
         switch ((int) courseGrade * 10) { //Multiply courseGrade by 10 to make int then convert to int because switch is incompatible with double

@@ -76,8 +76,9 @@ public class Major implements Serializable {
         ArrayList<Course> returnCourse = new ArrayList<Course> ();
         for (int i = 0; i < studentCourses.size(); i++) {
             for (int j = 0; j < reqCourses.length; j++) {
-                if (reqCourses[j].getCourseCode().equals(studentCourses.get(i).getCourseCode()))
+                if (reqCourses[j].getCourseCode().equals(studentCourses.get(i).getCourseCode()) && studentCourses.get(i).isSuccessful()) {
                     returnCourse.add(studentCourses.get(i));
+                }
             }
         }
         return returnCourse.toArray(new Course[returnCourse.size()]);
@@ -208,9 +209,9 @@ public class Major implements Serializable {
      * @return The number of semesters needed for the student to complete his or her 
      */
     public int getNumOfSemestersReq(Student student, CourseBag courses) {
-        ArrayList<Course> studentCourses = new ArrayList<Course> (Arrays.asList(student.getCourseWork()));
-        ArrayList<Course> prerequisites = new ArrayList<Course> ();
-        ArrayList<Course> temp = new ArrayList<Course> ();
+        ArrayList<Course> studentCourses = new ArrayList<Course>(Arrays.asList(student.getCourseWork()));
+        ArrayList<Course> prerequisites = new ArrayList<Course>();
+        ArrayList<Course> temp = new ArrayList<Course>();
         int semesters = 0;
         prerequisites = studentCourses;
         boolean loop = true;
@@ -230,7 +231,7 @@ public class Major implements Serializable {
             if (temp.size() > 0) {
                 semesters++;
                 prerequisites = temp;
-                temp = new ArrayList<Course> ();
+                temp = new ArrayList<Course>();
             } else {
                 loop = false;
             }
@@ -239,7 +240,7 @@ public class Major implements Serializable {
         for (Course c: getCoursesReq(student)) {
             semesters2 += c.getCredits();
         }
-        semesters2 = (int) Math.ceil(semesters2 / 18.0);
+        semesters2 = (int) Math.ceil((numOfCreditsReq - semesters2) / 18.0);
         if (semesters > semesters2) {
             return semesters; //Return whichever is greater
         } else {
@@ -266,7 +267,7 @@ public class Major implements Serializable {
         int phlReqTemp = phlReq;
         ArrayList<Course> returnCourses = new ArrayList<Course> ();
         for (int i = 0; i < studentCourses.size(); i++) {
-        	CourseAttributes temp = studentCourses.get(i).CAttributes;
+        	CourseAttributes temp = new CourseAttributes(studentCourses.get(i).CAttributes);
             if (labSciReqTemp > 0) {
                 if (studentCourses.get(i).CAttributes.isLabScience()) {
                     returnCourses.add(studentCourses.get(i));
@@ -351,7 +352,7 @@ public class Major implements Serializable {
                     studentCourses.get(i).CAttributes = new CourseAttributes(); //Prevents course from being counted twice by wiping all data
                 }
             }
-            studentCourses.get(i).CAttributes = temp;
+            studentCourses.get(i).CAttributes = temp;//Reset the course attributes
         }
         return returnCourses;
     }

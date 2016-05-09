@@ -124,12 +124,12 @@ public class StudentView {
         for (int i = 0; i < student.getFailedCourses().length; i++) {
             lstCoursesFailed.getItems().add(student.getFailedCourses()[i]);
         }
-        Course[] coursesReq = student.getMajor().getCoursesReq(student);
+        Course[] coursesReq = student.getMajor().getCoursesReq(student.clone());
         for (int i = 0; i < coursesReq.length; i++) {
-            if (coursesReq[i].toString() != null && !student.getMajor().getCoursesReq(student)[i].equals("null"))
+            if (coursesReq[i].toString() != null && !coursesReq[i].equals("null"))
                 lstCoursesNeeded.getItems().add(coursesReq[i]);
         }
-        Label lblSemestersNeeded = new Label("A minimum of " + student.semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
+        Label lblSemestersNeeded = new Label("A minimum of " + student.clone().semestersNeeded(allCourses) + " semesters are necessary to complete this degree.");
         Button btnBack = new Button("Back");
         btnBack.setOnAction(e -> {
             student.setMajor(studentMajor);

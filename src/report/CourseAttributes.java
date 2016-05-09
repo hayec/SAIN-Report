@@ -34,6 +34,20 @@ public class CourseAttributes implements Serializable {
         this.language = language;
         this.philosophy = philosophy;
     }
+    public CourseAttributes(CourseAttributes c) {
+    	this.physEd = c.physEd;
+    	this.history = c.history;
+        this.labScience = c.labScience;
+        this.math = c.math;
+        this.humanities = c.humanities;
+        this.business = c.business;
+        this.english = c.english;
+        this.communications = c.communications;
+        this.amerHis = c.amerHis;
+        this.socScience = c.socScience;
+        this.language = c.language;
+        this.philosophy = c.philosophy;
+    }
     public boolean isPhysEd() {
         return physEd;
     }

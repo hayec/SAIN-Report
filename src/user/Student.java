@@ -60,7 +60,11 @@ public class Student implements User, Serializable {
         return courseWork;
     }
     public Student clone() {
-        return new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, state, campus, major);
+        Student s = new Student(id, firstName, lastName, dateEnrolled, dateOfBirth, socialSecNum, address, city, zipCode, state, campus, major, username, password);
+        for(Course c : courseWork.getCourses()) {
+        	s.addCourse(c.clone());
+        }
+        return s;
     }
     public void addCourse(Course course) {
         courseWork.addCourse(course);
