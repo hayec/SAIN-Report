@@ -4,8 +4,7 @@ import java.util.EventObject;
 import user.Student;
 import user.User;
 
-public class SearchEventObject extends EventObject 
-{
+public class SearchEventObject extends EventObject {
 	private String id;
 	private String firstName;
 	private String lastName;
@@ -21,12 +20,12 @@ public class SearchEventObject extends EventObject
 	private User[] userResults;
 	private boolean inputValid = false;
 	private String errorMessage = new String();
-	public SearchEventObject(Object source)
-	{
+	public SearchEventObject(Object source)	{
 		super(source);
 	}
-	public SearchEventObject(Object source, String id, String firstName, String lastName, String address, String city, String state, String zipCode, String socSecNum, String major, String gpa, String username)
-	{
+	public SearchEventObject(Object source, String id, String firstName, String lastName,
+			String address, String city, String state, String zipCode, String socSecNum,
+			String major, String gpa, String username) {
 		super(source);
 		this.id = id;
 		this.firstName = firstName;
@@ -40,8 +39,8 @@ public class SearchEventObject extends EventObject
 		this.gpa = gpa;
 		this.username = username;
 	}
-	public SearchEventObject(Object source, String id, String firstName, String lastName, String address, String city, String state, String zipCode, String socSecNum, String username)
-	{
+	public SearchEventObject(Object source, String id, String firstName, String lastName, 
+			String address, String city, String state, String zipCode, String socSecNum, String username) {
 		super(source);
 		this.id = id;
 		this.firstName = firstName;
@@ -53,60 +52,46 @@ public class SearchEventObject extends EventObject
 		this.socSecNum = socSecNum;
 		this.username = username;
 	}
-	public String getUsername()
-	{
+	public String getUsername()	{
 		return username;
 	}
-	public String getId() 
-	{
+	public String getId() {
 		return id;
 	}
-	public String getFirstName() 
-	{
+	public String getFirstName() {
 		return firstName;
 	}
-	public String getLastName() 
-	{
+	public String getLastName() {
 		return lastName;
 	}
-	public String getAddress() 
-	{
+	public String getAddress() {
 		return address;
 	}
-	public String getCity() 
-	{
+	public String getCity() {
 		return city;
 	}
-	public String getState() 
-	{
+	public String getState() {
 		return state;
 	}
-	public String getZipCode() 
-	{
+	public String getZipCode() {
 		return zipCode;
 	}
-	public String getSocSecNum() 
-	{
+	public String getSocSecNum() {
 		return socSecNum;
 	}
-	public String getMajor() 
-	{
+	public String getMajor() {
 		return major;
 	}
-	public String getGpa() 
-	{
+	public String getGpa() {
 		return gpa;
 	}
-	public boolean isInputValid() 
-	{
+	public boolean isInputValid() {
 		return inputValid;
 	}
-	public void setInputValid(boolean inputValid) 
-	{
+	public void setInputValid(boolean inputValid) {
 		this.inputValid = inputValid;
 	}
-	public Student[] getStudentResults() 
-	{
+	public Student[] getStudentResults() {
 		return studentResults;
 	}
 	public User[] getUserResults() {

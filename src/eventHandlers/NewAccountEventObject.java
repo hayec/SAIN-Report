@@ -3,59 +3,47 @@ package eventHandlers;
 import java.util.EventObject;
 import user.User;
 
-public class NewAccountEventObject extends EventObject 
-{
+public class NewAccountEventObject extends EventObject {
 	private String username;
 	private String password;
 	private boolean isValidPassword;
 	private boolean accountValid;
 	private String errorMessage = new String();
 	private User user;
-	public NewAccountEventObject(Object source, String username, String password)
-	{
+	public NewAccountEventObject(Object source, String username, String password) {
 		super(source);
 		this.username = username;
 		this.password = password;
 	}
-	public NewAccountEventObject(Object source, User newUser)
-	{
+	public NewAccountEventObject(Object source, User newUser) {
 		super(source);
 		this.user = newUser;
 	}
-	public String getUsername() 
-	{
+	public String getUsername() {
 		return username;
 	}
-	public String getPassword()
-	{
+	public String getPassword() {
 		return password;
 	}
-	public User getUser()
-	{
+	public User getUser() {
 		return user;
 	}
-	public boolean isValidPassword() 
-	{
+	public boolean isValidPassword() {
 		return isValidPassword;
 	}
-	public boolean isValidAccount()
-	{
+	public boolean isValidAccount() {
 		return accountValid;
 	}
-	public void setValidPassword(boolean isValidPassword) 
-	{
+	public void setValidPassword(boolean isValidPassword) {
 		this.isValidPassword = isValidPassword;
 	}
-	public void setValidAccount(boolean accountValid)
-	{
+	public void setValidAccount(boolean accountValid) {
 		this.accountValid = accountValid;
 	}
-	public void setErrorMessage(String message)
-	{
+	public void setErrorMessage(String message) {
 		errorMessage = message;
 	}
-	public String getErrorMessage()
-	{
+	public String getErrorMessage() {
 		return errorMessage;
 	}
 }

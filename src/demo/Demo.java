@@ -3,13 +3,19 @@ package demo;
 import controller.SAINController;
 import javafx.application.Application;
 import javafx.stage.Stage;
-
-public class Demo extends Application 
-{
-
+/*
+ * *****************************************************************************************************************
+ * Developer : Christopher Hayes
+ * Date Created : May 8th 2016 05/08/2016
+ * Copyright ©2016 All rights reserved 
+ * *****************************************************************************************************************
+ */
+public class Demo extends Application {
+	public static void main(String[] args) {
+	//Needed to export jar file
+	}
 	@Override
-	public void start(Stage primaryStage)
-	{
+	public void start(Stage primaryStage) {
 		SAINController controller = new SAINController(primaryStage);
 	}
 }

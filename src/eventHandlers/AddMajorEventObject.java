@@ -4,8 +4,7 @@ import java.util.EventObject;
 import report.Course;
 import user.Major;
 
-public class AddMajorEventObject extends EventObject
-{
+public class AddMajorEventObject extends EventObject {
 	private boolean valid;
 	private String name;
 	private String minGPA;

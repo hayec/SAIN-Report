@@ -6,15 +6,13 @@ import user.Major;
 import user.Student;
 import user.User;
 
-public class SAINEventObject extends EventObject 
-{
+public class SAINEventObject extends EventObject {
 	private Major major;
 	private User user;
 	private Student student;
 	private String errorMessage = new String();
 	private boolean valid = false;
-	public SAINEventObject(Object source, Major major, User user, Student student)
-	{
+	public SAINEventObject(Object source, Major major, User user, Student student)	{
 		super(source);
 		this.user = user;
 		this.major = major;

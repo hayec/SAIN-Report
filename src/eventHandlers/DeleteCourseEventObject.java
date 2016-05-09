@@ -3,10 +3,9 @@ package eventHandlers;
 import java.util.EventObject;
 import report.Course;
 
-public class DeleteCourseEventObject extends EventObject 
-{
-	Course target;
-	Course[] courses;
+public class DeleteCourseEventObject extends EventObject {
+	private Course target;
+	private Course[] courses;
 	public DeleteCourseEventObject(Object source, Course target) {
 		super(source);
 		this.target = target;

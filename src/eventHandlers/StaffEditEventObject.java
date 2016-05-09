@@ -3,8 +3,7 @@ package eventHandlers;
 import java.time.LocalDate;
 import java.util.EventObject;
 
-public class StaffEditEventObject extends EventObject 
-{
+public class StaffEditEventObject extends EventObject {
 	private String username;
 	private int id;
 	private String firstName;

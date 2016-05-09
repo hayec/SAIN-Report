@@ -12,8 +12,7 @@ import java.util.Arrays;
 
 import report.Course;
 
-public class CourseDownloadToCourse {
-
+public class CourseDownloadToCourse {//Convert CourseDownload object to Course.bin for program
 	public static void main(String[] args) throws IOException {
 		File fileO = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Course Files\\Courses.bin");
 		FileOutputStream fileOut = new FileOutputStream(fileO);
@@ -32,7 +31,7 @@ public class CourseDownloadToCourse {
 					}
 				}
 				tempCourse.setAttributes(attr.toArray(new String[attr.size()]));
-				Course tempCourseNew = new Course(tempCourse.courseCode, tempCourse.getTitle(), tempCourse.getDescription(), tempCourse.isAmmerman(), tempCourse.isGrant(), tempCourse.isEastern(), tempCourse.getPrerequisites(), tempCourse.getCorequisites(), tempCourse.getCredits());
+				Course tempCourseNew = new Course(tempCourse.getCourseCode(), tempCourse.getTitle(), tempCourse.getDescription(), tempCourse.isAmmerman(), tempCourse.isGrant(), tempCourse.isEastern(), tempCourse.getPrerequisites(), tempCourse.getCorequisites(), tempCourse.getCredits());
 				for(int i = 0; i < tempCourse.getAttributes().length; i++)
 				{
 					if(tempCourse.getAttributes()[i] != null)

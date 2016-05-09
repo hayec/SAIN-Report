@@ -4,8 +4,7 @@ import java.util.EventObject;
 
 import report.Course;
 
-public class AddCourseEventObject extends EventObject 
-{
+public class AddCourseEventObject extends EventObject {
 	private String courseCode;
 	private String courseTitle;
 	private String courseDescription;

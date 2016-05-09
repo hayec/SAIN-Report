@@ -3,12 +3,18 @@ package user;
 import java.util.ArrayList;
 import eventHandlers.ModelChangedEventObject;
 import eventHandlers.ModelListener;
-
+/*
+ * Contains an ArrayList of Users.  Implements a variety algorithms for conveniently adding, removing, and searching for users.
+ */
 
 public class UserBag
 {
 	private ArrayList<User> users = new ArrayList<User>();
 	private ModelListener listenerModel;
+	  /*
+     * Adds the specified user to the ArrayList.
+     * @param user User to add.
+     */
 	public void addUser(User user)
 	{
 		if(user != null) {
@@ -18,6 +24,10 @@ public class UserBag
 			}
 		}
 	}
+	/*
+     * Adds all users in the specified array to the ArrayList.
+     * @param newUsers Array of users to add.
+     */
 	public void addUser(User[] newUsers)
 	{
 		for(int i = 0; i < newUsers.length; i++) {
@@ -29,6 +39,10 @@ public class UserBag
 			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
+	 /*
+     * Returns the specified user from the ArrayList.  If the user is not found, null is returned instead.
+     * @param id ID number of the user to be searched for
+     */
 	public User getUser(int id)
 	{
 		User returnUser = null;
@@ -41,6 +55,10 @@ public class UserBag
 		}
 		return returnUser;
 	}
+	 /*
+     * Returns the specified user from the ArrayList.  If the user is not found, null is returned instead.
+     * @param username Username of the user to be searched for
+     */
 	public User getUser(String username)
 	{
 		User returnUser = null;
@@ -53,6 +71,10 @@ public class UserBag
 		}
 		return returnUser;
 	}
+	 /*
+     * Removes the specified user from the ArrayList
+     * @param id ID number of the user to be removed
+     */
 	public void removeUser(int id)
 	{
 		for(User u : (ArrayList<User>) users.clone())
@@ -67,10 +89,18 @@ public class UserBag
 			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
+	/*
+     * Returns all users in the ArrayList
+     * @return The array of all users in the ArrayList
+     */
 	public User[] getUsers()
 	{
 		return users.toArray(new User[users.size()]);
 	}
+	/*
+     * Returns all users in the ArrayList with the specified values.  Blank or null strings are ignored as search terms, as are integers with negative values.
+     * @return The array of all users in the ArrayList which meet the criteria.
+     */
 	@SuppressWarnings("unchecked")
 	public User[] getUsers(String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear)//Any undesired requirements should be designated as negative or null
 	{
@@ -136,6 +166,10 @@ public class UserBag
 			returnUser = userResults.toArray(new User[userResults.size()]);
 		return returnUser;
 	}
+	/*
+     * Returns all students in the ArrayList with the specified values.  Blank or null strings are ignored as search terms, as are integers with negative values.
+     * @return The array of all students in the ArrayList which meet the criteria.
+     */
 	@SuppressWarnings("unchecked")
 	public Student[] getStudents(String firstName, String lastName, String socSecNum, String address, String city, int zipCode, String state, int birthYear, double gpa, Major major, int yearEnrolled)//Any undesired requirements should be designated as negative or null
 	{
@@ -223,6 +257,10 @@ public class UserBag
 			returnStudent = studentResults.toArray(new Student[studentResults.size()]);
 		return returnStudent;
 	}
+	/*
+     * Returns all students in the ArrayList
+     * @return The array of all students in the ArrayList
+     */
 	public Student[] getStudents()
 	{
 		ArrayList<Student> returnStudents = new ArrayList<Student>();
@@ -234,6 +272,10 @@ public class UserBag
 		}
 		return returnStudents.toArray(new Student[returnStudents.size()]);
 	}
+	/*
+     * Returns all administrators in the ArrayList
+     * @return The array of all administrators in the ArrayList
+     */
 	public Administrator[] getAdministrators()
 	{
 		ArrayList<Administrator> returnAdmins = new ArrayList<Administrator>();

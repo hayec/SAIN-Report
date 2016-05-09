@@ -7,8 +7,7 @@ import report.Course;
 import user.Major;
 import user.Student;
 
-public class EditEventObject extends EventObject
-{
+public class EditEventObject extends EventObject {
 	private String errorMessage = new String();
 	private boolean valid;
 	private int id;
@@ -26,8 +25,9 @@ public class EditEventObject extends EventObject
 	private String state;
 	private String password;
 	private Course[] coursework;
-	public EditEventObject (Object source, int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, String socialSecNum, String address, String city, String zipCode, String state, String campus, Major major, String username, String password, Course[] coursework)
-	{
+	public EditEventObject (Object source, int id, String firstName, String lastName, LocalDate dateEnrolled, LocalDate dateOfBirth, 
+			String socialSecNum, String address, String city, String zipCode, String state, String campus, Major major, 
+			String username, String password, Course[] coursework) {
 		super(source);
 		this.id = id;
 		this.firstName = firstName;

@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import report.Course;
 
 public class CourseDownloadtoCourses {
-
-	public static void main(String[] args) {
+	public static void main(String[] args) {//Convert CourseDownload objects to Course objects for importing majors
 		File[] files = new File("C:\\Users\\Christopher\\workspace\\SAIN Report\\Course Descriptions").listFiles();
 		for(File f : files)
 		{
@@ -26,7 +25,7 @@ public class CourseDownloadtoCourses {
 					}
 				}
 				tempCourse.setAttributes(attr.toArray(new String[attr.size()]));
-				Course tempCourseNew = new Course(tempCourse.courseCode, tempCourse.getTitle(), tempCourse.getDescription(), tempCourse.isAmmerman(), tempCourse.isGrant(), tempCourse.isEastern(), tempCourse.getPrerequisites(), tempCourse.getCorequisites(), tempCourse.getCredits());
+				Course tempCourseNew = new Course(tempCourse.getCourseCode(), tempCourse.getTitle(), tempCourse.getDescription(), tempCourse.isAmmerman(), tempCourse.isGrant(), tempCourse.isEastern(), tempCourse.getPrerequisites(), tempCourse.getCorequisites(), tempCourse.getCredits());
 				for(int i = 0; i < tempCourse.getAttributes().length; i++)
 				{
 					if(tempCourse.getAttributes()[i].equals("HUM"))

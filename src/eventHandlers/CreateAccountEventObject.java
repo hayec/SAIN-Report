@@ -5,8 +5,7 @@ import java.util.EventObject;
 
 import user.Major;
 
-public class CreateAccountEventObject extends EventObject 
-{
+public class CreateAccountEventObject extends EventObject {
 	private boolean validAccount = false;
 	private String errorMessage = new String();
 	private String id;
@@ -66,24 +65,19 @@ public class CreateAccountEventObject extends EventObject
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage += "\n" + errorMessage;
 	}
-	public void setId(int id)
-	{
+	public void setId(int id) {
 		this.id = Integer.toString(id);
 	}
-	public String getErrorMessage()
-	{
+	public String getErrorMessage()	{
 		return errorMessage;
 	}
-	public boolean isValidAccount()
-	{
+	public boolean isValidAccount()	{
 		return validAccount;
 	}
-	public void setValidAccount(boolean validAccount)
-	{
+	public void setValidAccount(boolean validAccount) {
 		this.validAccount = validAccount;
 	}
-	public boolean isAdmin()
-	{
+	public boolean isAdmin() {
 		return admin;
 	}
 	public String getId() {

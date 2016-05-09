@@ -2,13 +2,11 @@ package eventHandlers;
 
 import java.util.EventObject;
 
-public class RemoveStaffEventObject extends EventObject 
-{
+public class RemoveStaffEventObject extends EventObject {
 	private int id;
 	private String errorMessage = new String();
 	private boolean valid;
-	public RemoveStaffEventObject(Object sender, int id)
-	{
+	public RemoveStaffEventObject(Object sender, int id) {
 		super(sender);
 		this.id = id;
 	}
