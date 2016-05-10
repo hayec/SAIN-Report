@@ -11,24 +11,25 @@ import report.CourseBag;
  * A class which stores the data for one major.
  */
 public class Major implements Serializable {
-    String name;
-    double minGPA;
-    int numOfCreditsReq;
-    final int CREDITS_AT_SCCC = 36;
-    final int MAX_SEM_CREDITS = 19;
-    int physEdReq;
-    int hisReq;
-    int labSciReq;
-    int mathReq;
-    int humReq;
-    int busReq;
-    int engReq;
-    int comReq;
-    int amerHisReq;
-    int socSciReq;
-    int langReq;
-    int phlReq;
-    Course[] reqCourses;
+	private String name;
+    private double minGPA;
+    private int numOfCreditsReq;
+    private final int CREDITS_AT_SCCC = 36;
+    private final int MAX_SEM_CREDITS = 19;
+    private int physEdReq;
+    private int hisReq;
+    private int labSciReq;
+    private int mathReq;
+    private int humReq;
+    private int busReq;
+    private int engReq;
+    private int comReq;
+    private int amerHisReq;
+    private int socSciReq;
+    private int langReq;
+    private int phlReq;
+    private Course[] reqCourses;
+    private ElectiveFactory eFac;
     public Major(String name, int physEdReq, int hisReq, int labSciReq, int mathReq, int humReq, int busReq, int engReq, int comReq, int amerHisReq, int socSciReq, int langReq, int phlReq, int numOfCreditsReq, double minGPA, Course[] reqCourses) {
         this.name = name;
         this.physEdReq = physEdReq;
@@ -131,29 +132,29 @@ public class Major implements Serializable {
         studentCourses = tempCourse;
         int[] coursesSatisfied = getReqsNeeded(studentCourses); //Instantiate after major requirements are removed
         for (int i = 0; i < coursesSatisfied[0]; i++)
-            results.add(new Course(new CourseAttributes(true, false, false, false, false, false, false, false, false, false, false, false)));
+            results.add(eFac.getElective("Physical Education"));
         for (int i = 0; i < coursesSatisfied[1]; i++)
-            results.add(new Course(new CourseAttributes(false, true, false, false, false, false, false, false, false, false, false, false)));
+        	results.add(eFac.getElective("History"));
         for (int i = 0; i < coursesSatisfied[2]; i++)
-            results.add(new Course(new CourseAttributes(false, false, true, false, false, false, false, false, false, false, false, false)));
+        	results.add(eFac.getElective("Laboratory Science"));
         for (int i = 0; i < coursesSatisfied[3]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, true, false, false, false, false, false, false, false, false)));
+        	results.add(eFac.getElective("Mathematics"));
         for (int i = 0; i < coursesSatisfied[4]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, true, false, false, false, false, false, false, false)));
+        	results.add(eFac.getElective("Humanities"));
         for (int i = 0; i < coursesSatisfied[5]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, true, false, false, false, false, false, false)));
+        	results.add(eFac.getElective("Business"));
         for (int i = 0; i < coursesSatisfied[6]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, true, false, false, false, false, false)));
+        	results.add(eFac.getElective("English"));
         for (int i = 0; i < coursesSatisfied[7]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, true, false, false, false, false)));
+        	results.add(eFac.getElective("Communications"));
         for (int i = 0; i < coursesSatisfied[8]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, false, true, false, false, false)));
+        	results.add(eFac.getElective("American History"));
         for (int i = 0; i < coursesSatisfied[9]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, false, false, true, false, false)));
+        	results.add(eFac.getElective("Social Science"));
         for (int i = 0; i < coursesSatisfied[10]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, false, false, false, true, false)));
+        	results.add(eFac.getElective("Language"));
         for (int i = 0; i < coursesSatisfied[11]; i++)
-            results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, false, false, false, false, true)));
+        	results.add(eFac.getElective("Philosophy"));
         return results.toArray(new Course[studentCourses.size()]);
     }
     /**
