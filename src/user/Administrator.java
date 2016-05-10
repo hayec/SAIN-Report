@@ -2,7 +2,7 @@ package user;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-/*
+/**
  * A class which stores the data of one administrative user
  */
 public class Administrator implements User, Serializable {

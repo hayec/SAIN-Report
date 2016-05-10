@@ -78,7 +78,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-/*
+/**
  * The sole controller class for the SAIN Report application.  Handles and validates input from 
  * classes in the view package, and adds or retrieves data from classes in the report and user packages as necessary.
  */    
@@ -119,7 +119,7 @@ public class SAINController {
             loginView.start();
         }
     }
-    /*
+    /**
      * Sets listeners to wait for thrown event objects from the classes in the view package
      */
     public void setLoginListeners() {
@@ -165,7 +165,7 @@ public class SAINController {
             }
         });
     }
-    /*
+    /**
      * Sets listeners to wait for thrown event objects from the AdminView class in the view package
      */    
     public void setAdminListeners() {
@@ -729,7 +729,7 @@ public class SAINController {
             }
         });
     }
-    /*
+    /**
      * Sets listeners to wait for thrown event objects from the StaffView class in the view package
      */    
     public void setStaffListeners() {
@@ -931,7 +931,7 @@ public class SAINController {
             }
         });
     }
-    /*
+    /**
      * Sets listeners to wait for thrown event objects from the StudentView class in the view package
      */    
     public void setStudentListeners() {
@@ -985,7 +985,7 @@ public class SAINController {
             }
         });
     }
-    /*
+    /**
      * Sets listeners to wait for a model(CourseBag, UserBag, or MajorBag) to indicate that data has been changed.
      * Then proceeds to save data in a user specified manner. 
      */    
@@ -1009,7 +1009,7 @@ public class SAINController {
             }
         });
     }
-    /*
+    /**
      * Saves the user preference of data type to load from on startup.
      */
     public void saveSQL() {
@@ -1023,7 +1023,7 @@ public class SAINController {
 			e.printStackTrace();
 		}
     }
-    /*
+    /**
      * Loads the user preference of data type to load from on startup.
      * Default is loading from the binary data file.
      */
@@ -1037,7 +1037,7 @@ public class SAINController {
 			e.printStackTrace();
 		}
     }
-    /*
+    /**
      * Loads the program data from the user specified method.
      */
     public void loadData() throws ClassNotFoundException, IOException {
@@ -1048,7 +1048,7 @@ public class SAINController {
     		loadSqlData();
     	}
     }
-    /*
+    /**
      * Loads major, course, and user data from an SQL database.
      */
     public void loadSqlData() {
@@ -1104,7 +1104,7 @@ public class SAINController {
         }
         loading = false;
     }
-    /*
+    /**
      * Loads major, course, and user data from a binary file.
      */
     public void loadBinData() throws ClassNotFoundException, IOException {
@@ -1161,7 +1161,7 @@ public class SAINController {
             loginView.newUser();
         loading = false;
     }
-    /*
+    /**
      * Saves the program data in both binary and SQL formats
      * @return Whether or not the write was successful
      */
@@ -1171,7 +1171,7 @@ public class SAINController {
         } else
             return false;
     }
-    /*
+    /**
      * Saves the program data in both binary and SQL formats
      * @return Whether or not the write was successful
      */
@@ -1247,8 +1247,9 @@ public class SAINController {
         }
         return success;
     }
-    /*
+    /**
      * Saves major, course, and user data to a binary file.
+     * @return Success of the operation
      */
     public boolean saveBinData() {
         try {
@@ -1278,7 +1279,7 @@ public class SAINController {
             return false;
         }
     }
-    /*
+    /**
      * Generates an ID of the lowest possible unused value.
      * Value is dependant on the type of User
      * @param student Whether or not a student ID is desired

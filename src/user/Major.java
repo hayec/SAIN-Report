@@ -7,7 +7,7 @@ import java.util.Arrays;
 import report.Course;
 import report.CourseAttributes;
 import report.CourseBag;
-/*
+/**
  * A class which stores the data for one major.
  */
 public class Major implements Serializable {
@@ -50,7 +50,7 @@ public class Major implements Serializable {
     public Major() {
 
     }
-    /*
+    /**
      * Returns the number of credits required for the student to graduate, based on the fixed number of credits necessary for the major.
      * @param student The student for which the calculation is to be performed
      * @return The number of credits necessary for that student to graduate
@@ -66,7 +66,7 @@ public class Major implements Serializable {
         else
             return 0;
     }
-    /*
+    /**
      * Returns the array of courses required for the student's major which the student has completed.
      * @param student The student for which the calculation is to be performed
      * @return The array of courses necessary for the student's major which the student has completed.
@@ -83,7 +83,7 @@ public class Major implements Serializable {
         }
         return returnCourse.toArray(new Course[returnCourse.size()]);
     }
-    /*
+    /**
      * Returns the courses which the student needs to complete to fulfill the core major requirements.
      * @param studentCourses The ArrayList of courses which the student has completed
      * @return The array of courses necessary for the student's major which the student has not yet completed.
@@ -98,7 +98,7 @@ public class Major implements Serializable {
         }
         return reqCoursesTemp.toArray(new Course[reqCoursesTemp.size()]);
     }
-    /*
+    /**
      * Returns the courses which the student needs to complete to fulfill the core major requirements.
      * @param student The student for which the calculation is to be performed
      * @return The array of courses necessary for the student's major which the student has not yet completed.
@@ -107,7 +107,7 @@ public class Major implements Serializable {
         ArrayList<Course> studentCourses = new ArrayList<Course> (Arrays.asList(student.getCourseWork()));
         return getMajorCoursesReq(studentCourses);
     }
-    /*
+    /**
      * Returns the courses which the student needs to complete to fulfill the general education requirements.  These courses
      * are returned as generic courses, which are displayed via a custom Course.toString() method.
      * @param student The student for which the calculation is to be performed
@@ -156,7 +156,7 @@ public class Major implements Serializable {
             results.add(new Course(new CourseAttributes(false, false, false, false, false, false, false, false, false, false, false, true)));
         return results.toArray(new Course[studentCourses.size()]);
     }
-    /*
+    /**
      * Returns the courses which the student needs to complete to fulfill the full major requirements.
      * @param student The student for which the calculation is to be performed
      * @return The array of courses necessary for the student's major which the student has not yet completed.
@@ -179,7 +179,7 @@ public class Major implements Serializable {
         }
         return results;
     }
-    /*
+    /**
      * Returns the courses which the student has completed which don't count toward the major.
      * @param student The student for which the calculation is to be performed
      * @return The array of courses which are not applicable to the students major
@@ -201,7 +201,7 @@ public class Major implements Serializable {
         }
         return studentCourses.toArray(new Course[studentCourses.size()]);
     }
-    /*
+    /**
      * Calculates the approximate number of semesters necessary for the student to complete the selected degree.  Assumes a credit 
      * load of 18 credits per semester.
      * @param student The student for which the calculation is to be performed
@@ -247,7 +247,7 @@ public class Major implements Serializable {
             return semesters2;
         }
     }
-    /*
+    /**
      * Returns the courses which the student has completed which satisfy general education requirements for the major.
      * @param student The student for which the calculation is to be performed
      * @return The ArrayList of courses which were satisfied
@@ -356,7 +356,7 @@ public class Major implements Serializable {
         }
         return returnCourses;
     }
-    /*
+    /**
      * Calculates the number of each requirement needed to satisfy the general education requirements of the major
      * @param studentCourses The courses which the student has completed
      * @return The array of integers which contains the number of each general education requirement necessary for graduation

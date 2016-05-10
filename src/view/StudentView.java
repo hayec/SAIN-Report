@@ -46,8 +46,12 @@ public class StudentView {
     public StudentView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-    /*
+    /**
      * Creates a window which allows the user to select a major, then view a What-If Analysis or SAIN Report 
+     * @param user Currently logged in user
+     * @param student Current target
+     * @param majors Array of all defined majors
+     * @param allCourses Array of all defined courses
      */
     public void studentStart(User user, Student student, Major[] majors, Course[] allCourses) {
         studentMajor = student.getMajor(); //Save so it can be reset after What-If Analysis
@@ -97,7 +101,7 @@ public class StudentView {
         Scene scene = new Scene(pane, 1200, 400);
         primaryStage.setScene(scene);
     }
-    /*
+    /**
      * Creates a window which displays a What-If Analysis or SAIN Report
      * @param user Logged in user
      * @param student Current target
@@ -159,7 +163,7 @@ public class StudentView {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    /*
+    /**
      * Creates a window which allows the user to logout.
      * @param user The logged in user
      * @return An HBox containing the necessary event handlers and controls to allow the user to logout

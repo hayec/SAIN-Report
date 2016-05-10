@@ -46,7 +46,7 @@ import user.Major;
 import user.MajorBag;
 import user.Student;
 import user.User;
-/*
+/**
  * Displays the staff control panel and associated search windows.  This window allows staff to search for a student and generate the corresponding SAIN Report.
  * Administrators accessing this view have the added ability of editing a selected student.
  */
@@ -65,14 +65,18 @@ public class StaffView {
     public StaffView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-    /*
+    /**
      * Overloaded method which allows the courses object to be set before executing start()
+     * @param courses Array of currently declared courses
+     * @param admin Whether or not logged in user is an Administrator
+     * @param user Logged in user
+     * @param majors Array of currently declared majors
      */
     public void start(boolean admin, User user, Major[] majors, Course[] courses) {
         this.courses = courses;
         start(admin, user, majors);
     }
-    /*
+    /**
      * Displays the staff control panel and associated search windows.  This window allows staff to search for a student and generate the corresponding SAIN Report.
      * Administrators accessing this view have the added ability of editing a selected student.
      * @param admin Whether or not logged in user is an Administrator
@@ -271,7 +275,7 @@ public class StaffView {
             }
         }
     }
-    /*
+    /**
      * Allows the user to edit the previously selected student if the user is an Administrator/
      * @param user Logged in user
      * @param student Student to be edited
@@ -553,7 +557,7 @@ public class StaffView {
             }
         }
     }
-    /*
+    /**
      * Creates a window which allows the user to logout.
      * @param user The logged in user
      * @return An HBox containing the necessary event handlers and controls to allow the user to logout
@@ -647,7 +651,7 @@ public class StaffView {
     public void setListenerBack(AdminBackListener listenerBack) {
         this.listenerBack = listenerBack;
     }
-    /*
+    /**
      * Appends 0's to the beginning of the ID if necessary to create an 8-digit ID
      * @param id ID number to be parsed
      * @return Parsed ID number.  This may be equal to the original ID number, if that number was greater than 10000000

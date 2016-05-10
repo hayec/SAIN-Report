@@ -61,7 +61,7 @@ import user.Student;
 import user.User;
 import user.Major;
 import report.Course;
-/*
+/**
  * Displays the main administrative control panel and associated creation and edit windows.  All windows are accessible from this window.
  */
 public class AdminView {
@@ -84,11 +84,11 @@ public class AdminView {
     public AdminView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-    /*
+    /**
      * Displays the main administrative control panel.  All windows are accessible from this window.
      * @param user Administrator which is currently logged in
      * @param majorsIn An array of the currently defined majors
-     * @param coursesIN An array of the currently defined courses
+     * @param coursesIn An array of the currently defined courses
      */
     public void adminView(Administrator user, Major[] majorsIn, Course[] coursesIn) {
         majors = majorsIn;
@@ -447,13 +447,13 @@ public class AdminView {
         primaryStage.setTitle("Administrative View");
         primaryStage.show();
     }
-    /*
+    /**
      * Creates a window which allows the user to create a new account of any desired type.
      * @param user Administrator which is currently logged in
      * @param admin User to be created is Administrator
      * @param student User to be created is Student
      * @param majorsIn An array of the currently defined majors
-     * @param coursesIN An array of the currently defined courses
+     * @param coursesIn An array of the currently defined courses
      */
     public void createAccount(Administrator user, boolean admin, boolean student, Major[] majorsIn, Course[] coursesIn) {
         majors = majorsIn;
@@ -622,7 +622,7 @@ public class AdminView {
         primaryStage.setTitle("SAIN Report");
         primaryStage.show();
     }
-    /*
+    /**
      * Creates a window which allows the user to create or edit a previously selected course.
      * @param edit Whether or not the course is to be edited
      * @param course Course to be edited, if necessary
@@ -869,7 +869,7 @@ public class AdminView {
         newCourseStage.setScene(scene);
         newCourseStage.showAndWait();
     }
-    /*
+    /**
      * Creates a window which allows the user to create or edit a previously selected major.
      * @param edit Whether or not the major is to be edited
      * @param major Major to be edited, if necessary
@@ -1060,7 +1060,7 @@ public class AdminView {
         }
         newMajorStage.showAndWait();
     }
-    /*
+    /**
      * Creates a window which allows the user to edit a previously selected faculty account.
      * @param user The user to be edited
      * @param admin The logged in user
@@ -1185,7 +1185,7 @@ public class AdminView {
         primaryStage.setTitle("Save Data");
         primaryStage.show();
     }
-    /*
+    /**
      * Creates a window which allows the user to logout.
      * @param user The logged in user
      * @return An HBox containing the necessary event handlers and controls to allow the user to logout
@@ -1294,7 +1294,7 @@ public class AdminView {
     public void setListenerSQL(SQLListener listenerSQL) {
     	this.listenerSQL = listenerSQL;
     }
-    /*
+    /**
      * Appends 0's to the beginning of the ID if necessary to create an 8-digit ID
      * @param id ID number to be parsed
      * @return Parsed ID number.  This may be equal to the original ID number, if that number was greater than 10000000

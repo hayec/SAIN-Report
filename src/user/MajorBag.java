@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import eventHandlers.ModelChangedEventObject;
 import eventHandlers.ModelListener;
 import report.Course;
-/*
+/**
  * Contains an ArrayList of Majors.  Implements a variety algorithms for conveniently adding, removing, and searching for majors.
  */
 public class MajorBag {
     private ArrayList < Major > majors = new ArrayList < Major > ();
     private ModelListener listenerModel;
-    /*
+    /**
      * Adds the specified major to the ArrayList.
      * @param major Major to add.
      */
@@ -21,7 +21,7 @@ public class MajorBag {
             listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
         }
     }
-    /*
+    /**
      * Adds all majors in the specified array to the ArrayList.
      * @param newMajors Array of majors to add.
      */
@@ -32,9 +32,10 @@ public class MajorBag {
             listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
         }
     }
-    /*
+    /**
      * Returns the specified major from the ArrayList.  If the major is not found, null is returned instead.
      * @param major Name of the major to be searched for
+     * @return Search results
      */
     public Major getMajor(String major) {
         Major returnMajor = null;
@@ -46,7 +47,7 @@ public class MajorBag {
         }
         return returnMajor;
     }
-    /*
+    /**
      * Removes the specified major from the ArrayList
      * @param major Name of the major to be removed
      */
@@ -60,14 +61,14 @@ public class MajorBag {
             listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
         }
     }
-    /*
+    /**
      * Returns all majors in the ArrayList
      * @return The array of all majors in the ArrayList
      */
     public Major[] getMajors() {
         return majors.toArray(new Major[majors.size()]);
     }
-    /*
+    /**
      * Returns the names of all majors in the ArrayList
      * @return The string array of the names of all of the majors in the ArrayList
      */

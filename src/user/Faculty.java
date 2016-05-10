@@ -2,7 +2,7 @@ package user;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-/*
+/**
  * A class which stores the data of one faculty user
  */
 public class Faculty implements User, Serializable {

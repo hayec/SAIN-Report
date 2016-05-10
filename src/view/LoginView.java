@@ -28,7 +28,7 @@ import user.User;
 import java.util.Optional;
 
 import eventHandlers.*;
-/*
+/**
  * Contains windows which allow a user to login, or create a default account if none exist
  */
 public class LoginView {
@@ -38,7 +38,7 @@ public class LoginView {
     public LoginView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-    /*
+    /**
      * Creates a window which allows a user to login.
      */
     public void start() {
@@ -99,7 +99,7 @@ public class LoginView {
         primaryStage.setTitle("Login");
         primaryStage.show();
     }
-    /*
+    /**
      * Creates a window which allows a user to create a default account if no user accounts are found
      */
     public void newUser() {

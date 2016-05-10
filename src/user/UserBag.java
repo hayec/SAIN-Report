@@ -3,7 +3,7 @@ package user;
 import java.util.ArrayList;
 import eventHandlers.ModelChangedEventObject;
 import eventHandlers.ModelListener;
-/*
+/**
  * Contains an ArrayList of Users.  Implements a variety algorithms for conveniently adding, removing, and searching for users.
  */
 
@@ -11,7 +11,7 @@ public class UserBag
 {
 	private ArrayList<User> users = new ArrayList<User>();
 	private ModelListener listenerModel;
-	  /*
+	  /**
      * Adds the specified user to the ArrayList.
      * @param user User to add.
      */
@@ -24,7 +24,7 @@ public class UserBag
 			}
 		}
 	}
-	/*
+	/**
      * Adds all users in the specified array to the ArrayList.
      * @param newUsers Array of users to add.
      */
@@ -39,9 +39,10 @@ public class UserBag
 			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
-	 /*
+	 /**
      * Returns the specified user from the ArrayList.  If the user is not found, null is returned instead.
      * @param id ID number of the user to be searched for
+     * @return Search results
      */
 	public User getUser(int id)
 	{
@@ -55,9 +56,10 @@ public class UserBag
 		}
 		return returnUser;
 	}
-	 /*
+	 /**
      * Returns the specified user from the ArrayList.  If the user is not found, null is returned instead.
      * @param username Username of the user to be searched for
+     * @return Search results
      */
 	public User getUser(String username)
 	{
@@ -71,7 +73,7 @@ public class UserBag
 		}
 		return returnUser;
 	}
-	 /*
+	 /**
      * Removes the specified user from the ArrayList
      * @param id ID number of the user to be removed
      */
@@ -89,7 +91,7 @@ public class UserBag
 			listenerModel.modelChanged(new ModelChangedEventObject(new Object()));
 		}
 	}
-	/*
+	/**
      * Returns all users in the ArrayList
      * @return The array of all users in the ArrayList
      */
@@ -97,7 +99,7 @@ public class UserBag
 	{
 		return users.toArray(new User[users.size()]);
 	}
-	/*
+	/**
      * Returns all users in the ArrayList with the specified values.  Blank or null strings are ignored as search terms, as are integers with negative values.
      * @return The array of all users in the ArrayList which meet the criteria.
      */
@@ -166,7 +168,7 @@ public class UserBag
 			returnUser = userResults.toArray(new User[userResults.size()]);
 		return returnUser;
 	}
-	/*
+	/**
      * Returns all students in the ArrayList with the specified values.  Blank or null strings are ignored as search terms, as are integers with negative values.
      * @return The array of all students in the ArrayList which meet the criteria.
      */
@@ -257,7 +259,7 @@ public class UserBag
 			returnStudent = studentResults.toArray(new Student[studentResults.size()]);
 		return returnStudent;
 	}
-	/*
+	/**
      * Returns all students in the ArrayList
      * @return The array of all students in the ArrayList
      */
@@ -272,7 +274,7 @@ public class UserBag
 		}
 		return returnStudents.toArray(new Student[returnStudents.size()]);
 	}
-	/*
+	/**
      * Returns all administrators in the ArrayList
      * @return The array of all administrators in the ArrayList
      */

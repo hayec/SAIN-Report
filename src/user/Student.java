@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import report.Course;
 import report.CourseBag;
 import java.util.ArrayList;
-/*
+/**
  * A class which stores the data for one student
  */
 public class Student implements User, Serializable {
@@ -98,7 +98,7 @@ public class Student implements User, Serializable {
     public String getName() {
         return firstName + " " + lastName;
     }
-    /*
+    /**
      * Validates a given hashed password
      * @param password Hashed password to be verified
      * @return Whether or not the password is valid
@@ -128,7 +128,7 @@ public class Student implements User, Serializable {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    /*
+    /**
      * Calculates the students gpa based upon the grade in each course.
      * @return The student's calculated gpa
      */
@@ -255,7 +255,7 @@ public class Student implements User, Serializable {
     public String toString() {
         return getLastName() + ", " + getFirstName() + " " + parseId(getId());
     }
-    /*
+    /**
      * Appends 0's to the beginning of the ID if necessary to create an 8-digit ID
      * @param id ID number to be parsed
      * @return Parsed ID number.  This may be equal to the original ID number, if that number was greater than 10000000
